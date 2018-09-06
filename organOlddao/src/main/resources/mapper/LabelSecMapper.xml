@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.organOld.dao.repository.LabelSecDao">
+
+    <select id="getByFirType" resultType="com.organOld.dao.entity.label.LabelSec">
+
+        SELECT * from label_type WHERE 1=1
+        <if test="type!=0">
+            and fir_index=#{type}
+        </if>
+    </select>
+
+
+    <select id="getByPage" parameterType="com.organOld.dao.util.Page" resultType="com.organOld.dao.entity.label.LabelSec">
+    SELECT lt.id,lt.sec_name,lt.time,f.value firName
+    FROM label_type lt,auto_value f
+    WHERE lt.fir_index=f.id
+    <if test="sortType!=null and sortType!=''">
+        ORDER BY lt.${sortType}
+    </if>
+    <if test="sort!=null and sort!=''">
+        ${sort}
+    </if>
+    <if test="length!=null and length!=0">
+        limit #{start},#{length}
+    </if>
+</select>
+
+    <select id="getSizeByPage" parameterType="com.organOld.dao.util.Page" resultType="java.lang.Long">
+        SELECT count(1)
+        FROM label_type lt,auto_value f
+        WHERE lt.fir_index=f.id
+    </select>
+
+
+    <insert id="save" parameterType="com.organOld.dao.entity.label.LabelSec">
+        INSERT into label_type(fir_index,sec_name)
+        VALUES (#{firIndex},#{secName})
+    </insert>
+
+    <update id="updateById" parameterType="com.organOld.dao.entity.label.LabelSec">
+        UPDATE label_type
+        set fir_index=#{firIndex},sec_name=#{secName}
+        where id=#{id}
+    </update>
+</mapper>

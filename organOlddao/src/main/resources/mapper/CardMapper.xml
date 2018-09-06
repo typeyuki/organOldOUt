@@ -1,0 +1,162 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.organOld.dao.repository.CardDao">
+
+    <resultMap id="card" type="com.organOld.dao.entity.Card">
+        <id property="id" column="id" />
+        <id property="username" column="cid" />
+        <id property="status" column="status" />
+        <id property="money" column="money" />
+        <id property="password" column="password" />
+        <id property="isCreate" column="is_create" />
+        <result property="time" column="time" />
+        <association property="oldman" javaType="com.organOld.dao.entity.oldman.Oldman">
+            <id property="id" column="oid" />
+            <result property="name" column="name"/>
+        </association>
+    </resultMap>
+
+    <insert id="saveAll" parameterType="java.util.List">
+        INSERT into card(oldman_id,cid,password)
+        VALUES
+        <foreach collection="list" item="item" index="index" separator=",">
+            (#{item.oldmanId},#{item.cid},#{item.password})
+        </foreach>
+    </insert>
+
+    <update id="delByOldmanIds" parameterType="java.util.List">
+        UPDATE card c,oldman_base o SET c.status=3
+        WHERE c.oldman_id=o.id and
+        c.oldman_id not IN
+        <foreach collection="existOldmanIds" index="index" item="item" separator="," open="(" close=")">
+            #{item}
+        </foreach>
+        <if test="xqIds!=null">
+            and o.xq_id IN
+            <foreach collection="xqIds" index="index" item="item" separator="," open="(" close=")">
+                #{item}
+            </foreach>
+        </if>
+    </update>
+    <update id="ableByOldmanIds" parameterType="java.util.List">
+        UPDATE card c,oldman_base o SET c.status=1
+        WHERE c.oldman_id=o.id and
+        c.oldman_id  IN
+        <foreach collection="existOldmanIds" index="index" item="item" separator="," open="(" close=")">
+            #{item}
+        </foreach>
+        <if test="xqIds!=null">
+            and o.xq_id IN
+            <foreach collection="xqIds" index="index" item="item" separator="," open="(" close=")">
+                #{item}
+            </foreach>
+        </if>
+    </update>
+
+
+    <select id="getByPage" parameterType="com.organOld.dao.util.Page" resultMap="card">
+        SELECT c.id,c.cid,c.password,c.status,c.is_create,ob.id oid,ob.name,c.time,c.money
+        FROM card c,oldman_base ob
+        WHERE ob.id=c.oldman_id
+        <if test="entity.status!=null and entity.status!=0">
+            and c.status=#{entity.status}
+        </if>
+        <if test="entity.isCreate!=null">
+            and c.is_create=#{entity.isCreate}
+        </if>
+        <if test="entity!=null and entity.search!=null and entity.search!=''">
+            and (c.cid LIKE  concat('%',#{entity.search},'%') OR ob.name LIKE  concat('%',#{entity.search},'%'))
+        </if>
+        <if test="sortType!=null and sortType!=''">
+            ORDER BY ob.${sortType}
+        </if>
+        <if test="sort!=null and sort!=''">
+            ${sort}
+        </if>
+        <if test="length!=null and length!=0">
+            limit #{start},#{length}
+        </if>
+    </select>
+
+    <select id="getSizeByPage" parameterType="com.organOld.dao.util.Page" resultType="java.lang.Long">
+        SELECT count(1)
+        FROM card c,oldman_base ob
+        WHERE ob.id=c.oldman_id
+        <if test="entity.status!=null and entity.status!=0">
+            and c.status=#{entity.status}
+        </if>
+        <if test="entity.isCreate!=null">
+            and c.is_create=#{entity.isCreate}
+        </if>
+        <if test="entity!=null and entity.search!=null and entity.search!=''">
+            and (c.cid LIKE  concat('%',#{entity.search},'%') OR ob.name LIKE  concat('%',#{entity.search},'%'))
+        </if>
+    </select>
+
+
+    <select id="getById" resultType="com.organOld.dao.entity.Card">
+        SELECT *
+        FROM card WHERE id=#{id} and status=1
+    </select>
+
+    <select id="getByCid" resultType="com.organOld.dao.entity.Card">
+        SELECT *
+        FROM card WHERE cid=#{cid}
+    </select>
+
+    <update id="addMoney">
+        UPDATE card
+        SET money=money+${money}
+        WHERE id in
+        <foreach collection="ids" index="index" item="item" separator="," open="(" close=")">
+            #{item}
+        </foreach>
+    </update>
+
+    <update id="updateProps">
+        UPDATE card
+        SET ${prop}=#{value}
+        WHERE id in
+        <foreach collection="ids" index="index" item="item" separator="," open="(" close=")">
+            #{item}
+        </foreach>
+    </update>
+
+
+    <select id="getByOldmanId" resultType="com.organOld.dao.entity.Card">
+        SELECT * from card where oldman_id=#{oldmanId}
+    </select>
+
+
+    <update id="updateProp">
+        UPDATE card
+        SET ${prop}=#{value}
+        WHERE id=#{id}
+    </update>
+
+    <delete id="delByIds">
+        DELETE from card where id in
+        <foreach collection="array" index="index" item="item" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+    </delete>
+
+    <insert id="save" parameterType="com.organOld.dao.entity.Card">
+        INSERT into card(cid,password,oldman_id)
+        VALUE (#{cid},#{password},#{oldmanId})
+    </insert>
+
+    <select id="getQrDataByIds" resultType="com.organOld.dao.util.bean.QrCodeData">
+        SELECT c.id,c.cid,o.name FROM card c,oldman_base o where c.oldman_id=o.id  and is_create=0  and c.id IN
+        <foreach collection="array" index="index" item="item" separator="," open="(" close=")">
+            #{item}
+        </foreach>
+    </select>
+
+    <update id="updateById" parameterType="com.organOld.dao.entity.Card">
+        UPDATE card
+        SET password=#{password},is_create=#{isCreate},cid=#{cid}
+        WHERE id=#{id}
+    </update>
+
+</mapper>

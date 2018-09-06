@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.organOld.dao.repository.RecordDao">
+
+    <resultMap id="record" type="com.organOld.dao.entity.record.Record">
+        <id property="id" column="id" />
+        <result property="data" column="data"/>
+        <result property="type" column="type"/>
+        <result property="prevMoney" column="prev_money"/>
+        <result property="nowMoney" column="now_money"/>
+        <result property="order" column="order"/>
+        <result property="time" column="time" />
+        <association property="oldman" javaType="com.organOld.dao.entity.oldman.Oldman">
+            <id property="id" column="oid" />
+            <result property="name" column="name"/>
+        </association>
+        <association property="organ" javaType="com.organOld.dao.entity.organ.Organ">
+            <id property="id" column="orgid" />
+            <result property="name" column="orgname"/>
+        </association>
+    </resultMap>
+    <select id="getByPage" parameterType="com.organOld.dao.util.Page" resultMap="record">
+        SELECT r.id,r.data,r.time,r.type,r.order,r.prev_money,r.now_money,o.id oid,o.name,org.id orgid,org.name orgname
+        FROM record r left JOIN organ org on org.id=r.organ_id,oldman_base o
+        WHERE r.oldman_id=o.id and type=#{entity.type}
+        <if test="entity.organId!=null and entity.organId!=0">
+            and r.organ_id=#{entity.organId}
+        </if>
+        <if test="entity.start!=null">
+            <![CDATA[
+            and DATE_FORMAT(r.time,'%Y%m%d') >= DATE_FORMAT(#{entity.start},'%Y%m%d')
+            ]]>
+        </if>
+        <if test="entity.end!=null">
+            <![CDATA[
+            and DATE_FORMAT(r.time,'%Y%m%d') <= DATE_FORMAT(#{entity.end},'%Y%m%d')
+            ]]>
+        </if>
+        <if test="sortType!=null and sortType!=''">
+            ORDER BY r.time
+        </if>
+        <if test="sort!=null and sort!=''">
+            desc
+        </if>
+        <if test="length!=null and length!=0">
+            limit #{start},#{length}
+        </if>
+    </select>
+
+    <select id="getMoneySum" resultType="java.lang.Double">
+        SELECT sum(data) from record where type=1
+        <if test="organId!=null and organId!=0">
+            and organ_id=#{organId}
+        </if>
+        <if test="start!=null">
+            <![CDATA[
+            and DATE_FORMAT(time,'%Y%m%d') >= DATE_FORMAT(#{start},'%Y%m%d')
+            ]]>
+        </if>
+        <if test="end!=null">
+            <![CDATA[
+            and DATE_FORMAT(time,'%Y%m%d') <= DATE_FORMAT(#{end},'%Y%m%d')
+            ]]>
+        </if>
+    </select>
+
+    <select id="getSizeByPage" parameterType="com.organOld.dao.util.Page" resultType="java.lang.Long">
+        SELECT count(1)
+        FROM record r left JOIN organ org on org.id=r.organ_id,oldman_base o
+        WHERE r.oldman_id=o.id and type=#{entity.type}
+        <if test="entity.organId!=null and entity.organId!=0">
+            and organ_id=#{entity.organId}
+        </if>
+    </select>
+
+
+    <insert id="save" parameterType="com.organOld.dao.entity.record.Record">
+        INSERT into record(organ_id,oldman_id,`type`,`data`,prev_money,now_money,`order`)
+        VALUES (#{organId},#{oldmanId},#{type},#{data},#{prevMoney},#{nowMoney},#{order})
+    </insert>
+
+    <insert id="saveAll" parameterType="com.organOld.dao.entity.record.Record">
+        INSERT into record(organ_id,oldman_id,`type`,`data`,prev_money,now_money,`order`)
+        VALUES
+        <foreach collection="list" item="item" index="index" separator=",">
+            (#{item.organId},#{item.oldmanId},#{item.type},#{item.data},#{item.prevMoney},#{item.nowMoney},#{item.order})
+        </foreach>
+
+    </insert>
+
+    <select id="getByCardPage" parameterType="com.organOld.dao.util.Page" resultMap="record">
+        SELECT r.id,r.data,r.time,r.type,r.order,r.prev_money,r.now_money,org.id orgid,org.name orgname
+        FROM record r LEFT JOIN organ org on org.id=r.organ_id,card c
+        WHERE r.oldman_id=c.oldman_id and c.id=#{entity.cardId}
+        <if test="entity.type==null or entity.type==0">
+            and r.type != 9
+        </if>
+        <if test="entity.type!=null and entity.type!=0">
+            and r.type=#{entity.type}
+        </if>
+        <if test="entity.start!=null">
+            <![CDATA[
+            and DATE_FORMAT(r.time,'%Y%m%d') >= DATE_FORMAT(#{entity.start},'%Y%m%d')
+            ]]>
+        </if>
+        <if test="entity.end!=null">
+            <![CDATA[
+            and DATE_FORMAT(r.time,'%Y%m%d') <= DATE_FORMAT(#{entity.end},'%Y%m%d')
+            ]]>
+        </if>
+        <if test="sortType!=null and sortType!=''">
+            ORDER BY r.time
+        </if>
+        <if test="sort!=null and sort!=''">
+            DESC
+        </if>
+        <if test="length!=null and length!=0">
+            limit #{start},#{length}
+        </if>
+    </select>
+
+    <select id="getSizeByCardPage" parameterType="com.organOld.dao.util.Page" resultType="java.lang.Long">
+        SELECT count(1)
+        FROM record r LEFT JOIN organ org on org.id=r.organ_id,card c
+        WHERE r.oldman_id=c.oldman_id and c.id=#{entity.cardId}
+        <if test="entity.type==null or entity.type==0">
+            and r.type != 9
+        </if>
+        <if test="entity.type!=null and entity.type!=0">
+            and r.type=#{entity.type}
+        </if>
+        <if test="entity.start!=null">
+            <![CDATA[
+            and DATE_FORMAT(r.time,'%Y%m%d') >= DATE_FORMAT(#{entity.start},'%Y%m%d')
+            ]]>
+        </if>
+        <if test="entity.end!=null">
+            <![CDATA[
+            and DATE_FORMAT(r.time,'%Y%m%d') <= DATE_FORMAT(#{entity.end},'%Y%m%d')
+            ]]>
+        </if>
+    </select>
+</mapper>

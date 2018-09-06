@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.organOld.dao.repository.MenuDao">
+
+    <resultMap id="menuTree" type="com.organOld.dao.util.MenuTree">
+        <id property="id" column="id" />
+        <result property="name" column="name" />
+        <result property="url" column="url"/>
+        <result property="sequence" column="sequence"/>
+        <result property="icon" column="icon"/>
+        <collection property="children" ofType="com.organOld.dao.util.MenuTree">
+            <id property="id" column="cid" />
+            <result property="name" column="cname" />
+            <result property="url" column="curl"/>
+            <result property="sequence" column="csequence"/>
+            <collection property="children" ofType="com.organOld.dao.util.MenuTree">
+                <id property="id" column="ccid" />
+                <result property="name" column="ccname" />
+                <result property="url" column="ccurl"/>
+                <result property="sequence" column="ccsequence"/>
+            </collection>
+        </collection>
+    </resultMap>
+
+    <select id="getAllMenuTree" resultMap="menuTree">
+        SELECT m.id,m.name,m.url,m.sequence,m.icon,
+        mc.id cid,mc.name cname,mc.url curl,mc.sequence csequence,
+        mcc.id ccid,mcc.name ccname,mcc.url ccurl,mcc.sequence ccsequence
+        FROM sysmenu m LEFT JOIN sysmenu mc on mc.pid=m.id LEFT JOIN sysmenu mcc on mcc.pid=mc.id
+        WHERE m.pid=0 ORDER BY m.sequence,mc.sequence,mcc.sequence
+    </select>
+
+
+    <select id="getMenuTreeByAuthentications" resultMap="menuTree">
+        SELECT m.id,m.name,m.url,m.sequence,m.icon,
+        mc.id cid,mc.name cname,mc.url curl,mc.sequence csequence,
+        mcc.id ccid,mcc.name ccname,mcc.url ccurl,mcc.sequence ccsequence
+        FROM sysauthority auth,auth_menu am,sysmenu m LEFT JOIN sysmenu mc on mc.pid=m.id and mc.id in
+        (Select am.menu_id from auth_menu am,sysauthority auth where auth.au_name IN
+        <foreach collection="list" index="index" item="item" open="(" separator="," close=")">
+            #{item}
+        </foreach> and auth.id=am.auth_id)
+        LEFT JOIN sysmenu mcc on mcc.pid=mc.id
+        WHERE m.pid=0 AND
+            auth.au_name IN
+            <foreach collection="list" index="index" item="item" open="(" separator="," close=")">
+                #{item}
+            </foreach>
+        AND
+        am.auth_id=auth.id AND am.menu_id=m.id
+        ORDER BY m.sequence,mc.sequence,mcc.sequence
+    </select>
+</mapper>

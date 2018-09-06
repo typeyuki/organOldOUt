@@ -1,0 +1,332 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.organOld.dao.repository.OrganDao">
+
+    <select id="getSimpleByType" resultType="com.organOld.dao.entity.organ.Organ">
+        SELECT id,name
+        FROM organ
+        WHERE organ_type_id=#{type}
+        <if test="organId!=null and organId!=0">
+            AND parent=#{organId}
+        </if>
+
+    </select>
+
+
+    <select id="getNumByType" resultType="java.lang.Long">
+        SELECT count(1) from organ where organ_type_id=#{type}
+        <if test="organId!=null and organId!=0">
+            and parent=#{organId}
+        </if>
+    </select>
+    <select id="getByPage" parameterType="com.organOld.dao.util.Page" resultType="com.organOld.dao.entity.organ.Organ">
+        SELECT o.id,o.name,o.intro,o.address,o.phone,o.service_time,o.num,o.num_in,o.num_remain,o.status,ot.sec_type organType,d.value districtName,o.time,o.auth_consume,o.auth_product,o.auth_sign,o.auth_query_info,o.auth_query_integral
+        FROM organ o LEFT JOIN auto_value d on d.id=o.district_id,organ_type ot
+        WHERE o.organ_type_id=ot.id AND ot.fir_type=#{entity.organFirTypeId} and o.disable=0
+        <if test="entity.status!=null and entity.status=='3'.toString()">
+                AND (o.status=3 or o.status=4)
+        </if>
+        <if test="entity.status!=null and entity.status!='' and entity.status!='3'.toString()">
+            AND o.status=#{entity.status}
+        </if>
+        <if test="entity!=null and entity.search!=null and entity.search!=''">
+            and (
+            o.name LIKE  concat('%',#{entity.search},'%') OR o.intro LIKE  concat('%',#{entity.search},'%')
+            OR o.address LIKE  concat('%',#{entity.search},'%') OR o.phone LIKE  concat('%',#{entity.search},'%')
+            OR o.id=#{entity.search}
+            )
+        </if>
+        <if test="sortType!=null and sortType!=''">
+            ORDER BY ${sortType}
+        </if>
+        <if test="sort!=null and sort!=''">
+            ${sort}
+        </if>
+        <if test="length!=null and length!=0">
+            limit #{start},#{length}
+        </if>
+    </select>
+
+    <select id="getSizeByPage" parameterType="com.organOld.dao.util.Page" resultType="java.lang.Long">
+        SELECT count(1)
+        FROM organ o,organ_type ot
+        WHERE o.organ_type_id=ot.id AND ot.fir_type=#{entity.organFirTypeId} and o.disable=0
+        <if test="entity!=null and entity.status!=null and entity.status=='3'.toString()">
+            AND (o.status=3 or o.status=4)
+        </if>
+        <if test="entity!=null and entity.status!=null and entity.status!='' and entity.status!='3'.toString()">
+            AND o.status=#{entity.status}
+        </if>
+        <if test="entity!=null and entity.search!=null and entity.search!=''">
+            and (
+            o.name LIKE  concat('%',#{entity.search},'%') OR o.intro LIKE  concat('%',#{entity.search},'%')
+            OR o.address LIKE  concat('%',#{entity.search},'%') OR o.phone LIKE  concat('%',#{entity.search},'%')
+            OR o.id=#{entity.search}
+            )
+        </if>
+    </select>
+
+
+    <select id="getByUsername" parameterType="com.organOld.dao.util.Page" resultType="com.organOld.dao.entity.organ.Organ">
+        SELECT o.id,o.name,o.intro,o.address,o.phone,o.num,o.num_in,o.num_remain,ot.fir_type organFirTypeId,
+        ot.sec_type organType,ot.fir_type organTypeId,d.value districtName,o.work,o.service_time,o.web_url,o.img_url,o.require,o.institution
+        FROM organ o LEFT JOIN auto_value d on d.id=o.district_id,organ_type ot,sysuser u,user_organ uo
+        WHERE o.organ_type_id=ot.id AND o.id=uo.organ_id AND uo.user_id=u.id AND u.username=#{username}
+    </select>
+
+
+    <insert id="save" parameterType="com.organOld.dao.entity.organ.Organ" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO organ(
+        organ_type_id,name,intro,work,service_time,address,phone,web_url,img_url,num,auth_consume,auth_product,auth_sign,auth_query_info,auth_query_integral
+        <if test="require!=null and require!=''">
+            ,require
+        </if>
+        <if test="institution!=null and institution!=''">
+            ,institution
+        </if>
+        <if test="numIn!=null and numIn!=''">
+            ,num_in
+        </if>
+        <if test="numRemain!=null and numRemain!=''">
+            ,num_remain
+        </if>
+        <if test="status!=null and status!=''">
+            ,status
+        </if>
+        <if test="districtId!=null and districtId!=''">
+            ,district_id
+        </if>
+        <if test="parent!=null and parent!=0">
+            ,parent
+        </if>
+        )
+        VALUES (
+        #{organTypeId},#{name},#{intro},#{work},#{serviceTime},#{address},#{phone},#{webUrl},#{imgUrl},#{num},#{authConsume},#{authProduct},#{authSign},#{authQueryInfo},#{authQueryIntegral}
+        <if test="require!=null and require!=''">
+            ,#{require}
+        </if>
+        <if test="institution!=null and institution!=''">
+            ,#{institution}
+        </if>
+        <if test="numIn!=null and numIn!=''">
+            ,#{numIn}
+        </if>
+        <if test="numRemain!=null and numRemain!=''">
+            ,#{numRemain}
+        </if>
+        <if test="status!=null and status!=''">
+            ,#{status}
+        </if>
+        <if test="districtId!=null and districtId!=''">
+            ,#{districtId}
+        </if>
+        <if test="parent!=null and parent!=0">
+            ,#{parent}
+        </if>
+        )
+    </insert>
+
+    <select id="getAuthById" resultType="com.organOld.dao.entity.organ.Organ">
+        SELECT auth_consume,auth_product,auth_sign,auth_query_info,auth_query_integral from organ WHERE id=#{organId}
+    </select>
+
+    <update id="updateById" parameterType="com.organOld.dao.entity.organ.Organ">
+        UPDATE organ
+        SET id=#{id}
+        <if test="status!=null and status!=''">
+            ,status=#{status}
+        </if>
+        <if test="authConsume!=null and authConsume!=''">
+            ,auth_consume=#{authConsume}
+        </if>
+        <if test="authProduct!=null and authProduct!=''">
+            ,auth_product=#{authProduct}
+        </if>
+        <if test="authSign!=null and authSign!=''">
+            ,auth_sign=#{authSign}
+        </if>
+        <if test="authQueryInfo!=null and authQueryInfo!=''">
+            ,auth_query_info=#{authQueryInfo}
+        </if>
+        <if test="authQueryIntegral!=null and authQueryIntegral!=''">
+            ,auth_query_integral=#{authQueryIntegral}
+        </if>
+        <if test="require!=null and require!=''">
+            ,`require`=#{require}
+        </if>
+        <if test="institution!=null and institution!=''">
+            ,institution=#{institution}
+        </if>
+        <if test="numIn!=null and numIn!=''">
+            ,num_in=#{numIn}
+        </if>
+        <if test="numRemain!=null and numRemain!=''">
+            ,num_remain=#{numRemain}
+        </if>
+        <if test="districtId!=null and districtId!=''">
+            ,district_id=#{districtId}
+        </if>
+        <if test="organTypeId!=null and organTypeId!=0">
+            ,organ_type_id=#{organTypeId}
+        </if>
+        <if test="name!=null and name!=''">
+            ,name=#{name}
+        </if>
+        <if test="intro!=null and intro!=''">
+          ,intro=#{intro}
+        </if>
+        <if test="work!=null and work!=''">
+          ,work=#{work}
+        </if>
+        <if test="serviceTime!=null and serviceTime!=''">
+          ,service_time=#{serviceTime}
+        </if>
+        <if test="address!=null and address!=''">
+          ,address=#{address}
+        </if>
+        <if test="phone!=null and phone!=''">
+          ,phone=#{phone}
+        </if>
+        <if test="webUrl!=null and webUrl!=''">
+          ,web_url=#{webUrl}
+        </if>
+        <if test="imgUrl!=null and imgUrl!=''">
+          ,img_url=#{imgUrl}
+        </if>
+        <if test="num!=null and num!=0">
+          ,num=#{num}
+        </if>
+        <if test="parent!=null and parent!=0">
+          ,parent=#{parent}
+        </if>
+        WHERE id=#{id}
+    </update>
+
+
+    <select id="getRoleOrgan" resultType="com.organOld.dao.entity.organ.Organ">
+        SELECT o.id,o.name
+        FROM organ o,organ_type ot
+        WHERE o.organ_type_id=ot.id
+        <if test="type==1">
+            <if test="typeIndex==2">
+                and (ot.fir_type=21 or ot.fir_type=22)
+            </if>
+            <if test="typeIndex!=2">
+                and ot.fir_type=#{typeIndex}
+            </if>
+
+        </if>
+        <if test="type==2">
+            and ot.id=#{typeIndex}
+        </if>
+    </select>
+
+
+    <insert id="saveAll" parameterType="java.util.List">
+        INSERT into organ(organ_type_id,name,intro,work,service_time,address,phone,web_url,img_url,num,`require`,institution,num_in,num_remain,status,district_id)
+        VALUES
+        <foreach collection="list" item="item" index="index" separator=",">
+            (
+            #{item.organTypeId},#{item.name},#{item.intro},#{item.work},#{item.serviceTime},#{item.address},#{item.phone},#{item.webUrl},#{item.imgUrl},#{item.num}
+                ,#{item.require}
+                ,#{item.institution}
+                ,#{item.numIn}
+                ,#{item.numRemain}
+                ,#{item.status}
+                ,#{item.districtId}
+            )
+        </foreach>
+    </insert>
+
+    <select id="getById" resultType="com.organOld.dao.entity.organ.Organ">
+         SELECT o.id,o.name,o.intro,o.address,ot.fir_type organFirTypeId,o.phone,o.num,o.num_in,o.num_remain,o.parent,o.auth_consume,o.auth_product,o.auth_sign,o.auth_query_info,o.auth_query_integral,
+        ot.sec_type organType,ot.id organTypeId,d.value districtName,o.work,o.service_time,o.web_url,o.img_url,o.require,o.institution
+        FROM organ o LEFT JOIN auto_value d on d.id=o.district_id,organ_type ot
+        WHERE o.id=#{id} and ot.id=o.organ_type_id
+    </select>
+
+
+
+    <select id="getByType" resultType="com.organOld.dao.entity.organ.Organ">
+        SELECT * from organ where organ_type_id=#{type}
+    </select>
+
+    <select id="getByTypes" resultType="com.organOld.dao.entity.organ.Organ">
+        select id,name from organ WHERE
+        organ_type_id in
+        <foreach collection="list" index="index" item="item" open="(" separator="," close=")">
+            ${item}
+        </foreach>
+    </select>
+
+
+    <select id="getByIds" resultType="com.organOld.dao.entity.organ.Organ">
+        select id,name from organ WHERE
+        id in
+        <foreach collection="list" index="index" item="item" open="(" separator="," close=")">
+            ${item}
+        </foreach>
+    </select>
+
+    <select id="getByFirType" resultType="com.organOld.dao.entity.organ.Organ">
+        SELECT o.id,o.name
+        FROM organ o,organ_type ot
+        WHERE o.organ_type_id=ot.id and ot.fir_type=#{firType}
+    </select>
+
+
+    <update id="updateProps">
+        UPDATE organ
+        SET ${prop}=#{value}
+        WHERE id in
+        <foreach collection="ids" index="index" item="item" separator="," open="(" close=")">
+            #{item}
+        </foreach>
+    </update>
+
+    <select id="getIdByName" resultType="java.lang.Integer">
+        SELECT id from organ where name=#{name}
+    </select>
+
+
+    <select id="getAll" resultType="com.organOld.dao.entity.organ.Organ">
+        select id,name from organ
+    </select>
+    <select id="getAllSize" resultType="java.lang.Long">
+        select count(1) from organ
+    </select>
+
+    <update id="updateAuth">
+        UPDATE organ
+        SET auth_consume=#{consume},auth_product=#{product},auth_sign=#{sign},auth_query_info=#{info},auth_query_integral=#{integral}
+        WHERE id=#{id}
+    </update>
+
+    <select id="getALLNotInFirType" resultType="com.organOld.dao.entity.organ.Organ">
+        SELECT o.id,o.name from organ o,organ_type ot WHERE ot.id=o.organ_type_id
+        and ot.fir_type!=#{firType}
+    </select>
+
+    <select id="getOrganNum" resultType="java.util.Map">
+        SELECT
+        (
+        SELECT count(1) from organ o,organ_type ot where o.organ_type_id=ot.id and ot.fir_type=1
+        )as GovNum,
+        (
+        SELECT count(1) from organ o,organ_type ot where o.organ_type_id=ot.id and ot.fir_type=3
+        )as SocietyNum,
+        (
+        SELECT count(1) from organ o,organ_type ot where o.organ_type_id=ot.id and ot.fir_type=21
+        )as OrganOldNum,
+        (
+        SELECT count(1) from organ o,organ_type ot where o.organ_type_id=ot.id and ot.fir_type=22
+        )as CommunityOldNum
+    </select>
+
+
+
+    <select id="getOrganTypeMap" resultType="com.organOld.dao.entity.organ.Organ">
+      SELECT o.id,ot.fir_type organFirTypeId from organ o,organ_type ot WHERE o.organ_type_id=ot.id and (ot.fir_type=21 or ot.fir_type=22)
+    </select>
+
+</mapper>

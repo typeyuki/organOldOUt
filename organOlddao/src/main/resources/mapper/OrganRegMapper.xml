@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.organOld.dao.repository.OrganRegDao">
+
+    <select id="getByOrganId" resultType="com.organOld.dao.entity.organ.OrganReg">
+      SELECT * FROM organ_reg WHERE organ_id=#{organId}
+    </select>
+
+    <insert id="save" parameterType="com.organOld.dao.entity.organ.OrganReg">
+        INSERT into organ_reg(organ_id,phone,email)
+        VALUES (#{organId},#{phone},#{email})
+    </insert>
+</mapper>

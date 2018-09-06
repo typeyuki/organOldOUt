@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.organOld.dao.repository.out.GoodsDao">
+
+    <resultMap id="product" type="com.organOld.dao.entity.product.Product">
+        <id property="id" column="id" />
+        <result property="name" column="name"/>
+        <result property="price" column="price"/>
+        <result property="organId" column="organ_id"/>
+        <result property="intro" column="intro"/>
+        <result property="imgUrl" column="img_url"/>
+        <result property="type" column="type"/>
+        <result property="time" column="time"/>
+        <association property="productType" javaType="com.organOld.dao.entity.product.ProductType">
+            <id property="id" column="ptid" />
+            <result property="name" column="secName" />
+            <association property="firProductType" javaType="com.organOld.dao.entity.product.ProductType">
+                <id property="id" column="ptid" />
+                <result property="name" column="firName" />
+            </association>
+        </association>
+    </resultMap>
+    <select id="getAllProducts"  resultType="product">
+        SELECT  *
+        FROM product
+        WHERE  1=1;
+        <if test="sortType!=null and sortType!=''">
+            ORDER BY ${sortType}
+        </if>
+        <if test="sort!=null and sort!=''">
+            ${sort}
+        </if>
+        <if test="length!=null and length!=0">
+            limit #{start},#{length}
+        </if>
+    </select>
+
+    <select id="getAllSize"  resultType="java.lang.Long">
+        SELECT count(1)
+        FROM product
+        WHERE 1=1;
+    </select>
+    <select id="getByPage" parameterType="com.organOld.dao.util.Page" resultType="product">
+        SELECT p.id,p.time,p.name,p.price,p.organ_id,p.intro,p.img_url,pt.id ptid,pt.name secName,pf.name firName
+        FROM product p,product_type pt,product_type pf
+        WHERE  p.type=pt.id and pt.parent=pf.id
+        <if test="sortType!=null and sortType!=''">
+            ORDER BY ${sortType}
+        </if>
+        <if test="sort!=null and sort!=''">
+            ${sort}
+        </if>
+        <if test="length!=null and length!=0">
+            limit #{start},#{length}
+        </if>
+    </select>
+    <select id="getSizeByPage" parameterType="com.organOld.dao.util.Page" resultType="java.lang.Long">
+        SELECT count(1)
+        FROM product p,product_type pt,product_type pf
+        WHERE  p.type=pt.id and pt.parent=pf.id
+    </select>
+
+    <select id="getGoodsByOrganId" parameterType="com.organOld.dao.util.Page" resultType="product">
+        SELECT p.id,p.time,p.name,p.price,p.organ_id,p.intro,p.img_url
+        FROM product p
+        WHERE organ_id = #{entity.organId}
+        <if test="sortType!=null and sortType!=''">
+            ORDER BY ${sortType}
+        </if>
+        <if test="sort!=null and sort!=''">
+            ${sort}
+        </if>
+        <if test="length!=null and length!=0">
+            limit #{start},#{length}
+        </if>
+    </select>
+
+    <select id="getSizeByPageOrg" parameterType="com.organOld.dao.util.Page" resultType="java.lang.Long">
+        SELECT count(1)
+        FROM product
+        WHERE organ_id = #{entity.organId}
+    </select>
+
+   <select id="getOrganIdByName" resultType="java.lang.Integer">
+       <if test="name!=''">
+           SELECT organ_id
+           FROM product p
+           WHERE name = #{name}
+       </if>
+   </select>
+
+
+</mapper>

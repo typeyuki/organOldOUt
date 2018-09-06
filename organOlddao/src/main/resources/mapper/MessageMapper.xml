@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.organOld.dao.repository.MessageDao">
+
+    <resultMap id="message" type="com.organOld.dao.entity.Message">
+        <id property="id" column="id" />
+        <result property="type" column="type"/>
+        <result property="content" column="content"/>
+        <result property="isRead" column="is_read"/>
+        <result property="time" column="time" />
+        <association property="organ" javaType="com.organOld.dao.entity.organ.Organ">
+            <id property="id" column="oid" />
+            <result property="name" column="name"/>
+        </association>
+    </resultMap>
+
+    <insert id="saveAllMessage">
+        INSERT into message(user_id,type,content)
+        VALUES
+        <foreach collection="userIds" item="item" index="index" separator=",">
+            (#{item}, #{message.type},#{message.content})
+        </foreach>
+    </insert>
+
+    <select id="getByPage" parameterType="com.organOld.dao.util.Page" resultMap="message">
+        SELECT m.id,m.time,m.type,m.content,o.id oid,o.name,m.is_read
+        FROM message m left join organ o on m.organ_id=o.id,sysuser u
+        WHERE u.username=#{entity.username} and u.id=m.user_id
+        <if test="entity!=null and entity.search!=null and entity.search!=''">
+            and (m.content LIKE  concat('%',#{entity.search},'%')
+            OR (o.name LIKE  concat('%',#{entity.search},'%'))
+        </if>
+        <if test="entity.type!=null and entity.type!=0">
+            and m.type=#{entity.type}
+        </if>
+        <if test="sortType!=null and sortType!='' and sortType=='init'">
+            ORDER BY m.is_read asc,m.time desc
+        </if>
+        <if test="sortType!=null and sortType!='' and sortType!='init'">
+            ORDER BY m.${sortType} ${sort}
+        </if>
+        <if test="length!=null and length!=0">
+            limit #{start},#{length}
+        </if>
+    </select>
+
+    <select id="getSizeByPage" parameterType="com.organOld.dao.util.Page" resultType="java.lang.Long">
+        SELECT count(1)
+        FROM message m left join organ o on m.organ_id=o.id,sysuser u
+        WHERE u.username=#{entity.username} and u.id=m.user_id
+        <if test="entity.type!=null and entity.type!=0">
+            and m.type=#{entity.type}
+        </if>
+        <if test="entity!=null and entity.search!=null and entity.search!=''">
+            and (m.content LIKE  concat('%',#{entity.search},'%')
+            OR (o.name LIKE  concat('%',#{entity.search},'%'))
+        </if>
+    </select>
+
+    <update id="readByUsername">
+        UPDATE message m,sysuser u
+        set is_read=1
+        WHERE u.username=#{username} and u.id=m.user_id
+    </update>
+
+    <select id="getNoReadNumByUsername" resultType="java.lang.Integer">
+        SELECT count(1)
+        from message m,sysuser u
+        WHERE u.username=#{username} and u.id=m.user_id and m.is_read=0
+    </select>
+
+
+    <delete id="delByIds">
+        DELETE from message where id in
+        <foreach collection="array" index="index" item="item" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+    </delete>
+</mapper>

@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.organOld.dao.repository.ProductBookDao">
+
+    <resultMap id="productBook" type="com.organOld.dao.entity.product.ProductBook">
+        <id property="id" column="id" />
+        <result property="productIds" column="product_ids" />
+        <result property="organId" column="organ_id" />
+        <result property="time" column="time" />
+        <result property="status" column="status" />
+        <association property="oldman" javaType="com.organOld.dao.entity.oldman.Oldman">
+            <id property="id" column="oid" />
+            <result property="name" column="oname"/>
+        </association>
+    </resultMap>
+
+
+    <select id="getByPage" parameterType="com.organOld.dao.util.Page" resultMap="productBook">
+        SELECT pb.id,pb.product_ids,pb.time,pb.status,ob.id oid,ob.name oname
+        FROM product_book pb,oldman_base ob
+        WHERE pb.organ_id=#{entity.organId} and pb.oldman_id=ob.id
+        <if test="sortType!=null and sortType!=''">
+            ORDER BY pb.status
+        </if>
+        <if test="sort!=null and sort!=''">
+            asc
+        </if>
+        <if test="length!=null and length!=0">
+            limit #{start},#{length}
+        </if>
+    </select>
+
+    <select id="getSizeByPage" parameterType="com.organOld.dao.util.Page" resultType="java.lang.Long">
+        SELECT count(1)
+        FROM product_book
+        WHERE organ_id=#{entity.organId}
+    </select>
+
+    <update id="updateProp">
+        UPDATE product_book
+        SET ${prop}=#{value}
+        WHERE id=#{id}
+    </update>
+</mapper>

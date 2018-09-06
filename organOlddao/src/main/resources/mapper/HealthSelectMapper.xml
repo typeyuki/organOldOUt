@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.organOld.dao.repository.HealthSelectDao">
+
+
+    <select id="getByPage" parameterType="com.organOld.dao.util.Page" resultType="com.organOld.dao.entity.oldman.HealthSelect">
+        SELECT *
+        FROM health_select
+        where 1=1
+        <if test="sortType!=null and sortType!=''">
+            ORDER BY ${sortType}
+        </if>
+        <if test="sort!=null and sort!=''">
+            ${sort}
+        </if>
+        <if test="length!=null and length!=0">
+            limit #{start},#{length}
+        </if>
+    </select>
+
+    <select id="getSizeByPage" parameterType="com.organOld.dao.util.Page" resultType="java.lang.Long">
+        SELECT count(1)
+        FROM health_select
+        where 1=1
+    </select>
+
+    <insert id="save" parameterType="com.organOld.dao.entity.oldman.HealthSelect">
+        INSERT into health_select(fir_type,sec_type_name)
+        VALUES (#{firType},#{secTypeName})
+    </insert>
+
+    <update id="updateById" parameterType="com.organOld.dao.entity.oldman.HealthSelect">
+        UPDATE health_select
+        set fir_type=#{firType},sec_type_name=#{secTypeName}
+        where id=#{id}
+    </update>
+
+    <delete id="delByIds">
+        DELETE from health_select
+        where id in
+        <foreach collection="array" index="index" item="item" separator="," open="(" close=")">
+            #{item}
+        </foreach>
+    </delete>
+
+
+
+    <select id="getFirTypeById" resultType="java.lang.Integer">
+        SELECT fir_type FROM health_select where id=#{id}
+    </select>
+</mapper>

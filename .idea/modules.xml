@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/organOldOut.iml" filepath="$PROJECT_DIR$/organOldOut.iml" />
+      <module fileurl="file://$PROJECT_DIR$/../organOldOut/organOlddao/organOlddao.iml" filepath="$PROJECT_DIR$/../organOldOut/organOlddao/organOlddao.iml" />
+      <module fileurl="file://$PROJECT_DIR$/../organOldOut/organOldoutService/organOldoutService.iml" filepath="$PROJECT_DIR$/../organOldOut/organOldoutService/organOldoutService.iml" />
+      <module fileurl="file://$PROJECT_DIR$/../organOldOut/organOldweb/organOldweb.iml" filepath="$PROJECT_DIR$/../organOldOut/organOldweb/organOldweb.iml" />
+    </modules>
+  </component>
+</project>

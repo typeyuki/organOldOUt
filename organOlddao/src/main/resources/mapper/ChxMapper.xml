@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.organOld.dao.repository.ChxDao">
+
+    <select id="getSimple" resultType="com.organOld.dao.entity.home.Chx">
+        SELECT id,level
+        FROM chx
+    </select>
+
+    <insert id="save" parameterType="com.organOld.dao.entity.home.Chx" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO chx(level,service_time)
+        VALUES (#{level},#{serviceTime})
+    </insert>
+
+
+    <update id="updateById" parameterType="com.organOld.dao.entity.home.Chx">
+        UPDATE chx c,home h
+        SET c.level=#{level},c.service_time=#{serviceTime}
+        WHERE h.id=#{homeId} and h.sec_type=c.id
+    </update>
+
+
+    <delete id="delByIds">
+        DELETE from chx where id in
+        (
+        SELECT sec_type FROM  home where id IN
+            <foreach collection="array" index="index" item="item" open="(" separator="," close=")">
+                #{item}
+            </foreach>
+        )
+    </delete>
+</mapper>

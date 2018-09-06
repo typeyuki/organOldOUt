@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.organOld.dao.repository.LabelManDao">
+
+    <insert id="saveAll">
+        INSERT into label_oldman(label_id,oldman_id)
+        VALUES
+        <foreach collection="list" item="item" index="index" separator=",">
+            (#{item.labelId}, #{item.oldmanId})
+        </foreach>
+    </insert>
+
+    <update id="implement" parameterType="com.organOld.dao.entity.label.LabelMan">
+        UPDATE label_oldman
+        SET is_implement=#{isImplement},remark=#{remark}
+        WHERE id=#{id}
+    </update>
+
+
+    <select id="getLabelManImplNum" resultType="com.organOld.dao.entity.label.LabelManImplNum">
+        select(
+          SELECT count(1) from
+      label_oldman lm,oldman_base o,auto_value x,organ org
+         where lm.label_id=#{labelId} and lm.oldman_id=o.id and o.xq_id=x.id and x.parent_index=org.id and org.id=#{organId} ) sum,
+(
+          SELECT count(1) from
+      label_oldman lm,oldman_base o,auto_value x,organ org
+         where lm.label_id=#{labelId} and lm.oldman_id=o.id and o.xq_id=x.id and x.parent_index=org.id and  org.id=#{organId} and is_implement=0) no,
+         (
+          SELECT count(1) from
+      label_oldman lm,oldman_base o,auto_value x,organ org
+         where lm.label_id=#{labelId} and lm.oldman_id=o.id and o.xq_id=x.id and x.parent_index=org.id and org.id=#{organId} and is_implement=2 ) impl,
+         (
+          SELECT count(1) from
+      label_oldman lm,oldman_base o,auto_value x,organ org
+         where lm.label_id=#{labelId} and lm.oldman_id=o.id and o.xq_id=x.id  and x.parent_index=org.id and org.id=#{organId} and is_implement=1) noImpl
+
+    </select>
+    
+    <delete id="delByLabelIds">
+        DELETE from label_oldman where label_id in
+        <foreach collection="array" index="index" item="item" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+    </delete>
+
+
+    <delete id="delByOldmanIds">
+        DELETE from label_oldman where oldman_id in
+        <foreach collection="oldmanIds" index="index" item="item" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+        and label_id=#{labelId}
+    </delete>
+</mapper>
