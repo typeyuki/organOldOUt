@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.organOld.dao.repository.LinkmanDao">
+
+    <resultMap id="linkman" type="com.organOld.dao.entity.oldman.Linkman">
+        <id property="id" column="id" />
+        <result property="name" column="name" />
+        <result property="phone" column="phone" />
+        <result property="relation" column="relation" />
+        <result property="time" column="time" />
+        <association property="oldman" javaType="com.organOld.dao.entity.oldman.Oldman">
+            <id property="id" column="oid" />
+            <result property="name" column="oname"/>
+        </association>
+    </resultMap>
+
+
+    <select id="getByPage" parameterType="com.organOld.dao.util.Page" resultMap="linkman">
+        SELECT l.id,l.name,l.phone,l.relation,l.time,o.id oid,o.name oname
+        FROM linkman l,oldman_base o,organ org,auto_value x
+        WHERE l.oldman_id=o.id AND x.id=o.xq_id AND org.id=x.parent_index and o.disable=0
+        <if test="entity!=null and entity.id!=null and entity.id!=0">
+            and id=#{entity.id}
+        </if>
+        <if test="entity!=null and entity.oldman!=null and entity.oldman.id!=0">
+            and o.id=#{entity.oldman.id}
+        </if>
+        <if test="entity!=null and entity.organId!=null and entity.organId!=0">
+            and org.id in (
+            SELECT
+            case o.parent
+            when 0 then child.id
+            else o.id
+            end id
+            from organ o left join organ child on child.parent=o.id
+            WHERE o.id=#{entity.organId}
+            )
+        </if>
+        <if test="entity!=null and entity.search!=null and entity.search!=''">
+            and (l.name LIKE  concat('%',#{entity.search},'%')
+            OR l.phone LIKE  concat('%',#{entity.search},'%') OR l.relation LIKE  concat('%',#{entity.search},'%')
+            OR o.name LIKE  concat('%',#{entity.search},'%') OR o.id=#{entity.search})
+        </if>
+        <if test="sortType!=null and sortType!=''">
+            ORDER BY ${sortType}
+        </if>
+        <if test="sort!=null and sort!=''">
+            ${sort}
+        </if>
+        <if test="length!=null and length!=0">
+            limit #{start},#{length}
+        </if>
+    </select>
+
+    <select id="getSizeByPage" parameterType="com.organOld.dao.util.Page" resultType="java.lang.Long">
+        SELECT count(1)
+        FROM linkman l,oldman_base o,organ org,auto_value x
+        WHERE l.oldman_id=o.id AND x.id=o.xq_id AND org.id=x.parent_index and o.disable=0
+        <if test="entity!=null and entity.id!=null and entity.id!=0">
+            and id=#{entity.id}
+        </if>
+        <if test="entity!=null and entity.organId!=null and entity.organId!=0">
+            and org.id in (
+            SELECT
+            case o.parent
+            when 0 then child.id
+            else o.id
+            end id
+            from organ o left join organ child on child.parent=o.id
+            WHERE o.id=#{entity.organId}
+            )
+        </if>
+        <if test="entity!=null and entity.search!=null and entity.search!=''">
+            and (l.name LIKE  concat('%',#{entity.search},'%')
+            OR l.phone LIKE  concat('%',#{entity.search},'%') OR l.relation LIKE  concat('%',#{entity.search},'%')
+            OR o.name LIKE  concat('%',#{entity.search},'%') OR o.id=#{entity.search})
+        </if>
+    </select>
+
+
+
+    <update id="updateByOldmanIds" parameterType="java.util.List">
+        update linkman
+        SET
+        name= CASE oldman_id
+        <foreach collection="list" index="index" item="item" open="" separator=" " close="">
+            WHEN ${item.oldmanId} THEN #{item.name}
+        </foreach>
+        END,
+        phone= CASE oldman_id
+        <foreach collection="list" index="index" item="item" open="" separator=" " close="">
+            WHEN ${item.oldmanId} THEN #{item.phone}
+        </foreach>
+        END,
+        relation= CASE oldman_id
+        <foreach collection="list" index="index" item="item" open="" separator=" " close="">
+            WHEN ${item.oldmanId} THEN #{item.relation}
+        </foreach>
+        END
+        where oldman_id in
+        <foreach collection="list" index="index" item="item" separator="," open="(" close=")">
+            #{item.oldmanId,jdbcType=BIGINT}
+        </foreach>
+
+    </update>
+
+    <insert id="saveAll" parameterType="java.util.List">
+        INSERT into linkman(oldman_id,name,phone,relation)
+        VALUES
+        <foreach collection="list" item="item" index="index" separator=",">
+            (#{item.oldmanId}, #{item.name},#{item.phone},#{item.relation})
+        </foreach>
+    </insert>
+
+    <update id="updateById" parameterType="com.organOld.dao.entity.oldman.Linkman">
+        UPDATE linkman
+        SET name=#{name},relation=#{relation},phone=#{phone}
+        WHERE id=#{id}
+    </update>
+
+
+    <update id="updateByOldmanId" parameterType="com.organOld.dao.entity.oldman.Linkman">
+        UPDATE linkman
+        SET name=#{name},relation=#{relation},phone=#{phone}
+        WHERE oldman_id=#{oldmanId}
+    </update>
+
+    <select id="getById" resultType="com.organOld.dao.entity.oldman.Linkman">
+        SELECT * from linkman where id=#{id}
+    </select>
+
+
+    <select id="getByOldmanId" resultType="com.organOld.dao.entity.oldman.Linkman">
+        SELECT * from linkman where oldman_id=#{id}
+    </select>
+</mapper>

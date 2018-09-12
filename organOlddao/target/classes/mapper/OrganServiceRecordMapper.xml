@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.organOld.dao.repository.OrganServiceRecordDao">
+
+
+    <select id="getByPage" parameterType="com.organOld.dao.util.Page" resultType="com.organOld.dao.entity.organ.OrganServiceRecord">
+        SELECT osr.id,osr.order,osr.data,osr.time,ob.id oldmanId,ob.name oldmanName,dy.id organId,dy.name organName
+        FROM organ_service_record osr,oldman_base ob,organ dy
+        WHERE ob.id=osr.oldman_id and osr.organ_id=dy.id
+        <if test="entity!=null and entity.organId!=null and entity.organId!=0">
+            and dy.id =#{entity.organId}
+        </if>
+        <if test="sortType!=null and sortType!=''">
+            ORDER BY osr.${sortType}
+        </if>
+        <if test="sort!=null and sort!=''">
+            ${sort}
+        </if>
+        <if test="length!=null and length!=0">
+            limit #{start},#{length}
+        </if>
+    </select>
+
+    <select id="getSizeByPage" parameterType="com.organOld.dao.util.Page" resultType="java.lang.Long">
+        SELECT count(1)
+        FROM organ_service_record osr,oldman_base ob,organ dy
+        WHERE ob.id=osr.oldman_id and osr.organ_id=dy.id
+        <if test="entity!=null and entity.organId!=null and entity.organId!=0">
+            and dy.id =#{entity.organId}
+        </if>
+    </select>
+
+    <insert id="saveAll" parameterType="java.util.List">
+        INSERT into organ_service_record(oldman_id,organ_id,`data`,`time`,`order`)
+        VALUES
+        <foreach collection="list" item="item" index="index" separator=",">
+            (#{item.oldmanId}, #{item.organId},#{item.data},#{item.time},#{item.order})
+        </foreach>
+    </insert>
+</mapper>

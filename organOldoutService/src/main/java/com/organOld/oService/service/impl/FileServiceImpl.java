@@ -70,8 +70,8 @@ public class FileServiceImpl implements FileService {
         page.setStart(0);
 
         Oldman oldman=new Oldman();
-        oldman.setId(oldmanId);
-        OldsModel oldsModel = oldmanWrapper.wrapOldInfo(oldmanBaseDao.getById(oldmanId));
+        oldman.setId(comService.getIdBySession());
+        OldsModel oldsModel = oldmanWrapper.wrapOldInfo(oldmanBaseDao.getById(oldman.getId()));
         personalInfoModel.setOldman(oldsModel);
         Linkman linkman=new Linkman();
         linkman.setOldman(oldman);
@@ -109,12 +109,13 @@ public class FileServiceImpl implements FileService {
 
     @Override
     public OldsHealthModel getOldmanHealth (int oldmanId){
-        return oldsHealthWrapper.wrap(oldmanHealthDao.getByOldmanId(oldmanId));
+        return oldsHealthWrapper.wrap(oldmanHealthDao.getByOldmanId(comService.getIdBySession()));
     }
     @Override
     public String getByCardPage(BTableRequest bTableRequest, CardLogsRequest cardLogsRequest) {
         Page<Record> page= comService.getPage(bTableRequest,"record");
-        Record record=  logsWrapper.unwrapCard(cardLogsRequest);
+        cardLogsRequest.setOldmanId(comService.getIdBySession());
+        Record record = logsWrapper.unwrapCard(cardLogsRequest);
         page.setEntity(record);
         List<LogsModel> productModelList=recordDao.getByCardPage(page).stream().map( logsWrapper::wrap).collect(Collectors.toList());
         Long size=recordDao.getSizeByCardPage(page);
@@ -124,7 +125,7 @@ public class FileServiceImpl implements FileService {
 
     @Override
     public Conse getByLabel (int oldmanId){
-        List<LabelInfoModel> labels = labelDao.getManLabelByOldmanId(oldmanId).stream().map(labelWrapper::wrap).collect(Collectors.toList());
+        List<LabelInfoModel> labels = labelDao.getManLabelByOldmanId(comService.getIdBySession()).stream().map(labelWrapper::wrap).collect(Collectors.toList());
         return new Conse(true,labels);
     }
 }

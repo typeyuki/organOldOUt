@@ -1,0 +1,174 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.organOld.dao.repository.VisualDataDao">
+
+    <select id="getVisualData" resultType="java.util.Map">
+        select
+        (select count(1)
+            from oldman_base where disable=0
+        ) NumOld,
+        (select count(1)
+            from oldman_base
+        ) NumAll,
+        (select count(1)
+            from oldman_base where disable=0 and #{param1} > birthday
+        ) NumOld60,
+        (select count(1)
+            from oldman_base where disable=0 and #{param3} > birthday
+        ) NumOld80,
+        (select count(1)
+            from oldman_base where old_status=1
+        ) NumOrganOld,
+        (select count(1)
+            from oldman_base where old_status=2
+        ) NumCommunityOld,
+        (select count(1)
+            from oldman_base where old_status=3
+        ) NumFamilyOld,
+        (select count(1)
+            from oldman_base where old_status=4
+        ) NumSqJjOld,
+        (select count(1)
+            from oldman_base o,auto_value av where o.census=av.id and av.id=12
+        ) NumHuJi,
+        (select count(1)
+            from oldman_base o,auto_value av where o.census=av.id and av.id=13
+        ) NumFeiHuJi,
+        (select count(1)
+            from oldman_base where sex=2
+        ) NumMale,
+        (select count(1)
+            from oldman_base where sex=1
+        ) NumFemale,
+        (select count(1)
+            from oldman_base o,auto_value av where o.family=av.id and av.id=15
+        ) NumChunLao,
+        (select count(1)
+            from oldman_base o,auto_value av where o.family=av.id and av.id=15
+        ) NumDuJu,
+        (select count(1)
+            from oldman_base o,auto_value av where o.family=av.id and av.id=16
+        ) NumShiDu,
+        (select count(1)
+            from oldman_base o,auto_value av where o.family=av.id and av.id=17
+        ) NumYiLaoYYL,
+        (select count(1)
+            from oldman_base o,auto_value av where o.family=av.id and av.id=19
+        ) NumGuLao,
+        (select count(1)
+            from oldman_base o,auto_value av where o.family=av.id and av.id=20
+        ) NumSanZhiRY,
+        (select count(1)
+            from oldman_base o,auto_value av where o.family=av.id and av.id=21
+        ) NumQiTaFamily,
+        (select count(1)
+            from oldman_base  where #{param4}>birthday
+        ) NumAbove90M,
+        (select count(1)
+            from oldman_base where #{param3}>birthday and birthday > #{param4} and sex=2
+        ) Num80To90M,
+        (select count(1)
+            from oldman_base where #{param2}>birthday and birthday > #{param3} and sex=2
+        ) Num70To80M,
+        (select count(1)
+            from oldman_base where #{param1}>birthday and birthday > #{param2} and sex=2
+        ) Num60To70M,
+        (select count(1)
+            from oldman_base  where #{param4}>birthday and sex=1
+        ) NumAbove90F,
+        (select count(1)
+            from oldman_base where #{param3}>birthday and birthday > #{param4} and sex=1
+        ) Num80To90F,
+        (select count(1)
+            from oldman_base where #{param2}>birthday and birthday > #{param3} and sex=1
+        ) Num70To80F,
+        (select count(1)
+            from oldman_base where #{param1}>birthday and birthday > #{param2} and sex=1
+        ) Num60To70F,
+        (select count(1)
+            from oldman_base where economic=22
+        ) NumBangKunF,
+         (select count(1)
+            from oldman_base where economic=23
+        ) NumDiBao,
+         (select count(1)
+            from oldman_base where economic=24
+        ) NumYangLaoBX,
+         (select count(1)
+            from oldman_base where economic=25
+        ) NumYiLiaoJZJ,
+         (select count(1)
+            from oldman_base where economic=26
+        ) NumChengZhenYB,
+         (select count(1)
+            from oldman_base where economic=27
+        ) NumQiTaEco,
+        (select count(1)
+            from oldman_base ob,oldman_health_base ohb where ob.id=ohb.oldman_id and ohb.is_mb=1
+        ) NumSN,
+        (select count(1)
+            from oldman_base ob,oldman_health_base ohb where ob.id=ohb.oldman_id and ohb.is_exzl=4
+        ) NumZLS,
+        (select count(1)
+            from oldman_base ob,oldman_health_base ohb where ob.id=ohb.oldman_id and ohb.is_gz=5
+        ) NumGZS,
+        (select count(1)
+            from oldman_base ob,oldman_health_base ohb where ob.id=ohb.oldman_id and (ohb.intelligence=29 or ohb.intelligence=30)
+        ) NumSZ,
+        (select 367
+        ) NumCHXPJ,
+        (select 68
+        ) NumQiTaHealth,
+        (select 385
+        ) NumOrgGuMei,
+        (select 489
+        ) NumOrgPingYang,
+        (select 276
+        ) NumOrgDongLan,
+        (select 476
+        ) NumJiaTingYL,
+        (select 676
+        ) NumChangHuX,
+        (select 576
+        ) NumZhiNengHYY,
+        (select 476
+        ) NumJiaTingYS,
+        (select 676
+        ) NumJiaTingBC,
+         (select count(1)
+            from oldman_base where old_status=1
+        ) NumOrgOld,
+         (select count(1)
+            from oldman_base where old_status=4
+        ) NumSqJjOld,
+         (select count(1)
+            from oldman_base where old_status=2
+        ) NumSqOld,
+         (select count(1)
+            from oldman_base where old_status=3
+        ) NumJjOld,
+        (select 86
+
+        ) NumGuMeiIn,
+        (select 70
+        ) NumGuMeiRemain,
+        (select 155
+        ) NumDongLanIn,
+        (select 74
+        ) NumDongLanRemain,
+        (select 155
+        ) NumPingYangIn,
+        (select 92
+        ) NumPingYangRemain,
+        (select name from  organ where  id=1
+        )OrganName1,
+        (select name from  organ where  id=2
+        )OrganName2,
+        (select name from  organ where  id=3
+        )OrganName3
+        
+    </select>
+
+
+
+</mapper>

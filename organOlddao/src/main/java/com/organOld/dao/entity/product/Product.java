@@ -6,7 +6,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 public class Product extends DBEntity implements DBInterface {
     private Integer organId;
-    private String name;
     private double price;
     private String intro;
     private String imgUrl;
@@ -39,13 +38,6 @@ public class Product extends DBEntity implements DBInterface {
         this.organId = organId;
     }
 
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
 
     public double getPrice() {
         return price;

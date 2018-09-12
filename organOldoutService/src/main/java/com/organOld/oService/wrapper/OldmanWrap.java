@@ -3,6 +3,7 @@ package com.organOld.oService.wrapper;
 import com.organOld.dao.entity.AutoValue;
 import com.organOld.dao.entity.oldman.Oldman;
 import com.organOld.dao.entity.oldman.Xq;
+import com.organOld.oService.Tool;
 import com.organOld.oService.enumModel.GenderEnum;
 import com.organOld.oService.contract.OldmanRequest;
 import com.organOld.oService.model.OldsModel;
@@ -69,6 +70,8 @@ public class OldmanWrap implements Wrap<Oldman,OldsModel,OldmanRequest> {
         oldsModel.setBuildNum(oldman.getLouNum()+"");
         oldsModel.setAddress(oldman.getAddress());
         oldsModel.setIdNum(oldman.getPid());
+        oldsModel.setTime(Tool.dateToString(oldman.getTime(),"yyyy-MM-dd"));
+        oldsModel.setPhone(oldman.getPhone());
         if(oldman.getBirthday()!=null)
             oldsModel.setAge(ComService.birthdayToAge(oldman.getBirthday()));
         oldsModel.setSex(GenderEnum.getValue(oldman.getSex()));

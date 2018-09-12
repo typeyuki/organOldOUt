@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.organOld.dao.repository.HomeDoctorDao">
+
+    <insert id="save" parameterType="com.organOld.dao.entity.home.Doctor" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO home_doctor(name,organ_id)
+        VALUES (#{name},#{organId})
+    </insert>
+
+
+    <update id="updateById" parameterType="com.organOld.dao.entity.home.Doctor">
+        UPDATE home_doctor hd,home h
+        SET hd.name=#{name},hd.organ_id=#{organId}
+        WHERE h.id=#{homeId} and h.sec_type=hd.id
+    </update>
+
+
+    <delete id="delByIds">
+        DELETE from home_doctor where id in
+        (
+        SELECT sec_type FROM  home where id IN
+        <foreach collection="array" index="index" item="item" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+        )
+    </delete>
+</mapper>

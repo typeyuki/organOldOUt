@@ -5,7 +5,9 @@ import com.organOld.dao.repository.out.oldsUserDao;
 import com.organOld.oService.service.ComService;
 import com.organOld.oService.service.OldsUserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
+@Service
 public class OldsUserServiceImpl implements OldsUserService {
     @Autowired
     ComService comService;

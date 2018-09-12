@@ -63,7 +63,7 @@ public class ComService {
         calendar.set(Calendar.YEAR, calendar.get(Calendar.YEAR)-age);
         return calendar.getTime();
     }
-
+    OldmanDao oldmanBaseDao5;
     public static String getTabeleSortType(Integer index,String type){
         if (null == index){
             return "id";

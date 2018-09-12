@@ -15,8 +15,8 @@ import java.util.List;
 public class OldsHealthModel extends Pattern {
     private int oldmanId;
     private String bloodType;
-    private String intellInfo;//失智
-    private String sight;//视力
+    private String intelligence;//失智
+    private String eyesight;//视力
     private List<HealthAdd> Cancer=new ArrayList<>();//恶性肿瘤史  id+内容
     private List<HealthAdd> broken=new ArrayList<>();//骨折史
     private List<HealthAdd> disabled=new ArrayList<>();//残疾情况
@@ -41,20 +41,20 @@ public class OldsHealthModel extends Pattern {
         this.bloodType = bloodType;
     }
 
-    public String getIntellInfo() {
-        return intellInfo;
+    public String getIntelligence() {
+        return intelligence;
     }
 
-    public void setIntellInfo(String intellInfo) {
-        this.intellInfo = intellInfo;
+    public void setIntelligence(String intelligence) {
+        this.intelligence = intelligence;
     }
 
-    public String getSight() {
-        return sight;
+    public String getEyesight() {
+        return eyesight;
     }
 
-    public void setSight(String sight) {
-        this.sight = sight;
+    public void setEyesight(String eyesight) {
+        this.eyesight = eyesight;
     }
 
     public List<HealthAdd> getCancer() {

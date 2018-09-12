@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.organOld.dao.repository.LabelFeedbackDao">
+
+    <!--要以机构ID做完 主键  不然表中没存的 就找不到-->
+    <resultMap id="labelFeedback" type="com.organOld.dao.entity.label.LabelFeedback">
+        <id property="id" column="oid" />
+        <result property="remark" column="remark"/>
+        <result property="isFinish" column="is_finish"/>
+        <result property="time" column="time" />
+        <association property="organ" javaType="com.organOld.dao.entity.organ.Organ">
+            <id property="id" column="oid" />
+            <result property="name" column="name"/>
+            <result property="districtName" column="districtName"/>
+        </association>
+    </resultMap>
+    <select id="getByPage" parameterType="com.organOld.dao.util.Page" resultMap="labelFeedback">
+        SELECT lf.id,lf.is_finish,lf.remark,o.id oid,o.name,d.value districtName
+        FROM organ o LEFT join label_feedback lf on lf.organ_id=o.id and lf.label_id=#{entity.labelId}
+        LEFT JOIN auto_value d on d.id=o.district_id
+        WHERE o.organ_type_id=2
+        <if test="entity!=null and entity.labelOrganId!=null and entity.labelOrganId!=0">
+            and o.id in (
+            SELECT
+            case o.parent
+            when 0 then child.id
+            else o.id
+            end id
+            from organ o left join organ child on child.parent=o.id
+            WHERE o.id=#{entity.labelOrganId}
+            )
+        </if>
+        <if test="entity!=null and entity.organId!=null and entity.organId!=0">
+            and o.id in (
+            SELECT
+            case o.parent
+            when 0 then child.id
+            else o.id
+            end id
+            from organ o left join organ child on child.parent=o.id
+            WHERE o.id=#{entity.organId}
+            )
+        </if>
+        <if test="sortType!=null and sortType!=''">
+            ORDER BY o.${sortType}
+        </if>
+        <if test="sort!=null and sort!=''">
+            ${sort}
+        </if>
+        <if test="length!=null and length!=0">
+            limit #{start},#{length}
+        </if>
+    </select>
+
+    <select id="getSizeByPage" parameterType="com.organOld.dao.util.Page" resultType="java.lang.Long">
+        SELECT count(1)
+        FROM organ o LEFT join label_feedback lf on lf.organ_id=o.id
+        WHERE o.organ_type_id=2
+        <if test="entity!=null and entity.labelOrganId!=null and entity.labelOrganId!=0">
+            and o.id in (
+            SELECT
+            case o.parent
+            when 0 then child.id
+            else o.id
+            end id
+            from organ o left join organ child on child.parent=o.id
+            WHERE o.id=#{entity.labelOrganId}
+            )
+        </if>
+        <if test="entity!=null and entity.organId!=null and entity.organId!=0">
+            and o.id in (
+            SELECT
+            case o.parent
+            when 0 then child.id
+            else o.id
+            end id
+            from organ o left join organ child on child.parent=o.id
+            WHERE o.id=#{entity.organId}
+            )
+        </if>
+    </select>
+
+
+    <insert id="save" parameterType="com.organOld.dao.entity.label.LabelFeedback">
+        INSERT into label_feedback(organ_id,label_id,is_finish,remark)
+        VALUES (#{organId},#{labelId},#{isFinish},#{remark})
+    </insert>
+
+    <select id="getByLabelIdOrganId" resultType="com.organOld.dao.entity.label.LabelFeedback">
+        SELECT * from label_feedback where label_id=#{labelId} AND organ_id=#{organId}
+    </select>
+
+
+    <delete id="deleteByLabelId">
+        DELETE from label_feedback WHERE label_id=#{labelId}
+    </delete>
+
+
+    <delete id="delByLabelIds">
+        DELETE from label_feedback where label_id in
+        <foreach collection="array" index="index" item="item" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+    </delete>
+</mapper>

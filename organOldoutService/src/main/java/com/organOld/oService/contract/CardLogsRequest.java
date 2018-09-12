@@ -5,6 +5,7 @@ public class CardLogsRequest {
     private Integer type;
     private String start;
     private String end;
+    private int oldmanId;
 
     public Integer getType() {
         return type;
@@ -36,5 +37,13 @@ public class CardLogsRequest {
 
     public void setId(int id) {
         this.id = id;
+    }
+
+    public int getOldmanId() {
+        return oldmanId;
+    }
+
+    public void setOldmanId(int oldmanId) {
+        this.oldmanId = oldmanId;
     }
 }

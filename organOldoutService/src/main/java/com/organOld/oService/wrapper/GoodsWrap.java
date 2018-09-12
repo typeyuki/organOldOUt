@@ -18,6 +18,10 @@ public class GoodsWrap implements Wrap<Product,GoodsModel,GoodsRequest> {
         goodsModel.setSecType(product.getProductType().getName());
         goodsModel.setFirType(product.getProductType().getFirProductType().getName());
         BeanUtils.copyProperties(product, goodsModel);
+        if(product.getProductType().getType().equals("1"))
+            goodsModel.setName(goodsModel.getSecType());
+        if(product.getProductType().getFirProductType().getType().equals("1"))
+            goodsModel.setName(goodsModel.getFirType());
         goodsModel.setTime(Tool.dateToString(product.getTime(), TimeConst.DATA_FORMAT_YMD));
         return goodsModel;
     }
@@ -30,7 +34,6 @@ public class GoodsWrap implements Wrap<Product,GoodsModel,GoodsRequest> {
         product.setIntro(goodsRequest.getIntro());
         if(goodsRequest.getId()!=null)
         product.setId(goodsRequest.getId());
-        product.setName(goodsRequest.getName());
         product.setOrganId(goodsRequest.getOrganId());
         product.setType(goodsRequest.getType());
         return product;

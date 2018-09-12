@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.organOld.dao.repository.HealthSelectManDao">
+
+    <insert id="saveAll" parameterType="java.util.List">
+        INSERT into health_select_oldman(oldman_id,health_select_id)
+        VALUES
+        <foreach collection="list" item="item" index="index" separator=",">
+            (#{item.oldmanId}, #{item.healthSelectId})
+        </foreach>
+    </insert>
+
+    <delete id="delByOldmanIds" parameterType="java.util.List">
+        DELETE from health_select_oldman
+        WHERE oldman_id IN
+        <foreach collection="list" index="index" item="item" separator="," open="(" close=")">
+            #{item}
+        </foreach>
+    </delete>
+    <delete id="delByOldmanId" >
+        DELETE from health_select_oldman
+        WHERE oldman_id =#{oldmanId}
+    </delete>
+</mapper>

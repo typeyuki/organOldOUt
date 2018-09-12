@@ -76,8 +76,8 @@ public class OldsHealthWrap implements Wrap<OldmanHealth,OldsHealthModel,OldsHea
             }
         }
         if(method.size()==0){
-            method.add("Sight");
-            method.add("IntellInfo");
+            method.add("Eyesight");
+            method.add("Intelligence");
         }
         if(map.size()==0){
             List<Integer> autoIds= comService.getAutoValueTypes("health_add");

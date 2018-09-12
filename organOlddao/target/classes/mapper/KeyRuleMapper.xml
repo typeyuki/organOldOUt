@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.organOld.dao.repository.KeyRuleDao">
+
+    <select id="getAll" resultType="com.organOld.dao.entity.oldman.KeyRule">
+        SELECT k.id,k.value_index,k.goal,k.type,
+        case k.type
+        when 1 then value
+        else ""
+        end value_name
+        FROM key_rule k,auto_value a  where k.value_index=a.id
+    </select>
+
+
+    <select id="getAllRule" resultType="com.organOld.dao.entity.oldman.KeyRule">
+        SELECT k.id,k.value_index,k.goal,k.type,
+        case k.type
+            when 3 then c.level
+            when 4 then hs.sec_type_name
+            when 7 then hs.sec_type_name
+            else a.value
+            end value_name
+        FROM key_rule k left join chx c on k.value_index=c.id left join health_select hs on hs.id=k.value_index
+		  ,auto_value a  where k.value_index=a.id
+    </select>
+
+    <update id="updateByIds">
+       UPDATE key_rule
+       SET
+        goal= CASE id
+        <foreach collection="list" index="index" item="item" open="" separator=" " close="">
+            WHEN ${item.id} THEN #{item.goal}
+        </foreach>
+        END
+        WHERE id in
+        <foreach collection="list" index="index" item="item" open="(" separator="," close=")">
+            ${item.id}
+        </foreach>
+    </update>
+</mapper>

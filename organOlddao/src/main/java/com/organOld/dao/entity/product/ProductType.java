@@ -5,6 +5,7 @@ import com.organOld.dao.entity.DBEntity;
 public class ProductType extends DBEntity{
     private String name;
     private String parent;
+    private String type;
     private ProductType firProductType;
 
 
@@ -30,5 +31,13 @@ public class ProductType extends DBEntity{
 
     public void setParent(String parent) {
         this.parent = parent;
+    }
+
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
     }
 }

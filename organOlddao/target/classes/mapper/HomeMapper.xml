@@ -1,0 +1,158 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.organOld.dao.repository.HomeDao">
+
+    <resultMap id="home" type="com.organOld.dao.entity.home.Home">
+        <id property="id" column="id" />
+        <result property="firType" column="fir_type"/>
+        <result property="secType" column="sec_type" />
+        <result property="time" column="time" />
+        <association property="chx" javaType="com.organOld.dao.entity.home.Chx">
+            <id property="id" column="cid"/>
+            <result property="level" column="level"/>
+            <result property="serviceTime" column="service_time"/>
+        </association>
+        <association property="doctor" javaType="com.organOld.dao.entity.home.Doctor">
+            <id property="id" column="did"/>
+            <result property="name" column="name"/>
+            <result property="organId" column="organId" />
+        </association>
+        <association property="organ" javaType="com.organOld.dao.entity.organ.Organ">
+            <id property="id" column="oid"/>
+            <result property="name" column="oname"/>
+        </association>
+    </resultMap>
+
+
+    <select id="getByPage" parameterType="com.organOld.dao.util.Page" resultMap="home">
+        SELECT
+        <if test="entity.firType!=null and (entity.firType==1 or entity.firType==3)">
+            *
+            FROM home
+            WHERE fir_type=#{entity.firType}
+        </if>
+        <if test="entity.firType!=null and entity.firType==2">
+            h.id,h.fir_type,h.sec_type,c.id cid,c.level,c.service_time,c.time
+            FROM home h,chx c
+            WHERE h.fir_type=#{entity.firType} AND h.sec_type=c.id
+        </if>
+        <if test="entity.firType!=null and entity.firType==4">
+            h.id,h.fir_type,h.sec_type,d.id did,d.name,o.id oid,o.name oname,d.time
+            FROM home h,home_doctor d,organ o
+            WHERE h.fir_type=#{entity.firType} AND h.sec_type=d.id AND d.organ_id=o.id
+            <if test="entity!=null and entity.search!=null and entity.search!=''">
+                and (d.name LIKE  concat('%',#{entity.search},'%') OR o.name LIKE  concat('%',#{entity.search},'%'))
+            </if>
+        </if>
+        <if test="entity.firType!=null and entity.firType==5">
+            h.id,h.fir_type,h.sec_type,o.id oid,o.name oname,o.time
+            FROM home h,organ o
+            WHERE h.fir_type=#{entity.firType} AND h.sec_type=o.id
+            <if test="entity!=null and entity.search!=null and entity.search!=''">
+                and (o.name LIKE  concat('%',#{entity.search},'%'))
+            </if>
+        </if>
+        <if test="sortType!=null and sortType!=''">
+            ORDER BY ${sortType}
+        </if>
+        <if test="sort!=null and sort!=''">
+            ${sort}
+        </if>
+        <if test="length!=null and length!=0">
+            limit #{start},#{length}
+        </if>
+    </select>
+    <select id="getSizeByPage" parameterType="com.organOld.dao.util.Page" resultType="java.lang.Long">
+        SELECT count(1)
+        <if test="entity.firType!=null and (entity.firType==1 or entity.firType==3)">
+            FROM home
+            WHERE fir_type=#{entity.firType}
+        </if>
+        <if test="entity.firType!=null and entity.firType==2">
+            FROM home h
+            WHERE h.fir_type=#{entity.firType}
+        </if>
+        <if test="entity.firType!=null and entity.firType==4">
+            FROM home h
+            WHERE h.fir_type=#{entity.firType}
+        </if>
+        <if test="entity.firType!=null and entity.firType==5">
+            FROM home h
+            WHERE h.fir_type=#{entity.firType}
+        </if>
+    </select>
+
+    <select id="getIdBySecType" resultType="java.lang.Integer">
+        SELECT h.id FROM home h
+        <if test="firType==1 or firType==3">
+            where sec_type LIKE concat('%',#{name},'%')
+        </if>
+        <if test="firType==2">
+            ,chx c
+            where h.sec_type=c.id and c.level=#{name}
+        </if>
+        <if test="firType==4">
+            ,home_doctor hd
+            where h.sec_type=hd.id and hd.name LIKE concat('%',#{name},'%')
+        </if>
+        <if test="firType==5">
+            ,organ o
+            where h.sec_type=o.id and o.name LIKE concat('%',#{name},'%')
+        </if>
+    </select>
+
+
+    <insert id="save" parameterType="com.organOld.dao.entity.home.Home" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO home(fir_type,sec_type)
+        VALUES (#{firType},#{secType})
+    </insert>
+
+    <update id="updateById" parameterType="com.organOld.dao.entity.home.Home">
+        UPDATE home
+        SET sec_type=#{secType}
+        WHERE id=#{id}
+    </update>
+
+    <select id="getByIdAndFirType" resultMap="home">
+        SELECT
+        <if test="firType!=null and (firType==1 or firType==3 or firType==5)">
+            *
+            FROM home
+            WHERE id=#{id}
+        </if>
+        <if test="firType!=null and firType==2">
+            h.id,h.fir_type,h.sec_type,c.id cid,c.level,c.service_time
+            FROM home h,chx c
+            WHERE h.id=#{id} AND h.sec_type=c.id
+        </if>
+        <if test="firType!=null and firType==4">
+            h.id,h.fir_type,h.sec_type,d.id did,d.name,o.id organId
+            FROM home h,home_doctor d,organ o
+            WHERE h.id=#{id} AND h.sec_type=d.id AND d.organ_id=o.id
+        </if>
+    </select>
+
+
+    <delete id="delByIds">
+        DELETE from home where id in
+        <foreach collection="array" index="index" item="item" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+    </delete>
+
+
+    <select id="getAll" resultType="com.organOld.dao.entity.home.Home">
+        SELECT h.id,h.fir_type,
+        case h.fir_type
+        when 2 then c.level
+        when 4 then hd.name
+        when 5 then org.name
+        else h.sec_type
+        end sec_type
+        FROM home h left join chx c on c.id=h.sec_type left join organ org on org.id=h.sec_type left join home_doctor hd on hd.id=h.sec_type
+    </select>
+
+    <select id="getById" resultType="com.organOld.dao.entity.home.Home">
+        SELECT * from home where id=#{id}
+    </select>
+</mapper>

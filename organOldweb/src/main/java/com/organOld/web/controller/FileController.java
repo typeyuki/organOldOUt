@@ -1,4 +1,4 @@
-package com.organOld.web.controller.out;
+package com.organOld.web.controller;
 
 import com.organOld.oService.contract.BTableRequest;
 import com.organOld.oService.contract.CardLogsRequest;
@@ -18,11 +18,11 @@ public class FileController {
     FileService fileService;
 
     @ResponseBody
-    @RequestMapping(value="/{id}/getById", method = RequestMethod.GET)
+    @RequestMapping(value="/getById", method = RequestMethod.GET)
         public Conse getById (@PathVariable int id){return new Conse(true,fileService.getPersonalInfo(id)); }
 
     @ResponseBody
-    @RequestMapping(value="/{id}/getHealthById", method = RequestMethod.GET)
+    @RequestMapping(value="/getHealthById", method = RequestMethod.GET)
         public Conse getHealthById (@PathVariable int id){
             return new Conse(true,fileService.getOldmanHealth(id));
     }
@@ -34,10 +34,8 @@ public class FileController {
     }
 
     @ResponseBody
-    @RequestMapping(value = "/{id}/getLabelById", method = RequestMethod.GET)
+    @RequestMapping(value = "/getLabelById", method = RequestMethod.GET)
         public Conse getLabelById (@PathVariable int id){
             return fileService.getByLabel(id);
     }
-
-
 }

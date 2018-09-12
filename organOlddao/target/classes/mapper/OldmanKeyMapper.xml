@@ -1,0 +1,206 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.organOld.dao.repository.OldmanKeyDao">
+
+    <resultMap id="oldmanKey" type="com.organOld.dao.entity.oldman.OldmanKey">
+        <id property="oldmanId" column="id" />
+        <result property="birthday" column="birthday"/>
+        <result property="familyIndex" column="family" />
+        <result property="economicIndex" column="economic" />
+        <result property="floor" column="floor" />
+        <result property="isActivityOrgan" column="isActivityOrgan" />
+        <result property="chxIndex" column="chx_index" />
+        <result property="intelligence" column="intelligence" />
+        <result property="eyesight" column="eyesight" />
+        <result property="keyStatus" column="key_status" />
+        <result property="futureKeyStatus" column="future_key_status" />
+        <collection property="healthSelectIdsList" ofType="com.organOld.dao.entity.oldman.HealthSelect">
+            <id property="id" column="hsid" />
+            <result property="firType" column="fir_type" />
+        </collection>
+    </resultMap>
+
+    <resultMap id="oldmanHandle" type="com.organOld.dao.entity.oldman.Oldman">
+        <id property="id" column="id" />
+        <result property="name" column="name"/>
+        <result property="goal" column="goal" />
+        <result property="isHandle" column="is_handle"/>
+        <result property="keyStatus" column="key_status"/>
+        <result property="oldStatus" column="old_status"/>
+        <association property="oldmanKeyHandle" javaType="com.organOld.dao.entity.oldman.OldmanKeyHandle">
+            <id property="id" column="khid"/>
+            <result property="homeFirTypes" column="home_fir_types"/>
+            <result property="type" column="type"/>
+            <result property="organIds" column="organ_ids"/>
+        </association>
+        <collection property="organList" ofType="com.organOld.dao.entity.organ.Organ">
+            <id property="id" column="oid" />
+            <result property="name" column="oname" />
+            <result property="organNum" column="organ_num"/>
+            <result property="organTypeId" column="organ_type_id"/>
+            <result property="applyTime" column="apply_time"/>
+        </collection>
+        <collection property="homeList" ofType="com.organOld.dao.entity.home.Home">
+            <id property="id" column="hid" />
+            <result property="firType" column="fir_type" />
+        </collection>
+    </resultMap>
+
+
+
+    <select id="getByPage" parameterType="com.organOld.dao.util.Page" resultMap="oldmanHandle">
+        SELECT ob.id,ob.name,kh.type,kh.organ_ids,kh.home_fir_types,organ.id oid,organ.name oname,organ.organ_type_id,oo.apply_time,oo.num organ_num,ob.is_handle,ob.old_status,h.fir_type,
+        <if test="entity!=null and entity.future!=null and entity.future!=''">
+            ob.future_goal goal,ob.future_key_status key_status
+        </if>
+        <if test="entity==null or entity.future==null or entity.future==''">
+            ob.goal,ob.key_status
+        </if>
+        FROM oldman_base ob left join organ_oldman oo on oo.oldman_id=ob.id
+        left join key_handle kh on kh.oldman_id=ob.id
+        left join organ organ on organ.id=oo.organ_id
+        left join home_oldman ho on ho.oldman_id=ob.id
+        left join home h on h.id=ho.home_id
+        ,organ org,auto_value x
+        WHERE x.id=ob.xq_id AND org.id=x.parent_index and ob.disable=0
+
+        <if test="entity!=null and entity.future!=null and entity.future!=''">
+            and (ob.future_key_status =2 or ob.future_key_status =3 or ob.future_key_status =4)
+            <if test="entity!=null and  entity.goalStart!=null and entity.goalStart!=0">
+               and ob.future_goal &gt;= #{entity.goalStart}
+            </if>
+            <if test="entity!=null and  entity.goalEnd!=null and entity.goalEnd!=0">
+                and ob.future_goal &lt;= #{entity.goalEnd}
+            </if>
+        </if>
+
+        <if test="entity==null or entity.future==null or entity.future==''">
+            and (ob.key_status =2 or ob.key_status =3 or ob.key_status =4)
+            <if test="entity!=null and  entity.goalStart!=null and entity.goalStart!=0">
+               and ob.goal &gt;= #{entity.goalStart}
+            </if>
+            <if test="entity!=null and  entity.goalEnd!=null and entity.goalEnd!=0">
+               and ob.goal &lt;= #{entity.goalEnd}
+            </if>
+        </if>
+        <if test="entity!=null and  entity.isHandle!=null">
+            and ob.is_handle=#{entity.isHandle}
+        </if>
+        <if test="entity!=null and  entity.keyStatus!=null and entity.keyStatus==3">
+            and ob.key_status=3
+        </if>
+        <if test="entity!=null and  entity.keyStatus!=null and entity.keyStatus==4">
+            and ob.key_status=4
+        </if>
+        <if test="entity!=null and  entity.keyStatus!=null and entity.keyStatus==2">
+            and (ob.key_status=4 or ob.key_status=2)
+        </if>
+        <if test="entity!=null and  entity.isActivity!=null and entity.isActivity==1">
+            and oo.num=0
+        </if>
+        <if test="entity!=null and  entity.isActivity!=null and entity.isActivity==0">
+            and  (oo.num IS NULL and ob.is_handle!=2)
+        </if>
+        <if test="entity!=null and  entity.id!=null and entity.id!=0">
+            and ob.id=#{entity.id}
+        </if>
+        <if test="entity!=null and entity.search!=null and entity.search!=''">
+            and (ob.name LIKE  concat('%',#{entity.search},'%')
+            OR ob.id=#{entity.search})
+        </if>
+        <if test="entity!=null and entity.xqIds!=null">
+            and ob.xq_id in
+            <foreach collection="entity.xqIds" index="index" item="item" open="(" separator="," close=")">
+                ${item}
+            </foreach>
+
+        </if>
+        <if test="entity!=null and entity.future!=null and entity.future!=''">
+            ORDER BY future_key_status
+        </if>
+        <if test="entity==null or entity.future==null or entity.future==''">
+            ORDER BY key_status
+        </if>
+        desc
+        <if test="length!=null and length!=0">
+            limit #{start},#{length}
+        </if>
+    </select>
+
+    <select id="getSizeByPage" parameterType="com.organOld.dao.util.Page" resultType="java.lang.Long">
+        SELECT count(1)
+        FROM oldman_base ob left join organ_oldman oo on oo.oldman_id=ob.id
+        WHERE ob.disable=0
+        <if test="entity!=null and entity.future!=null and entity.future!=''">
+            and (ob.future_key_status =2 or ob.future_key_status =3 or ob.future_key_status =4)
+            <if test="entity!=null and  entity.goalStart!=null and entity.goalStart!=0">
+               and ob.future_goal &gt;= #{entity.goalStart}
+            </if>
+            <if test="entity!=null and  entity.goalEnd!=null and entity.goalEnd!=0">
+               and ob.future_goal &lt;= #{entity.goalEnd}
+            </if>
+        </if>
+        <if test="entity==null or entity.future==null or entity.future==''">
+            and (ob.key_status =2 or ob.key_status =3 or ob.key_status =4)
+            <if test="entity!=null and  entity.goalStart!=null and entity.goalStart!=0">
+                and ob.goal &gt;= #{entity.goalStart}
+            </if>
+            <if test="entity!=null and  entity.goalEnd!=null and entity.goalEnd!=0">
+                and ob.goal &lt;= #{entity.goalEnd}
+            </if>
+        </if>
+        <if test="entity!=null and  entity.isHandle!=null">
+            and ob.is_handle=#{entity.isHandle}
+        </if>
+        <if test="entity!=null and  entity.isActivity!=null and entity.isActivity==1">
+            and oo.num=0
+        </if>
+        <if test="entity!=null and  entity.isActivity!=null and entity.isActivity==0">
+            and (oo.num!=0 or oo.num IS NULL)
+        </if>
+        <if test="entity!=null and  entity.id!=null and entity.id!=0">
+            and ob.id=#{entity.id}
+        </if>
+        <if test="entity!=null and entity.xqIds!=null">
+            and ob.xq_id in
+            <foreach collection="entity.xqIds" index="index" item="item" open="(" separator="," close=")">
+                ${item}
+            </foreach>
+
+        </if>
+    </select>
+
+
+    <select id="getAllOldmanKey" resultMap="oldmanKey">
+        SELECT ob.id,ob.key_status,ob.birthday,ob.floor,ob.economic,ob.family,ohb.intelligence,ohb.eyesight,ho.home_id,hs.id hsid,hs.fir_type,
+        case oo.num
+			when 0 then 57
+			else 58
+			end isActivityOrgan
+        FROM oldman_base ob left join home_oldman ho on ob.id=ho.oldman_id left join home h on ho.home_id=h.id and h.fir_type=2
+		  left join health_select_oldman hso on hso.oldman_id=ob.id left join health_select hs on hs.id=hso.health_select_id and hs.fir_type in (1,2)
+		  left join organ_oldman oo on oo.oldman_id=ob.id left join organ org on org.id=oo.organ_id left join organ_type ot on ot.id=org.organ_type_id and ot.fir_type=21,
+		 oldman_health_base ohb
+        where  ob.id=ohb.oldman_id and ob.disable=0
+    </select>
+
+
+    <!--是否主动申请进 养老院 的逻辑是： 床位号为0 则得分 其他有床位号 或者 没进养老院的都不得分-->
+    <select id="getOldmanKeyByRound" resultMap="oldmanKey"  parameterType="com.organOld.dao.util.Page">
+        SELECT ob.id,ob.key_status,ob.future_key_status,ob.birthday,ob.floor,ob.economic,ob.family,ohb.intelligence,ohb.eyesight,ho.home_id,hs.id hsid,hs.fir_type,
+        case oo.num
+			when 0 then 57
+			else 58
+			end isActivityOrgan
+        FROM oldman_base ob left join home_oldman ho on ob.id=ho.oldman_id left join home h on ho.home_id=h.id and h.fir_type=2
+        left join health_select_oldman hso on hso.oldman_id=ob.id left join health_select hs on hs.id=hso.health_select_id and hs.fir_type in (1,2)
+		left join organ_oldman oo on oo.oldman_id=ob.id left join organ org on org.id=oo.organ_id left join organ_type ot on ot.id=org.organ_type_id and ot.fir_type=21,
+        oldman_health_base ohb
+        where ob.id=ohb.oldman_id
+        and ob.id in(
+        select a.id from
+        (select oo.id from oldman_base oo where oo.disable=0 and oo.id>${current} limit 0,#{round} ) as a
+        )
+    </select>
+
+</mapper>

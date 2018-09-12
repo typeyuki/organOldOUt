@@ -17,10 +17,11 @@ import com.organOld.oService.service.GoodsService;
 import com.organOld.oService.wrapper.AutoValWrap;
 import com.organOld.oService.wrapper.GoodsWrap;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.stream.Collectors;
-
+@Service
 public class GoodsServiceImpl implements GoodsService {
     @Autowired
     ComService comService;
@@ -64,8 +65,8 @@ public class GoodsServiceImpl implements GoodsService {
         return comService.tableReturn(bTableRequest.getsEcho(),size, goodsModelList);
     }
     @Override
-    public Conse getOrganByProduct(String name){
-        List<Integer> organIds = goodsDao.getOrganIdByName(name);
+    public Conse getOrganByProduct(int type){
+        List<Integer> organIds = goodsDao.getOrganIdByName(type);
         List<AutoValModel> organNames = autoValDao.getByIds(organIds).stream().map(autoValWrapper::wrap).collect(Collectors.toList());
         return new Conse(true,organNames);
     }
@@ -78,7 +79,8 @@ public class GoodsServiceImpl implements GoodsService {
     }
 
     @Override
-    public List<ProductType> getTypeByParent(int parent){
-        return productTypeDao.getByParent(parent);
+    public Conse getTypeByParent(int parent){
+        List<ProductType> productTypes = productTypeDao.getByParent(parent);
+        return new Conse(true,productTypes);
     }
 }

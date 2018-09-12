@@ -1,0 +1,135 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.organOld.dao.repository.UserDao">
+
+    <select id="getByUsername" resultType="com.organOld.dao.entity.SysUser">
+      SELECT id,username,password FROM sysuser WHERE username=#{username} and disable=0
+    </select>
+
+    <select id="getSysAuthoritiesByUsername" resultType="com.organOld.dao.entity.SysAuthority">
+        SELECT sa.au_name FROM sysauthority sa,sysuser su,user_role ur,role_authority ra
+        WHERE su.username=#{username} AND su.id=ur.user_id AND ur.role_id=ra.role_id AND ra.authority_id=sa.id
+    </select>
+
+    <select id="getOrganIdByUsername" resultType="java.lang.Integer">
+        SELECT uo.organ_id
+        FROM user_organ uo,sysuser u
+        WHERE uo.user_id=u.id AND u.username=#{username}
+    </select>
+    <select id="getOrganTypeByUsername" resultType="java.lang.String">
+        SELECT ot.sec_type
+        FROM user_organ uo,sysuser u,organ o,organ_type ot
+        WHERE uo.user_id=u.id AND u.username=#{username} and uo.organ_id=o.id AND o.organ_type_id=ot.id
+    </select>
+
+    <insert id="save" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO sysuser(username,password) VALUE (#{username},#{password})
+    </insert>
+
+    <insert id="setUserRole">
+        INSERT INTO user_role(user_id,role_id) VALUE (#{userId},#{roleId})
+    </insert>
+    <insert id="setUserOrgan">
+        INSERT INTO user_organ(user_id,organ_id) VALUE (#{userId},#{organId})
+    </insert>
+
+
+
+    <select id="getByPage" parameterType="com.organOld.dao.util.Page" resultType="com.organOld.dao.entity.SysUser">
+        SELECT u.id,u.username,u.password,u.disable,r.desc,u.time,o.name organ_name
+        FROM sysuser u left join user_organ uo on uo.user_id=u.id left join organ o on o.id=uo.organ_id,sysrole r,user_role ur
+        WHERE u.id=ur.user_id and r.id=ur.role_id
+        <if test="entity!=null and entity.search!=null and entity.search!=''">
+            and (u.username LIKE  concat('%',#{entity.search},'%')
+            OR o.name  LIKE  concat('%',#{entity.search},'%') OR u.id=#{entity.search})
+        </if>
+        <if test="entity.disable!=null">
+           and u.disable=#{entity.disable}
+        </if>
+        <if test="entity.roleId!=null and entity.roleId!=0">
+           and r.id=#{entity.roleId}
+        </if>
+        <if test="sortType!=null and sortType!=''">
+            ORDER BY ${sortType}
+        </if>
+        <if test="sort!=null and sort!=''">
+            ${sort}
+        </if>
+        <if test="length!=null and length!=0">
+            limit #{start},#{length}
+        </if>
+    </select>
+    <select id="getSizeByPage" parameterType="com.organOld.dao.util.Page" resultType="java.lang.Long">
+        SELECT count(1)
+        FROM sysuser u left join user_organ uo on uo.user_id=u.id left join organ o on o.id=uo.organ_id,sysrole r,user_role ur
+        WHERE u.id=ur.user_id and r.id=ur.role_id
+        <if test="entity!=null and entity.search!=null and entity.search!=''">
+            and (u.username LIKE  concat('%',#{entity.search},'%')
+            OR o.name  LIKE  concat('%',#{entity.search},'%') OR u.id=#{entity.search})
+        </if>
+        <if test="entity.disable!=null">
+            and u.disable=#{entity.disable}
+        </if>
+        <if test="entity.roleId!=null and entity.roleId!=0">
+            and r.id=#{entity.roleId}
+        </if>
+    </select>
+
+    <select id="getAllRole" resultType="com.organOld.dao.entity.SysRole">
+        SELECT  * from sysrole
+    </select>
+
+    <select id="getJwUserId" resultType="java.lang.Integer">
+        SELECT u.id
+        FROM sysuser u,organ o,user_organ uo
+        WHERE (o.organ_type_id=2 or o.organ_type_id=33) and u.id=uo.user_id and uo.organ_id=o.id
+        <if test="organId!=null and organId!=0">
+            and o.parent=#{organId}
+        </if>
+    </select>
+
+
+    <select id="ckeckOrganLogin" resultType="com.organOld.dao.entity.organ.Organ">
+        SELECT o.id,o.auth_consume,o.auth_sign,o.auth_query_info,o.auth_query_integral
+        FROM organ o,sysuser u,user_organ uo
+        WHERE u.username=#{username} and password=#{password} and o.id=uo.organ_id and u.id=uo.user_id and u.disable=0
+    </select>
+
+    <update id="setDisableByOrganId">
+        UPDATE sysuser u,user_organ uo set u.disable=1
+        WHERE uo.organ_id=#{organId} and u.id=uo.user_id
+    </update>
+
+
+    <delete id="delByIds">
+        UPDATE sysuser SET disable=1 where id in
+        <foreach collection="array" index="index" item="item" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+    </delete>
+
+    <select id="getById" resultType="com.organOld.dao.entity.SysUser">
+        SELECT u.id,u.username,u.password,r.id roleId,o.id organId,o.auth_consume,o.auth_product,o.auth_sign,o.auth_query_info,o.auth_query_integral
+        FROM sysuser u left join user_organ uo on uo.user_id=u.id left join organ o on o.id=uo.organ_id,sysrole r,user_role ur
+        WHERE u.id=ur.user_id and r.id=ur.role_id and u.id=#{id}
+    </select>
+
+    <update id="updateById" parameterType="com.organOld.dao.entity.SysUser">
+UPDATE sysuser SET username=#{username},password=#{password} where id=#{id};
+UPDATE user_role SET role_id=#{roleId} where user_id=#{id};
+UPDATE user_organ SET organ_id=#{organId} where user_id=#{id}
+    </update>
+
+    <select id="getByOrganId" resultType="com.organOld.dao.entity.SysUser">
+         SELECT u.id,u.username,u.password
+         FROM sysuser u,user_organ uo
+			where  uo.user_id=u.id and  uo.organ_id=#{organId}
+    </select>
+
+
+    <update id="updateProp">
+        UPDATE sysuser
+        SET ${prop}=#{value}
+        WHERE id=#{id}
+    </update>
+</mapper>

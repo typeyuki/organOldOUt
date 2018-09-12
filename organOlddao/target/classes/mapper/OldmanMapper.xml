@@ -1,0 +1,1055 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.organOld.dao.repository.OldmanDao">
+
+    <resultMap id="oldman" type="com.organOld.dao.entity.oldman.Oldman">
+        <id property="id" column="id" />
+        <result property="name" column="name"/>
+        <result property="sex" column="sex" />
+        <result property="birthday" column="birthday" />
+        <result property="pid" column="pid" />
+        <result property="address" column="address" />
+        <result property="phone" column="phone" />
+        <result property="xqId" column="xq_id" />
+        <result property="census" column="census" />
+        <result property="louNum" column="lou_num" />
+        <result property="oldStatus" column="old_status" />
+        <result property="politicalStatus" column="political_status" />
+        <result property="integral" column="integral"/>
+        <result property="time" column="time" />
+        <result property="sqzw" column="sqzw" />
+        <result property="zc" column="zc" />
+        <result property="family" column="family"/>
+        <result property="familyType" column="family_type"/>
+        <result property="economic" column="economic"/>
+        <result property="isVolunteer" column="is_volunteer"/>
+        <collection property="labelManList" ofType="com.organOld.dao.entity.label.LabelMan">
+            <id property="id" column="lmid" />
+            <result property="labelName" column="label_name"/>
+            <result property="isImplement" column="is_implement" />
+        </collection>
+    </resultMap>
+
+
+    <resultMap id="exportOldman" type="com.organOld.dao.util.bean.ExportOldman">
+        <id property="id" column="id" />
+        <result property="name" column="name"/>
+        <result property="sex" column="sex" />
+        <result property="birthday" column="birthday" />
+        <result property="pid" column="pid" />
+        <result property="address" column="address" />
+        <result property="xqId" column="xq_id" />
+        <result property="phone" column="phone" />
+        <result property="census" column="census" />
+        <result property="louNum" column="lou_num" />
+        <result property="oldStatus" column="old_status" />
+        <result property="politicalStatus" column="political_status" />
+        <result property="sqzw" column="sqzw" />
+        <result property="zc" column="zc" />
+        <result property="bloodType" column="blood_type"/>
+        <result property="intelligence" column="intelligence" />
+        <result property="eyesight" column="eyesight" />
+        <result property="family" column="family"/>
+        <result property="familyType" column="family_type"/>
+        <result property="economic" column="economic"/>
+        <association property="linkman" javaType="com.organOld.dao.entity.oldman.Linkman">
+            <result property="name" column="lname" />
+            <result property="phone" column="lphone" />
+            <result property="relation" column="relation" />
+        </association>
+        <collection property="healthAdd" ofType="com.organOld.dao.entity.oldman.HealthAdd">
+            <id property="id" column="haid" />
+            <result property="type" column="type"/>
+            <result property="desc" column="desc" />
+        </collection>
+        <collection property="healthSelect" ofType="com.organOld.dao.entity.oldman.HealthSelect">
+            <id property="id" column="hsid" />
+            <result property="firType" column="fir_type"/>
+            <result property="secTypeName" column="sec_type_zname" />
+        </collection>
+    </resultMap>
+
+    <resultMap id="idPid" type="com.organOld.dao.entity.oldman.Oldman">
+            <result property="id" column="id" />
+            <result property="pid" column="pid" />
+            <result property="oldStatus" column="old_status" />
+            <result property="isHandle" column="is_handle" />
+    </resultMap>
+
+    <select id="getAllOldman" resultMap="idPid">
+        SELECT id,pid,old_status,is_handle from oldman_base where 1=1
+    </select>
+
+
+    <select id="getBySearch" resultMap="oldman">
+        SELECT id,name
+        FROM oldman_base
+        WHERE  disable=0
+            and (id =#{search} OR name LIKE  concat('%',#{search},'%'))
+    </select>
+    <!--不能简单的 limit 0，10  因为有1对多的关系  会补全   一条记录当多条使用（由于某个字段有多个值）-->
+    <select id="getByPage" parameterType="com.organOld.dao.util.Page" resultMap="oldman">
+        SELECT o.id,o.name,o.sex,o.birthday,o.census,o.political_status,o.xq_id,o.family,o.economic,o.is_volunteer,o.old_status
+        FROM oldman_base o,oldman_health_base ohb
+        WHERE  o.disable=0 and o.id=ohb.oldman_id
+        <if test="entity.birthdayStart!=null">
+                <![CDATA[
+            and DATE_FORMAT(o.birthday,'%Y') >= DATE_FORMAT(#{entity.birthdayStart},'%Y')
+            ]]>
+            </if>
+            <if test="entity.birthdayEnd!=null">
+                <![CDATA[
+            and DATE_FORMAT(o.birthday,'%Y') <= DATE_FORMAT(#{entity.birthdayEnd},'%Y')
+            ]]>
+            </if>
+            <if test="entity!=null and entity.id!=null and entity.id!=0">
+                and o.id=#{entity.id}
+            </if>
+            <if test="entity!=null and entity.xqIds!=null">
+                and o.xq_id in
+                <foreach collection="entity.xqIds" index="index" item="item" open="(" separator="," close=")">
+                    ${item}
+                </foreach>
+            </if>
+            <if test="entity!=null and entity.sex!=null and entity.sex!=0">
+                and o.sex=#{entity.sex}
+            </if>
+        <if test="entity!=null and entity.isVolunteer!=null and entity.isVolunteer!=''">
+            and o.is_volunteer=#{entity.isVolunteer}
+        </if>
+            <if test="entity!=null and entity.isHealth!=null and entity.isHealth.length > 0">
+                and (ohb.is_mb in
+                <foreach collection="entity.isHealth" index="index" item="item" open="(" separator="," close=")">
+                    ${item}
+                </foreach>
+                or ohb.is_sn in
+                <foreach collection="entity.isHealth" index="index" item="item" open="(" separator="," close=")">
+                    ${item}
+                </foreach>
+                or ohb.is_ywfy in
+                <foreach collection="entity.isHealth" index="index" item="item" open="(" separator="," close=")">
+                    ${item}
+                </foreach>
+                or ohb.is_exzl in
+                <foreach collection="entity.isHealth" index="index" item="item" open="(" separator="," close=")">
+                    ${item}
+                </foreach>
+                or ohb.is_gz in
+                <foreach collection="entity.isHealth" index="index" item="item" open="(" separator="," close=")">
+                    ${item}
+                </foreach>
+                or ohb.is_cj in
+                <foreach collection="entity.isHealth" index="index" item="item" open="(" separator="," close=")">
+                    ${item}
+                </foreach>
+                )
+            </if>
+            <if test="entity!=null and entity.familyArray!=null and entity.familyArray.length > 0">
+                and
+                <foreach collection="entity.familyArray" index="index" item="item" open="(" separator="or" close=")">
+                    (o.family like concat('%',#{item},'%'))
+                </foreach>
+            </if>
+            <if test="entity!=null and entity.familyTypeArray!=null and entity.familyTypeArray.length > 0">
+                and
+                <foreach collection="entity.familyTypeArray" index="index" item="item" open="(" separator="or" close=")">
+                    (o.family_type like concat('%',#{item},'%'))
+                </foreach>
+            </if>
+            <if test="entity!=null and entity.intelligence!=null and entity.intelligence.length > 0">
+                and ohb.intelligence in
+                <foreach collection="entity.intelligence" index="index" item="item" open="(" separator="," close=")">
+                    ${item}
+                </foreach>
+            </if>
+            <if test="entity!=null and entity.eyesight!=null and entity.eyesight.length > 0">
+                and ohb.eyesight in
+                <foreach collection="entity.eyesight" index="index" item="item" open="(" separator="," close=")">
+                    ${item}
+                </foreach>
+            </if>
+            <if test="entity!=null and entity.economicArray!=null and entity.economicArray.length > 0">
+                and
+                <foreach collection="entity.economicArray" index="index" item="item" open="(" separator="or" close=")">
+                    (o.economic like concat('%',#{item},'%'))
+                </foreach>
+            </if>
+            <if test="entity!=null and entity.censusArray!=null and entity.censusArray.length > 0">
+                and o.census in
+                <foreach collection="entity.censusArray" index="index" item="item" open="(" separator="," close=")">
+                    ${item}
+                </foreach>
+            </if>
+            <if test="entity!=null and entity.zcArray!=null and entity.zcArray.length > 0">
+                and o.zc in
+                <foreach collection="entity.zcArray" index="index" item="item" open="(" separator="," close=")">
+                    ${item}
+                </foreach>
+            </if>
+            <if test="entity!=null and entity.sqzwArray!=null and entity.sqzwArray.length > 0">
+                and
+                <foreach collection="entity.sqzwArray" index="index" item="item" open="(" separator="or" close=")">
+                    (o.sqzw like concat('%',#{item},'%'))
+                </foreach>
+            </if>
+            <if test="entity!=null and entity.oldStatusArray!=null and entity.oldStatusArray.length > 0">
+                and o.old_status in
+                <foreach collection="entity.oldStatusArray" index="index" item="item" open="(" separator="," close=")">
+                    ${item}
+                </foreach>
+            </if>
+            <if test="entity!=null and entity.politicalStatusArray!=null and entity.politicalStatusArray.length > 0">
+                and o.political_status in
+                <foreach collection="entity.politicalStatusArray" index="index" item="item" open="(" separator="," close=")">
+                    ${item}
+                </foreach>
+            </if>
+            <if test="entity!=null and entity.search!=null and entity.search!=''">
+                and (o.pid LIKE  concat('%',#{entity.search},'%') OR o.address LIKE  concat('%',#{entity.search},'%') OR o.name LIKE  concat('%',#{entity.search},'%')
+                OR o.phone LIKE  concat('%',#{entity.search},'%'))
+            </if>
+             limit #{start},#{length}
+
+
+    </select>
+
+    <select id="getSizeByPage" parameterType="com.organOld.dao.util.Page" resultType="java.lang.Long">
+        SELECT count(1)
+        FROM oldman_base o,oldman_health_base ohb
+        WHERE  o.disable=0 and o.id=ohb.oldman_id
+        <if test="entity.birthdayStart!=null">
+            <![CDATA[
+            and DATE_FORMAT(o.birthday,'%Y') >= DATE_FORMAT(#{entity.birthdayStart},'%Y')
+            ]]>
+        </if>
+        <if test="entity.birthdayEnd!=null">
+            <![CDATA[
+            and DATE_FORMAT(o.birthday,'%Y') <= DATE_FORMAT(#{entity.birthdayEnd},'%Y')
+            ]]>
+        </if>
+        <if test="entity!=null and entity.id!=null and entity.id!=0">
+            and o.id=#{entity.id}
+        </if>
+        <if test="entity!=null and entity.xqIds!=null">
+            and o.xq_id in
+            <foreach collection="entity.xqIds" index="index" item="item" open="(" separator="," close=")">
+                ${item}
+            </foreach>
+        </if>
+        <if test="entity!=null and entity.sex!=null and entity.sex!=0">
+            and o.sex=#{entity.sex}
+        </if>
+        <if test="entity!=null and entity.isVolunteer!=null and entity.isVolunteer!=''">
+            and o.is_volunteer=#{entity.isVolunteer}
+        </if>
+        <if test="entity!=null and entity.isHealth!=null and entity.isHealth.length > 0">
+            and (ohb.is_mb in
+            <foreach collection="entity.isHealth" index="index" item="item" open="(" separator="," close=")">
+                ${item}
+            </foreach>
+            or ohb.is_sn in
+            <foreach collection="entity.isHealth" index="index" item="item" open="(" separator="," close=")">
+                ${item}
+            </foreach>
+            or ohb.is_ywfy in
+            <foreach collection="entity.isHealth" index="index" item="item" open="(" separator="," close=")">
+                ${item}
+            </foreach>
+            or ohb.is_exzl in
+            <foreach collection="entity.isHealth" index="index" item="item" open="(" separator="," close=")">
+                ${item}
+            </foreach>
+            or ohb.is_gz in
+            <foreach collection="entity.isHealth" index="index" item="item" open="(" separator="," close=")">
+                ${item}
+            </foreach>
+            or ohb.is_cj in
+            <foreach collection="entity.isHealth" index="index" item="item" open="(" separator="," close=")">
+                ${item}
+            </foreach>
+            )
+        </if>
+        <if test="entity!=null and entity.familyArray!=null and entity.familyArray.length > 0">
+            and
+            <foreach collection="entity.familyArray" index="index" item="item" open="(" separator="or" close=")">
+                (o.family like concat('%',#{item},'%'))
+            </foreach>
+        </if>
+        <if test="entity!=null and entity.familyTypeArray!=null and entity.familyTypeArray.length > 0">
+            and
+            <foreach collection="entity.familyTypeArray" index="index" item="item" open="(" separator="or" close=")">
+                (o.family_type like concat('%',#{item},'%'))
+            </foreach>
+        </if>
+        <if test="entity!=null and entity.intelligence!=null and entity.intelligence.length > 0">
+            and ohb.intelligence in
+            <foreach collection="entity.intelligence" index="index" item="item" open="(" separator="," close=")">
+                ${item}
+            </foreach>
+        </if>
+        <if test="entity!=null and entity.eyesight!=null and entity.eyesight.length > 0">
+            and ohb.eyesight in
+            <foreach collection="entity.eyesight" index="index" item="item" open="(" separator="," close=")">
+                ${item}
+            </foreach>
+        </if>
+        <if test="entity!=null and entity.economicArray!=null and entity.economicArray.length > 0">
+            and
+            <foreach collection="entity.economicArray" index="index" item="item" open="(" separator="or" close=")">
+                (o.economic like concat('%',#{item},'%'))
+            </foreach>
+        </if>
+        <if test="entity!=null and entity.censusArray!=null and entity.censusArray.length > 0">
+            and o.census in
+            <foreach collection="entity.censusArray" index="index" item="item" open="(" separator="," close=")">
+                ${item}
+            </foreach>
+        </if>
+        <if test="entity!=null and entity.zcArray!=null and entity.zcArray.length > 0">
+            and o.zc in
+            <foreach collection="entity.zcArray" index="index" item="item" open="(" separator="," close=")">
+                ${item}
+            </foreach>
+        </if>
+        <if test="entity!=null and entity.sqzwArray!=null and entity.sqzwArray.length > 0">
+            and
+            <foreach collection="entity.sqzwArray" index="index" item="item" open="(" separator="or" close=")">
+                (o.sqzw like concat('%',#{item},'%'))
+            </foreach>
+        </if>
+        <if test="entity!=null and entity.oldStatusArray!=null and entity.oldStatusArray.length > 0">
+            and o.old_status in
+            <foreach collection="entity.oldStatusArray" index="index" item="item" open="(" separator="," close=")">
+                ${item}
+            </foreach>
+        </if>
+        <if test="entity!=null and entity.politicalStatusArray!=null and entity.politicalStatusArray.length > 0">
+            and o.political_status in
+            <foreach collection="entity.politicalStatusArray" index="index" item="item" open="(" separator="," close=")">
+                ${item}
+            </foreach>
+        </if>
+        <if test="entity!=null and entity.search!=null and entity.search!=''">
+            and (o.pid LIKE  concat('%',#{entity.search},'%') OR o.address LIKE  concat('%',#{entity.search},'%') OR o.name LIKE  concat('%',#{entity.search},'%')
+            OR o.phone LIKE  concat('%',#{entity.search},'%'))
+        </if>
+
+    </select>
+
+    <delete id="delById">
+        DELETE FROM oldman_base WHERE id=#{id}
+    </delete>
+
+    <insert id="save" parameterType="com.organOld.dao.entity.oldman.Oldman" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO oldman_base(economic,family,family_type,is_volunteer,name,sex,birthday,pid,address,xq_id,census,political_status,phone,lou_num,floor,disable,zc,sqzw)
+        VALUE (#{economic},#{family},#{familyType},#{isVolunteer},#{name},#{sex},#{birthday},#{pid},#{address},#{xqId},#{census},#{politicalStatus},#{phone},#{louNum},#{floor},0,#{zc},#{sqzw})
+    </insert>
+
+    <insert id="saveAll" parameterType="java.util.List" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO oldman_base(economic,family,family_type,is_volunteer,name,sex,birthday,pid,address,xq_id,census,political_status,phone,lou_num,floor,disable,zc,sqzw)
+        VALUES
+        <foreach collection="list" item="item" index="index" separator=",">
+        (#{item.economic},#{item.family},#{item.familyType},#{item.isVolunteer},#{item.name},#{item.sex},#{item.birthday},#{item.pid},#{item.address},#{item.xqId},#{item.census},#{item.politicalStatus},#{item.phone},#{item.louNum},#{item.floor},0,#{item.zc},#{item.sqzw})
+        </foreach>
+    </insert>
+
+    <insert id="saveAllNoExist" parameterType="java.util.List" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO oldman_base(name,pid,disable)
+        VALUES
+        <foreach collection="list" item="item" index="index" separator=",">
+            (#{item.name},#{item.pid},2)
+        </foreach>
+    </insert>
+
+    <update id="updateKeyOldman">
+        UPDATE oldman_base
+        SET
+        goal= CASE id
+            <foreach collection="list" index="index" item="item" open="" separator=" " close="">
+                WHEN ${item.id} THEN #{item.goal}
+            </foreach>
+        END,
+        key_status= CASE id
+            <foreach collection="list" index="index" item="item" open="" separator=" " close="">
+                WHEN ${item.id} THEN #{item.keyStatus}
+            </foreach>
+        END
+        WHERE id in
+            <foreach collection="list" index="index" item="item" open="(" separator="," close=")">
+                ${item.id}
+            </foreach>
+
+    </update>
+
+    <update id="updateKeyOldmanFuture">
+        UPDATE oldman_base
+        SET
+        future_goal= CASE id
+        <foreach collection="list" index="index" item="item" open="" separator=" " close="">
+            WHEN ${item.id} THEN #{item.goal}
+        </foreach>
+        END,
+        future_key_status= CASE id
+        <foreach collection="list" index="index" item="item" open="" separator=" " close="">
+            WHEN ${item.id} THEN #{item.keyStatus}
+        </foreach>
+        END
+        WHERE id in
+        <foreach collection="list" index="index" item="item" open="(" separator="," close=")">
+            ${item.id}
+        </foreach>
+    </update>
+
+    <select id="getMaxId" resultType="java.lang.Long">
+        select MAX(id) FROM oldman_base
+    </select>
+
+
+    <select id="getIdByPid" resultType="java.lang.Integer">
+        SELECT id FROM oldman_base WHERE pid=#{pid}
+    </select>
+
+    <update id="updateById" parameterType="com.organOld.dao.entity.oldman.Oldman">
+        UPDATE oldman_base
+        set name=#{name},birthday=#{birthday},sex=#{sex},pid=#{pid},address=#{address},census=#{census},political_status=#{politicalStatus},
+        phone=#{phone},xq_id=#{xqId},lou_num=#{louNum},floor=#{floor},zc=#{zc},sqzw=#{sqzw},family=#{family},economic=#{economic},family_type=#{familyType}
+        where id=#{id}
+    </update>
+
+
+    <update id="updateByIds" parameterType="java.util.List">
+        update oldman_base
+        SET disable=0,
+        name= CASE id
+        <foreach collection="list" index="index" item="item" open="" separator=" " close="">
+            WHEN ${item.id} THEN #{item.name}
+        </foreach>
+        ELSE name
+        END,
+        sex= CASE id
+        <foreach collection="list" index="index" item="item" open="" separator=" " close="">
+            WHEN ${item.id} THEN #{item.sex}
+        </foreach>
+        ELSE sex
+        END,
+        birthday= CASE id
+        <foreach collection="list" index="index" item="item" open="" separator=" " close="">
+            WHEN ${item.id} THEN #{item.birthday}
+        </foreach>
+        ELSE birthday
+        END,
+        pid= CASE id
+        <foreach collection="list" index="index" item="item" open="" separator=" " close="">
+            WHEN ${item.id} THEN #{item.pid}
+        </foreach>
+        END,
+        address= CASE id
+        <foreach collection="list" index="index" item="item" open="" separator=" " close="">
+            WHEN ${item.id} THEN #{item.address}
+        </foreach>
+        ELSE address
+        END,
+        xq_id= CASE id
+        <foreach collection="list" index="index" item="item" open="" separator=" " close="">
+            WHEN ${item.id} THEN #{item.xqId}
+        </foreach>
+        ELSE xq_id
+        END,
+        census= CASE id
+        <foreach collection="list" index="index" item="item" open="" separator=" " close="">
+            WHEN ${item.id} THEN #{item.census}
+        </foreach>
+        ELSE census
+        END,
+        zc= CASE id
+        <foreach collection="list" index="index" item="item" open="" separator=" " close="">
+            WHEN ${item.id} THEN #{item.zc}
+        </foreach>
+        ELSE zc
+        END,
+        sqzw= CASE id
+        <foreach collection="list" index="index" item="item" open="" separator=" " close="">
+            WHEN ${item.id} THEN #{item.sqzw}
+        </foreach>
+        ELSE sqzw
+        END,
+        political_status= CASE id
+        <foreach collection="list" index="index" item="item" open="" separator=" " close="">
+            WHEN ${item.id} THEN #{item.politicalStatus}
+        </foreach>
+        ELSE political_status
+        END,
+        phone= CASE id
+        <foreach collection="list" index="index" item="item" open="" separator=" " close="">
+            WHEN ${item.id} THEN #{item.phone}
+        </foreach>
+        ELSE phone
+        END,
+        lou_num= CASE id
+        <foreach collection="list" index="index" item="item" open="" separator=" " close="">
+            WHEN ${item.id} THEN #{item.louNum}
+        </foreach>
+        ELSE lou_num
+        END,
+        floor= CASE id
+        <foreach collection="list" index="index" item="item" open="" separator=" " close="">
+            WHEN ${item.id} THEN #{item.floor}
+        </foreach>
+        ELSE floor
+        END,
+        economic= CASE id
+        <foreach collection="list" index="index" item="item" open="" separator=" " close="">
+            WHEN ${item.id} THEN #{item.economic}
+        </foreach>
+        ELSE economic
+        END,
+        family= CASE id
+        <foreach collection="list" index="index" item="item" open="" separator=" " close="">
+            WHEN ${item.id} THEN #{item.family}
+        </foreach>
+        ELSE family
+        END,
+        family_type= CASE id
+        <foreach collection="list" index="index" item="item" open="" separator=" " close="">
+            WHEN ${item.id} THEN #{item.familyType}
+        </foreach>
+        ELSE family_type
+        END,
+        is_volunteer= CASE id
+        <foreach collection="list" index="index" item="item" open="" separator=" " close="">
+            WHEN ${item.id} THEN #{item.isVolunteer}
+        </foreach>
+        ELSE is_volunteer
+        END
+        where id in
+        <foreach collection="list" index="index" item="item" separator="," open="(" close=")">
+            #{item.id,jdbcType=BIGINT}
+        </foreach>
+    </update>
+
+
+    <update id="setDisabled">
+        UPDATE oldman_base
+        SET disable=1
+        WHERE id NOT in
+        <foreach collection="list" index="index" item="item" separator="," open="(" close=")">
+            #{item}
+        </foreach>
+        <if test="xqIds!=null">
+            and xq_id IN
+            <foreach collection="xqIds" index="index" item="item" separator="," open="(" close=")">
+                #{item}
+            </foreach>
+        </if>
+    </update>
+
+    <update id="updateProp">
+        UPDATE oldman_base
+        SET ${prop}=#{value}
+        WHERE id=#{id}
+    </update>
+
+    <update id="updateProps">
+        UPDATE oldman_base
+        SET ${prop}=#{value}
+        WHERE id in
+        <foreach collection="ids" index="index" item="item" separator="," open="(" close=")">
+            #{item}
+        </foreach>
+    </update>
+
+    <select id="getIntegralByOldmanId" resultMap="oldman">
+        SELECT name,integral FROM oldman_base WHERE id=#{oldmanId} and disable!=1
+    </select>
+
+    <update id="updateOrganExceLImportByIds">
+        update oldman_base
+        SET
+        old_status= CASE id
+        <foreach collection="list" index="index" item="item" open="" separator=" " close="">
+            WHEN ${item.id} THEN ${item.oldStatus}
+        </foreach>
+        else old_status
+        END,
+        is_handle= CASE id
+        <foreach collection="list" index="index" item="item" open="" separator=" " close="">
+            WHEN ${item.id} THEN ${item.isHandle}
+        </foreach>
+        else is_handle
+        END
+    </update>
+
+    <select id="getIntegralByPage" parameterType="com.organOld.dao.util.Page" resultMap="oldman">
+        select o.id,o.name,o.integral
+        FROM oldman_base o,organ org,auto_value x
+        WHERE o.disable=0 and x.id=o.xq_id AND org.id=x.parent_index
+        <if test="entity!=null and entity.organId!=null and entity.organId!=0">
+            and org.id in (
+            SELECT
+            case o.parent
+            when 0 then child.id
+            else o.id
+            end id
+            from organ o left join organ child on child.parent=o.id
+            WHERE o.id=#{entity.organId}
+            )
+        </if>
+        <if test="entity!=null and entity.search!=null and entity.search!=''">
+            and (o.name LIKE  concat('%',#{entity.search},'%')
+            OR o.id=#{entity.search})
+        </if>
+        <if test="sortType!=null and sortType!=''">
+            ORDER BY ${sortType}
+        </if>
+        <if test="sort!=null and sort!=''">
+            ${sort}
+        </if>
+        <if test="length!=null and length!=0">
+            limit #{start},#{length}
+        </if>
+    </select>
+
+
+    <select id="getIntegralSizeByPage" parameterType="com.organOld.dao.util.Page" resultType="java.lang.Long">
+        select count(1)
+        FROM oldman_base o,organ org,auto_value x
+        WHERE o.disable=0 and x.id=o.xq_id AND org.id=x.parent_index
+        <if test="entity!=null and entity.organId!=null and entity.organId!=0">
+            and org.id in (
+            SELECT
+            case o.parent
+            when 0 then child.id
+            else o.id
+            end id
+            from organ o left join organ child on child.parent=o.id
+            WHERE o.id=#{entity.organId}
+            )
+        </if>
+        <if test="entity!=null and entity.search!=null and entity.search!=''">
+            and (o.name LIKE  concat('%',#{entity.search},'%')
+            OR o.id=#{entity.search})
+        </if>
+    </select>
+
+    <update id="addInregral">
+        UPDATE oldman_base
+        set integral = integral+${integral}
+        WHERE id=#{oldmanId}
+    </update>
+
+    <select id="getById" resultType="com.organOld.dao.entity.oldman.Oldman">
+        SELECT * from oldman_base where id=#{id}
+    </select>
+
+
+    <select id="getByJwId" resultType="com.organOld.dao.entity.oldman.Oldman">
+        SELECT o.id,o.name,o.pid,o.old_status,o.is_handle FROM oldman_base o
+        <if test="jwId!=null and jwId!=0">
+            ,auto_value x,organ org
+            where o.xq_id=x.id and x.parent_index=org.id and org.id=#{jwId}
+        </if>
+    </select>
+
+
+
+    <select id="getAll" parameterType="com.organOld.dao.entity.oldman.Oldman" resultMap="exportOldman">
+        SELECT o.id,o.name,o.sqzw,o.zc,o.sex,o.birthday,o.census,o.political_status,o.phone,o.address,o.pid,o.lou_num,o.old_status,
+        o.xq_id,o.family,o.economic,l.name lname,l.phone lphone,l.relation,o.family_type,
+        ohb.blood_type,ohb.eyesight,ohb.intelligence,ha.type,ha.desc,hs.fir_type,hs.sec_type_name,ha.id haid,hs.id hsid
+        FROM oldman_base o
+        left JOIN linkman l on l.oldman_id=o.id,
+        oldman_health_base ohb  LEFT JOIN health_add ha ON ha.oldman_id=ohb.oldman_id
+        LEFT JOIN health_select_oldman hso on hso.oldman_id=ohb.oldman_id left join health_select hs on hso.health_select_id=hs.id
+        WHERE  o.disable=0
+        AND ohb.oldman_id=o.id
+        <if test="birthdayStart!=null">
+                <![CDATA[
+            and DATE_FORMAT(o.birthday,'%Y') >= DATE_FORMAT(#{birthdayStart},'%Y')
+            ]]>
+       </if>
+        <if test="birthdayEnd!=null">
+                <![CDATA[
+            and DATE_FORMAT(o.birthday,'%Y') <= DATE_FORMAT(#{birthdayEnd},'%Y')
+            ]]>
+        </if>
+           <if test="id!=null and id!=0">
+                and o.id=#{id}
+          </if>
+        <if test="xqIds!=null">
+            and o.xq_id in
+            <foreach collection="xqIds" index="index" item="item" open="(" separator="," close=")">
+                ${item}
+            </foreach>
+
+        </if>
+            <if test="sex!=null and sex!=0">
+                and o.sex=#{sex}
+            </if>
+            <if test="isHealth!=null and isHealth.length > 0">
+                and (ohb.is_mb in
+                <foreach collection="isHealth" index="index" item="item" open="(" separator="," close=")">
+                    ${item}
+                </foreach>
+                or ohb.is_sn in
+                <foreach collection="isHealth" index="index" item="item" open="(" separator="," close=")">
+                    ${item}
+                </foreach>
+                or ohb.is_ywfy in
+                <foreach collection="isHealth" index="index" item="item" open="(" separator="," close=")">
+                    ${item}
+                </foreach>
+                or ohb.is_exzl in
+                <foreach collection="isHealth" index="index" item="item" open="(" separator="," close=")">
+                    ${item}
+                </foreach>
+                or ohb.is_gz in
+                <foreach collection="isHealth" index="index" item="item" open="(" separator="," close=")">
+                    ${item}
+                </foreach>
+                or ohb.is_cj in
+                <foreach collection="isHealth" index="index" item="item" open="(" separator="," close=")">
+                    ${item}
+                </foreach>
+                )
+            </if>
+            <if test="familyArray!=null and familyArray.length > 0">
+                and o.family in
+                <foreach collection="familyArray" index="index" item="item" open="(" separator="," close=")">
+                    ${item}
+                </foreach>
+            </if>
+            <if test="familyTypeArray!=null and familyTypeArray.length > 0">
+                and o.family_type in
+                <foreach collection="familyTypeArray" index="index" item="item" open="(" separator="," close=")">
+                    ${item}
+                </foreach>
+            </if>
+            <if test="intelligence!=null and intelligence.length > 0">
+                and ohb.intelligence in
+                <foreach collection="intelligence" index="index" item="item" open="(" separator="," close=")">
+                    ${item}
+                </foreach>
+            </if>
+            <if test="eyesight!=null and eyesight.length > 0">
+                and ohb.eyesight in
+                <foreach collection="eyesight" index="index" item="item" open="(" separator="," close=")">
+                    ${item}
+                </foreach>
+            </if>
+            <if test="economicArray!=null and economicArray.length > 0">
+                and o.economic in
+                <foreach collection="economicArray" index="index" item="item" open="(" separator="," close=")">
+                    ${item}
+                </foreach>
+            </if>
+            <if test="censusArray!=null and censusArray.length > 0">
+                and o.census in
+                <foreach collection="censusArray" index="index" item="item" open="(" separator="," close=")">
+                    ${item}
+                </foreach>
+            </if>
+            <if test="zcArray!=null and zcArray.length > 0">
+                and o.zc in
+                <foreach collection="zcArray" index="index" item="item" open="(" separator="," close=")">
+                    ${item}
+                </foreach>
+            </if>
+            <if test="sqzwArray!=null and sqzwArray.length > 0">
+                and
+                <foreach collection="sqzwArray" index="index" item="item" open="(" separator="or" close=")">
+                    (o.sqzw like concat('%',#{item},'%'))
+                </foreach>
+            </if>
+            <if test="oldStatusArray!=null and oldStatusArray.length > 0">
+                and o.old_status in
+                <foreach collection="oldStatusArray" index="index" item="item" open="(" separator="," close=")">
+                    ${item}
+                </foreach>
+            </if>
+            <if test="politicalStatusArray!=null and politicalStatusArray.length > 0">
+                and o.political_status in
+                <foreach collection="politicalStatusArray" index="index" item="item" open="(" separator="," close=")">
+                    ${item}
+                </foreach>
+            </if>
+            <if test="search!=null and search!=''">
+                and (o.pid LIKE  concat('%',#{search},'%') OR o.address LIKE  concat('%',#{search},'%') OR o.name LIKE  concat('%',#{search},'%')
+                OR o.phone LIKE  concat('%',#{search},'%'))
+            </if>
+
+    </select>
+
+
+    <select id="getOrganOldmans" resultType="com.organOld.dao.entity.oldman.Oldman">
+        SELECT id,pid FROM oldman_base
+        where 1=1
+        <if test="xqIds!=null">
+            and xq_id in
+            <foreach collection="xqIds" index="index" item="item" open="(" separator="," close=")">
+                ${item}
+            </foreach>
+        </if>
+    </select>
+
+
+    <delete id="delVolunteerByXqIds" parameterType="java.util.List">
+        UPDATE oldman_base SET is_volunteer=0
+        WHERE
+         id not IN
+        <foreach collection="existOldmanIds" index="index" item="item" separator="," open="(" close=")">
+            #{item}
+        </foreach>
+        <if test="xqIds!=null">
+            and xq_id IN
+            <foreach collection="xqIds" index="index" item="item" separator="," open="(" close=")">
+                #{item}
+            </foreach>
+        </if>
+    </delete>
+
+    <select id="getOldNum60" resultType="Long">
+        SELECT count(1) FROM oldman_base
+        where disable = 0
+    </select>
+    <update id="delHomeOldStatus">
+        UPDATE oldman_base SET
+        is_handle= CASE old_status
+        WHEN 3 THEN 0
+        WHEN 4 THEN 2
+        ELSE is_handle
+        END,
+        old_status= CASE old_status
+        WHEN 3 THEN 0
+        WHEN 4 THEN 2
+        ELSE old_status
+        END
+        WHERE old_status=3 OR old_status=4
+    </update>
+
+
+    <update id="updateHomeOldStatusById">
+        UPDATE oldman_base SET
+        old_status= CASE old_status
+        WHEN 2 THEN 4
+        WHEN 0 THEN 3
+        ELSE old_status
+        END,
+        is_handle= CASE is_handle
+        WHEN 0 THEN 2
+        ELSE is_handle
+        END
+        WHERE id=#{id}
+    </update>
+
+
+    <update id="delHomeOldStatusByIds">
+        UPDATE oldman_base SET
+        is_handle= CASE old_status
+        WHEN 3 THEN 0
+        WHEN 4 THEN 2
+        ELSE is_handle
+        END,
+        old_status= CASE old_status
+        WHEN 3 THEN 0
+        WHEN 4 THEN 2
+        ELSE old_status
+        END
+        WHERE id in
+        <foreach collection="list" index="index" item="item" separator="," open="(" close=")">
+            #{item}
+        </foreach>
+    </update>
+
+    <update id="delCommunityOldmanStatusByIds">
+        UPDATE oldman_base SET
+        is_handle= CASE old_status
+        WHEN 2 THEN 0
+        WHEN 4 THEN 2
+        ELSE is_handle
+        END,
+        old_status= CASE old_status
+        WHEN 2 THEN 0
+        WHEN 4 THEN 3
+        ELSE old_status
+        END
+        WHERE id in
+        <foreach collection="array" index="index" item="item" separator="," open="(" close=")">
+            #{item}
+        </foreach>
+    </update>
+
+    <select id="updateCommunityOldmanStatusById">
+        UPDATE oldman_base SET
+        old_status= CASE old_status
+        WHEN 3 THEN 4
+        WHEN 0 THEN 2
+        ELSE old_status
+        END,
+        is_handle= CASE is_handle
+        WHEN 0 THEN 2
+        ELSE is_handle
+        END
+        WHERE id=#{id}
+    </select>
+
+    <select id="getByDelOldmanIds" resultType="com.organOld.dao.entity.oldman.Oldman">
+        SELECT DISTINCT o.id,o.is_handle,o.old_status from oldman_base o,home_oldman ho
+        WHERE o.id=ho.oldman_id and ho.oldman_id in
+        <foreach collection="list" index="index" item="item" separator="," open="(" close=")">
+            #{item}
+        </foreach>
+    </select>
+
+
+
+    <select id="getOldStatusNum" resultType="java.util.Map">
+            select
+            (select count(1) from oldman_base where old_status=1 and disable=0
+        <if test="xqIds!=null">
+            and xq_id in
+            <foreach collection="list" index="index" item="item" open="(" separator="," close=")">
+                ${item}
+            </foreach>
+        </if>
+            ) as OrganOldNum,
+            (select count(1) from oldman_base where old_status=2 and disable=0
+        <if test="xqIds!=null">
+            and xq_id in
+            <foreach collection="list" index="index" item="item" open="(" separator="," close=")">
+                ${item}
+            </foreach>
+        </if>
+        ) as CommunityOldNum,
+            (select count(1) from oldman_base where old_status=3 and disable=0
+        <if test="xqIds!=null">
+            and xq_id in
+            <foreach collection="list" index="index" item="item" open="(" separator="," close=")">
+                ${item}
+            </foreach>
+        </if>
+        ) as FamilyOldNum,
+            (select count(1) from oldman_base where old_status=4 and disable=0
+        <if test="xqIds!=null">
+            and xq_id in
+            <foreach collection="list" index="index" item="item" open="(" separator="," close=")">
+                ${item}
+            </foreach>
+        </if>
+        ) as CfOldNum
+    </select>
+
+
+    <select id="getOldmanNum"  resultType="java.util.Map">
+        select (
+        select count(1) from oldman_base where disable=0
+        <if test="xqIds!=null">
+            and xq_id in
+            <foreach collection="xqIds" index="index" item="item" open="(" separator="," close=")">
+                ${item}
+            </foreach>
+        </if>
+        )as Num,
+        (
+        SELECT count(1) from oldman_base where
+        <![CDATA[
+            DATE_FORMAT(birthday,'%Y') <= DATE_FORMAT(#{start60},'%Y')
+            ]]>
+        AND
+        <![CDATA[
+            DATE_FORMAT(birthday,'%Y') > DATE_FORMAT(#{start80},'%Y')
+            ]]>
+        <if test="xqIds!=null">
+            and xq_id in
+            <foreach collection="xqIds" index="index" item="item" open="(" separator="," close=")">
+                ${item}
+            </foreach>
+        </if>
+        ) as Num60,
+        (
+        SELECT count(1) from oldman_base where
+        <![CDATA[
+            DATE_FORMAT(birthday,'%Y') <= DATE_FORMAT(#{start80},'%Y')
+            ]]>
+        <if test="xqIds!=null">
+            and xq_id in
+            <foreach collection="xqIds" index="index" item="item" open="(" separator="," close=")">
+                ${item}
+            </foreach>
+        </if>
+        ) as Num80
+    </select>
+
+    <select id="getIntegralSort" resultType="com.organOld.dao.entity.oldman.Oldman">
+        SELECT id,name,integral from oldman_base
+        WHERE disable=0
+        <if test="xqIds!=null">
+            and xq_id in
+            <foreach collection="list" index="index" item="item" open="(" separator="," close=")">
+                ${item}
+            </foreach>
+        </if>
+        order by integral DESC limit 0,5
+    </select>
+
+
+    <select id="getKeyNum"  resultType="java.util.Map">
+        SELECT
+        (select count(1) from oldman_base where disable=0 and goal>= #{baseGoal}
+        <if test="xqIds!=null">
+            and xq_id in
+            <foreach collection="xqIds" index="index" item="item" open="(" separator="," close=")">
+                ${item}
+            </foreach>
+        </if>
+        ) as Num,
+        (select count(1) from oldman_base where disable=0 and goal>= #{baseGoal} and is_handle=2
+        <if test="xqIds!=null">
+            and xq_id in
+            <foreach collection="xqIds" index="index" item="item" open="(" separator="," close=")">
+                ${item}
+            </foreach>
+        </if>
+        ) as ApNum,
+        (select count(1) from oldman_base where disable=0 and goal>= #{baseGoal} and is_handle=1
+        <if test="xqIds!=null">
+            and xq_id in
+            <foreach collection="xqIds" index="index" item="item" open="(" separator="," close=")">
+                ${item}
+            </foreach>
+        </if>
+        ) as ClNum
+    </select>
+
+    <update id="updateHomeOldStatusByOldmanIds">
+        UPDATE oldman_base SET
+        is_handle= 2,
+        old_status= CASE old_status
+        WHEN 0 THEN 3
+        WHEN 2 THEN 4
+        ELSE old_status
+        END
+        WHERE id in
+        <foreach collection="list" index="index" item="item" separator="," open="(" close=")">
+            #{item}
+        </foreach>
+    </update>
+
+    <update id="updateOrganOldStatusByOldmanIds">
+        UPDATE oldman_base
+        SET
+        old_status= CASE id
+        <foreach collection="list" index="index" item="item" open="" separator=" " close="">
+            WHEN ${item.id} THEN #{item.oldStatus}
+        </foreach>
+        END,
+        is_handle=2
+        WHERE id in
+        <foreach collection="list" index="index" item="item" open="(" separator="," close=")">
+            ${item.id}
+        </foreach>
+    </update>
+
+    <update id="delAllOldStatusHandle">
+        UPDATE oldman_base SET is_handle=0,old_status=0
+    </update>
+</mapper>

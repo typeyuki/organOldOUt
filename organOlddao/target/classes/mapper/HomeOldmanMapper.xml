@@ -1,0 +1,269 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.organOld.dao.repository.HomeOldmanDao">
+
+    <resultMap id="homeOldman" type="com.organOld.dao.entity.home.HomeOldman">
+        <id property="id" column="id" />
+        <result property="timeIn" column="time_in" />
+        <result property="timeOut" column="time_out"/>
+        <result property="isService" column="is_service"/>
+        <result property="time" column="time"/>
+        <result property="ny" column="ny"/>
+        <association property="oldman" javaType="com.organOld.dao.entity.oldman.Oldman">
+            <id property="id" column="oid" />
+            <result property="name" column="name"/>
+            <result property="disable" column="disable" />
+        </association>
+        <association property="organ" javaType="com.organOld.dao.entity.organ.Organ">
+            <id property="id" column="orgid" />
+            <result property="name" column="orgname"/>
+        </association>
+        <association property="home" javaType="com.organOld.dao.entity.home.Home">
+            <id property="id" column="hid" />
+            <result property="firType" column="fir_type"/>
+            <result property="secType" column="sec_type"/>
+        </association>
+    </resultMap>
+
+    <!--养老状态 居家养老-->
+    <select id="getByPage" parameterType="com.organOld.dao.util.Page" resultMap="homeOldman">
+        SELECT ho.id,ho.ny,ho.time_in,ho.time_out,ho.is_service,o.id oid,o.name,h.id hid,ho.time,orgDy.id orgid,orgDy.name orgname,h.fir_type,
+        case h.fir_type
+        when 2 then c.level
+        when 4 then hd.name
+        when 5 then org.name
+        else h.sec_type
+        end sec_type
+        FROM home_oldman ho left join organ orgDy on ho.organ_id=orgDy.id and orgDy.disable=0
+        ,oldman_base o,home h left join chx c on c.id=h.sec_type left join organ org on org.id=h.sec_type left join home_doctor hd on hd.id=h.sec_type
+        WHERE ho.home_id=h.id and ho.oldman_id=o.id and ho.ny=#{entity.ny}
+        <if test="entity.oldStatus!=null and entity.oldStatus!=0">
+              AND (o.old_status=3 OR o.old_status=4)
+        </if>
+        <if test="entity!=null and entity.oldmanId!=null and entity.oldmanId!=0">
+            and o.id=#{entity.oldmanId}
+        </if>
+        <if test="entity!=null and entity.oldman!=null and entity.oldman.id!=0">
+            and o.id=#{entity.oldman.id}
+        </if>
+        <if test="entity!=null and entity.xqIds!=null">
+            and o.xq_id in
+            <foreach collection="entity.xqIds" index="index" item="item" open="(" separator="," close=")">
+                ${item}
+            </foreach>
+        </if>
+        <if test="entity!=null and entity.type!=null and entity.type.length > 0">
+            and h.fir_type IN
+            <foreach collection="entity.type" index="index" item="item" separator="," open="(" close=")">
+                #{item}
+            </foreach>
+        </if>
+        <if test="entity.homeId!=null and entity.homeId!=0">
+            AND ho.home_id=#{entity.homeId}
+        </if>
+        <if test="entity!=null and entity.search!=null and entity.search!=''">
+            and ( orgDy.name LIKE  concat('%',#{entity.search},'%') OR hd.name LIKE  concat('%',#{entity.search},'%') OR org.name LIKE  concat('%',#{entity.search},'%')
+            OR h.sec_type LIKE  concat('%',#{entity.search},'%')
+            OR o.name LIKE  concat('%',#{entity.search},'%') OR o.id=#{entity.search})
+        </if>
+        <if test="sortType!=null and sortType!=''">
+            ORDER BY ${sortType}
+        </if>
+        <if test="sort!=null and sort!=''">
+            ${sort}
+        </if>
+        <if test="length!=null and length!=0">
+            limit #{start},#{length}
+        </if>
+    </select>
+
+    <select id="getSizeByPage" parameterType="com.organOld.dao.util.Page" resultType="java.lang.Long">
+        SELECT count(1)
+        FROM home_oldman ho left join organ orgDy on ho.organ_id=orgDy.id and orgDy.disable=0
+        ,oldman_base o,home h left join chx c on c.id=h.sec_type left join organ org on org.id=h.sec_type left join home_doctor hd on hd.id=h.sec_type
+        WHERE ho.home_id=h.id and ho.oldman_id=o.id and ho.ny=#{entity.ny}
+        <if test="entity.oldStatus!=null and entity.oldStatus!=0">
+              AND (o.old_status=3 OR o.old_status=4)
+        </if>
+        <if test="entity!=null and entity.oldmanId!=null and entity.oldmanId!=0">
+            and o.id=#{entity.oldmanId}
+        </if>
+        <if test="entity!=null and entity.oldman!=null and entity.oldman.id!=0">
+            and o.id=#{entity.oldman.id}
+        </if>
+        <if test="entity!=null and entity.xqIds!=null">
+            and o.xq_id in
+            <foreach collection="entity.xqIds" index="index" item="item" open="(" separator="," close=")">
+                ${item}
+            </foreach>
+        </if>
+        <if test="entity!=null and entity.type!=null and entity.type.length > 0">
+            and h.fir_type IN
+            <foreach collection="entity.type" index="index" item="item" separator="," open="(" close=")">
+                #{item}
+            </foreach>
+        </if>
+        <if test="entity.homeId!=null and entity.homeId!=0">
+            AND ho.home_id=#{entity.homeId}
+        </if>
+        <if test="entity!=null and entity.search!=null and entity.search!=''">
+            and ( orgDy.name LIKE  concat('%',#{entity.search},'%') OR hd.name LIKE  concat('%',#{entity.search},'%') OR org.name LIKE  concat('%',#{entity.search},'%')
+            OR h.sec_type LIKE  concat('%',#{entity.search},'%')
+            OR o.name LIKE  concat('%',#{entity.search},'%') OR o.id=#{entity.search})
+        </if>
+    </select>
+
+
+
+<!--居家养老录入人员看到的-->
+    <select id="getManAllByPage" parameterType="com.organOld.dao.util.Page" resultMap="homeOldman">
+        SELECT ho.id,ho.time_in,ho.ny,ho.time_out,ho.is_service,o.id oid,o.name,o.disable,h.id hid,ho.time,orgDy.id orgid,orgDy.name orgname,h.fir_type,
+        case h.fir_type
+        when 2 then c.level
+        when 4 then hd.name
+        when 5 then org.name
+        else h.sec_type
+        end sec_type
+        FROM home_oldman ho left join organ orgDy on ho.organ_id=orgDy.id and orgDy.disable=0
+        left join oldman_base o on ho.oldman_id=o.id,home h left join chx c on c.id=h.sec_type left join organ org on org.id=h.sec_type left join home_doctor hd on hd.id=h.sec_type
+        WHERE ho.home_id=h.id
+        <if test="entity.ny!=null and entity.ny!=''">
+            AND ho.ny=#{entity.ny}
+        </if>
+        <if test="entity!=null and entity.oldmanId!=null and entity.oldmanId!=0">
+            and o.id=#{entity.oldmanId}
+        </if>
+        <if test="entity!=null and entity.oldman!=null and entity.oldman.id!=0">
+            and o.id=#{entity.oldman.id}
+        </if>
+        <if test="entity!=null and entity.type!=null and entity.type.length > 0">
+            and h.fir_type IN
+            <foreach collection="entity.type" index="index" item="item" separator="," open="(" close=")">
+                #{item}
+            </foreach>
+        </if>
+        <if test="entity.homeId!=null and entity.homeId!=0">
+            AND ho.home_id=#{entity.homeId}
+        </if>
+        <if test="entity!=null and entity.search!=null and entity.search!=''">
+            and ( orgDy.name LIKE  concat('%',#{entity.search},'%') OR hd.name LIKE  concat('%',#{entity.search},'%') OR org.name LIKE  concat('%',#{entity.search},'%')
+            OR h.sec_type LIKE  concat('%',#{entity.search},'%')
+            OR o.name LIKE  concat('%',#{entity.search},'%') OR o.id=#{entity.search})
+        </if>
+        <if test="sortType!=null and sortType!=''">
+            ORDER BY ${sortType}
+        </if>
+        <if test="sort!=null and sort!=''">
+            DESC
+        </if>
+        <if test="length!=null and length!=0">
+            limit #{start},#{length}
+        </if>
+    </select>
+
+    <select id="getManAllSizeByPage" parameterType="com.organOld.dao.util.Page" resultType="java.lang.Long">
+        SELECT count(1)
+        FROM home_oldman ho left join organ orgDy on ho.organ_id=orgDy.id and orgDy.disable=0
+        left join oldman_base o on ho.oldman_id=o.id,home h left join chx c on c.id=h.sec_type left join organ org on org.id=h.sec_type left join home_doctor hd on hd.id=h.sec_type
+        WHERE ho.home_id=h.id
+        <if test="entity.ny!=null and entity.ny!=''">
+            AND ho.ny=#{entity.ny}
+        </if>
+        <if test="entity!=null and entity.oldmanId!=null and entity.oldmanId!=0">
+            and o.id=#{entity.oldmanId}
+        </if>
+        <if test="entity!=null and entity.oldman!=null and entity.oldman.id!=0">
+            and o.id=#{entity.oldman.id}
+        </if>
+        <if test="entity!=null and entity.type!=null and entity.type.length > 0">
+            and h.fir_type IN
+            <foreach collection="entity.type" index="index" item="item" separator="," open="(" close=")">
+                #{item}
+            </foreach>
+        </if>
+        <if test="entity.homeId!=null and entity.homeId!=0">
+            AND ho.home_id=#{entity.homeId}
+        </if>
+        <if test="entity!=null and entity.search!=null and entity.search!=''">
+            and ( orgDy.name LIKE  concat('%',#{entity.search},'%') OR hd.name LIKE  concat('%',#{entity.search},'%') OR org.name LIKE  concat('%',#{entity.search},'%')
+            OR h.sec_type LIKE  concat('%',#{entity.search},'%')
+            OR o.name LIKE  concat('%',#{entity.search},'%') OR o.id=#{entity.search})
+        </if>
+    </select>
+
+
+    <select id="getByOrganId" resultType="com.organOld.dao.entity.oldman.Oldman">
+        SELECT o.id,o.name,o.pid,o.old_status,o.is_handle FROM oldman_base o,home_oldman oo WHERE oo.organ_id=#{organId} and oo.oldman_id=o.id
+    </select>
+
+
+    <insert id="saveAll" parameterType="java.util.List">
+        INSERT into home_oldman(ny,home_id,oldman_id,time_in,time_out,is_service,organ_id)
+        VALUES
+        <foreach collection="list" item="item" index="index" separator=",">
+            (#{item.ny},#{item.homeId},#{item.oldmanId},#{item.timeIn},#{item.timeOut},#{item.isService},#{item.organId})
+        </foreach>
+    </insert>
+
+    <delete id="delByJwId">
+        DELETE from home_oldman
+        <if test="jwId!=null and jwId!=0">
+            where oldman_id in (
+            SELECT o.id from oldman_base o,auto_value x,organ org WHERE o.xq_id=x.id and x.parent_index=org.id and org.id=#{jwId}
+            )
+        </if>
+
+    </delete>
+
+    <delete id="delAll">
+        DELETE from home_oldman where 1=1
+    </delete>
+
+
+
+    <select id="getById" resultType="com.organOld.dao.entity.home.HomeOldman">
+        SELECT id,home_id,time_in,time_out,organ_id,is_service from home_oldman where id=#{id}
+    </select>
+
+
+
+    <delete id="delByIds">
+        DELETE from home_oldman where id in
+        <foreach collection="array" index="index" item="item" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+    </delete>
+
+    <delete id="delByNy">
+        DELETE FROM home_oldman where ny=#{ny}
+    </delete>
+
+    <insert id="save" parameterType="com.organOld.dao.entity.home.HomeOldman">
+        INSERT into home_oldman(organ_id,oldman_id,time_in,time_out,home_id,is_service)
+        VALUES
+        (#{organId},#{oldmanId},#{timeIn},#{timeOut},#{homeId},#{isService})
+    </insert>
+
+    <update id="updateById" parameterType="com.organOld.dao.entity.home.HomeOldman">
+        UPDATE home_oldman
+        SET time_in=#{timeIn},time_out=#{timeOut},is_service=#{isService},home_id=#{homeId},organ_id=#{organId}
+        WHERE id=#{id}
+    </update>
+
+    <select id="getDelOldmanIdsByHomeOldmanIds" resultType="java.lang.Integer">
+        SELECT DISTINCT oldman_id from home_oldman
+        WHERE id in
+        <foreach collection="array" index="index" item="item" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+    </select>
+
+    <select id="getHomeOldmanOidSize" resultType="java.lang.Long">
+        SELECT count(DISTINCT oldman_id) from home_oldman WHERE ny=#{ny}
+    </select>
+    
+    <select id="getOidByRound" resultType="java.lang.Integer">
+        SELECT DISTINCT oldman_id from home_oldman WHERE ny=#{ny}
+        limit #{current},#{round}
+    </select>
+</mapper>

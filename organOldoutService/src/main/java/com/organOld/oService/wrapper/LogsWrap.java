@@ -50,6 +50,7 @@ public class LogsWrap implements Wrap<Record,LogsModel,LogsRequest> {
     public Record unwrapCard(CardLogsRequest cardLogsRequest) {
         Record record=new Record();
         record.setCardId(cardLogsRequest.getId());
+        record.setOldmanId(cardLogsRequest.getOldmanId());
         record.setStart(Tool.stringToDate(cardLogsRequest.getStart()));
         record.setEnd(Tool.stringToDate(cardLogsRequest.getEnd()));
         record.setType(cardLogsRequest.getType());

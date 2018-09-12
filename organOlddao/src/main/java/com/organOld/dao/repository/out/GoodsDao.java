@@ -12,7 +12,7 @@ import java.util.List;
 public interface GoodsDao  extends BaseDao<Product,Number> {
      List<Product> getGoodsByOrganId (Page<Product> page);
 
-     List<Integer> getOrganIdByName (@Param("name")String name);
+     List<Integer> getOrganIdByName (@Param("type")int type);
 
      Long getSizeByPageOrg (Page<Product> page);
 

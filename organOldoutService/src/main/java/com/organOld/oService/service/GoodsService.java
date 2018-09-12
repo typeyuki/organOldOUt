@@ -12,9 +12,9 @@ public interface GoodsService {
 
     String getProductByOrganId (GoodsRequest goodsRequest, BTableRequest bTableRequest);
 
-    Conse getOrganByProduct (String name);
+    Conse getOrganByProduct (int type);
 
     String getAllProduct(BTableRequest bTableRequest);
 
-    List<ProductType> getTypeByParent (int parent);
+    Conse getTypeByParent (int parent);
 }

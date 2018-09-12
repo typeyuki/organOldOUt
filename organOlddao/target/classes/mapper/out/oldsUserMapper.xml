@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.organOld.dao.repository.out.oldsUserDao">
+
+    <resultMap id="card" type="com.organOld.dao.entity.Card">
+        <id property="id" column="id" />
+        <id property="username" column="cid" />
+        <id property="status" column="status" />
+        <id property="money" column="money" />
+        <id property="password" column="password" />
+        <id property="isCreate" column="is_create" />
+        <result property="time" column="time" />
+    </resultMap>
+    <select id="getByUsername" resultType="com.organOld.dao.entity.Card">
+            SELECT oldmanId,password,username FROM card WHERE cid = #{cid}
+    </select>
+
+    <select id="getOldsIdByUsername" resultType="java.lang.Integer">
+            SELECT oldmanId FROM card WHERE cid = #{cid}
+    </select>
+
+    <select id="getById" resultType="com.organOld.dao.entity.Card">
+            SELECT * from WHERE card WHERE oldmanId = #{id};
+    </select>
+
+    <update id="updateProp">
+        UPDATE card
+        SET ${prop} = #{value}
+        WHERE cid = #{id}
+    </update>
+</mapper>
