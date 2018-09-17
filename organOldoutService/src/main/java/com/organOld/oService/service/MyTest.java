@@ -4,10 +4,7 @@ package com.organOld.oService.service;
 
 import com.organOld.dao.entity.AutoValue;
 import com.organOld.dao.entity.oldman.Linkman;
-import com.organOld.oService.contract.BTableRequest;
-import com.organOld.oService.contract.CardLogsRequest;
-import com.organOld.oService.contract.Conse;
-import com.organOld.oService.contract.GoodsRequest;
+import com.organOld.oService.contract.*;
 import com.organOld.oService.model.LinkmanModel;
 import com.organOld.oService.model.OldsHealthModel;
 import com.organOld.oService.model.PersonalInfoModel;
@@ -29,6 +26,9 @@ public class MyTest {
 
     @Autowired
     GoodsService goodsService;
+
+    @Autowired
+    CartService cartService;
 
     @Test
     public void myTest() {
@@ -96,5 +96,15 @@ public class MyTest {
     public void testProductD(){
         Conse conse = goodsService.getTypeByParent(3);
         conse.getData();
+    }
+
+    @Test
+    public void testCartA(){
+        CartRequest cartRequest = new CartRequest();
+        cartRequest.setOldmanId(36);
+        cartRequest.setOrganId(9);
+        cartRequest.setProductId(3);
+        Conse conse = cartService.SaveInCart(cartRequest);
+        conse.getClass();
     }
 }
