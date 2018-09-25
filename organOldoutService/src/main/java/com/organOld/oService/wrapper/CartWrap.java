@@ -4,16 +4,22 @@ import com.organOld.dao.entity.product.Product;
 import com.organOld.dao.entity.product.ProductCart;
 import com.organOld.oService.contract.CartRequest;
 import com.organOld.oService.model.GoodsModel;
+import com.organOld.oService.service.GoodsService;
 import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Service;
 
 @Service
 public class CartWrap implements Wrap<ProductCart,GoodsModel,CartRequest> {
+    @Autowired
+    GoodsService goodsService;
+
     @Override
     public GoodsModel wrap (ProductCart productCart){
-
-        return null;
+        GoodsModel goodsModel = goodsService.getProductById(productCart.getProductId());
+        goodsModel.setId(productCart.getId());
+        return goodsModel;
     }
     @Override
     public ProductCart unwrap(CartRequest cartRequest){

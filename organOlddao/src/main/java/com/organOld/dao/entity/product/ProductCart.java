@@ -7,7 +7,7 @@ public class ProductCart extends DBEntity implements DBInterface {
     private Integer oldmanId;
     private Integer organId;
     private Integer productId;
-
+    private Integer type;
     public Integer getOldmanId() {
         return oldmanId;
     }
@@ -31,5 +31,13 @@ public class ProductCart extends DBEntity implements DBInterface {
 
     public void setProductId(Integer productId) {
         this.productId = productId;
+    }
+
+    public Integer getType() {
+        return type;
+    }
+
+    public void setType(Integer type) {
+        this.type = type;
     }
 }

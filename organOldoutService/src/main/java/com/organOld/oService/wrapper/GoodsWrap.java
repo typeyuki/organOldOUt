@@ -15,14 +15,16 @@ public class GoodsWrap implements Wrap<Product,GoodsModel,GoodsRequest> {
     @Override
     public GoodsModel wrap(Product product) {
         GoodsModel goodsModel =new GoodsModel();
-        goodsModel.setSecType(product.getProductType().getName());
-        goodsModel.setFirType(product.getProductType().getFirProductType().getName());
-        BeanUtils.copyProperties(product, goodsModel);
-        if(product.getProductType().getType().equals("1"))
-            goodsModel.setName(goodsModel.getSecType());
-        if(product.getProductType().getFirProductType().getType().equals("1"))
-            goodsModel.setName(goodsModel.getFirType());
-        goodsModel.setTime(Tool.dateToString(product.getTime(), TimeConst.DATA_FORMAT_YMD));
+        if(product != null) {
+            goodsModel.setSecType(product.getProductType().getName());
+            goodsModel.setFirType(product.getProductType().getFirProductType().getName());
+            BeanUtils.copyProperties(product, goodsModel);
+            if (product.getProductType().getType().equals("1"))
+                goodsModel.setName(goodsModel.getSecType());
+            if (product.getProductType().getFirProductType().getType().equals("1"))
+                goodsModel.setName(goodsModel.getFirType());
+            goodsModel.setTime(Tool.dateToString(product.getTime(), TimeConst.DATA_FORMAT_YMD));
+        }
         return goodsModel;
     }
 

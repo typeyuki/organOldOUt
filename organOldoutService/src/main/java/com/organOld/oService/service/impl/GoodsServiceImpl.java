@@ -10,6 +10,8 @@ import com.organOld.dao.util.Page;
 import com.organOld.oService.contract.BTableRequest;
 import com.organOld.oService.contract.Conse;
 import com.organOld.oService.contract.GoodsRequest;
+import com.organOld.oService.exception.OtherServiceException;
+import com.organOld.oService.exception.ServiceException;
 import com.organOld.oService.model.AutoValModel;
 import com.organOld.oService.model.GoodsModel;
 import com.organOld.oService.service.ComService;
@@ -48,6 +50,8 @@ public class GoodsServiceImpl implements GoodsService {
         page.setEntity(product);
         List<GoodsModel> goodsModelList =goodsDao.getByPage(page).stream().map(goodsWrapper::wrap).collect(Collectors.toList());
         Long size=goodsDao.getSizeByPage(page);
+        if(goodsModelList.size() == 0|| size == 0)
+            throw new OtherServiceException("无法获取商品信息");
         return comService.tableReturn(bTableRequest.getsEcho(),size, goodsModelList);
     }
 
@@ -62,12 +66,16 @@ public class GoodsServiceImpl implements GoodsService {
         page.setEntity(product);
         List<GoodsModel> goodsModelList =goodsDao.getGoodsByOrganId(page).stream().map(goodsWrapper::wrap).collect(Collectors.toList());
         Long size=goodsDao.getSizeByPageOrg(page);
+        if(size == 0)
+            throw new OtherServiceException("获取商品信息出错.");
         return comService.tableReturn(bTableRequest.getsEcho(),size, goodsModelList);
     }
     @Override
     public Conse getOrganByProduct(int type){
         List<Integer> organIds = goodsDao.getOrganIdByName(type);
         List<AutoValModel> organNames = autoValDao.getByIds(organIds).stream().map(autoValWrapper::wrap).collect(Collectors.toList());
+        if(organNames.size() == 0)
+            throw new ServiceException("获取机构信息出错.");
         return new Conse(true,organNames);
     }
 
@@ -75,6 +83,8 @@ public class GoodsServiceImpl implements GoodsService {
     public String getAllProduct(BTableRequest bTableRequest){
         List<GoodsModel> goodsModelList = goodsDao.getAllProducts().stream().map(goodsWrapper::wrap).collect(Collectors.toList());
         Long size = goodsDao.getAllSize();
+        if(size == 0)
+            throw new OtherServiceException("获取商品信息出错.");
         return comService.tableReturn(bTableRequest.getsEcho(),size,goodsModelList);
     }
 
@@ -82,5 +92,20 @@ public class GoodsServiceImpl implements GoodsService {
     public Conse getTypeByParent(int parent){
         List<ProductType> productTypes = productTypeDao.getByParent(parent);
         return new Conse(true,productTypes);
+    }
+
+    @Override
+    public String getProductsByIds(List<Integer> productIds,BTableRequest bTableRequest){
+        List<GoodsModel> goodsModelList = goodsDao.getByIds(productIds).stream().map(goodsWrapper::wrap).collect(Collectors.toList());
+        Long size = goodsDao.getSizeByIds(productIds);
+        if(size == 0)
+            throw new OtherServiceException("获取购物车信息失败.");
+        return comService.tableReturn(bTableRequest.getsEcho(),size,goodsModelList);
+    }
+    @Override
+    public GoodsModel getProductById(int productId){
+        Product product = goodsDao.getById(productId);
+        GoodsModel goodsModel = goodsWrapper.wrap(product);
+        return goodsModel;
     }
 }

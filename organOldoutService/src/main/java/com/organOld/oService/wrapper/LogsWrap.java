@@ -16,24 +16,26 @@ public class LogsWrap implements Wrap<Record,LogsModel,LogsRequest> {
     @Override
     public LogsModel wrap(Record record) {
         LogsModel logsModel =new LogsModel();
-        logsModel.setId(record.getId());
-        logsModel.setData(record.getData());
-        //logsModel.setOldman(record.getOldman());
-        logsModel.setTime(Tool.dateToString(record.getTime(), TimeConst.DATA_FORMAT_YMDHMS));
-        logsModel.setOrgan(record.getOrgan());
-        logsModel.setType(LogsTypeEnum.getValue(record.getType()));
-        logsModel.setOrder(record.getOrder());
-        if(record.getPrevMoney()!=null){
-            if(record.getType()==9){
-                logsModel.setMoneyChange(record.getPrevMoney().intValue()+"--->"+record.getNowMoney().intValue());
-            }else{
-                logsModel.setMoneyChange(record.getPrevMoney()+"--->"+record.getNowMoney());
+        if(record != null) {
+            logsModel.setId(record.getId());
+            logsModel.setData(record.getData());
+            //logsModel.setOldman(record.getOldman());
+            logsModel.setTime(Tool.dateToString(record.getTime(), TimeConst.DATA_FORMAT_YMDHMS));
+            logsModel.setOrgan(record.getOrgan());
+            logsModel.setType(LogsTypeEnum.getValue(record.getType()));
+            logsModel.setOrder(record.getOrder());
+            if (record.getPrevMoney() != null) {
+                if (record.getType() == 9) {
+                    logsModel.setMoneyChange(record.getPrevMoney().intValue() + "--->" + record.getNowMoney().intValue());
+                } else {
+                    logsModel.setMoneyChange(record.getPrevMoney() + "--->" + record.getNowMoney());
+                }
             }
-        }
 
-        if(record.getType()==9){
-            //积分记录
-            logsModel.setOrder(record.getOrder().equals("1")?"消费":"签到");
+            if (record.getType() == 9) {
+                //积分记录
+                logsModel.setOrder(record.getOrder().equals("1") ? "消费" : "签到");
+            }
         }
         return logsModel;
     }

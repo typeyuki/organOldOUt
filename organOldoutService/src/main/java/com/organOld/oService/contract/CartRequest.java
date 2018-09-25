@@ -5,6 +5,7 @@ public class CartRequest {
     private Integer organId;
     private Integer oldmanId;
     private Integer productId;
+    private Integer type;
 
     public int getId() {
         return id;
@@ -36,5 +37,13 @@ public class CartRequest {
 
     public void setProductId(Integer productId) {
         this.productId = productId;
+    }
+
+    public Integer getType() {
+        return type;
+    }
+
+    public void setType(Integer type) {
+        this.type = type;
     }
 }

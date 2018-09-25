@@ -20,4 +20,10 @@ public interface GoodsDao  extends BaseDao<Product,Number> {
 
      Long getAllSize();
 
+     List<Product> getByIds (List<Integer> productIds);
+
+     Long getSizeByIds(List<Integer> productIds);
+
+     @Override
+     Product getById(Number number);
 }

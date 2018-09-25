@@ -14,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @RunWith(SpringJUnit4ClassRunner.class)
@@ -40,6 +41,11 @@ public class MyTest {
     public void testLabel() {
         Conse conse = fileService.getByLabel(36);
         conse.getData();
+    }
+    @Test
+    public void testPersonalInfo(){
+        PersonalInfoModel personalInfoModel = fileService.getPersonalInfo(34);
+        personalInfoModel.getHome();
     }
 
     @Test
@@ -106,5 +112,14 @@ public class MyTest {
         cartRequest.setProductId(3);
         Conse conse = cartService.SaveInCart(cartRequest);
         conse.getClass();
+    }
+
+    @Test
+    public void testCartB(){
+        BTableRequest bTableRequest = new BTableRequest();
+        bTableRequest.setiDisplayLength(10);
+        bTableRequest.setiDisplayStart(0);
+        String result = cartService.getProByOldmanId(36,bTableRequest);
+        String text = result;
     }
 }

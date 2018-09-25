@@ -4,6 +4,7 @@ import com.organOld.dao.entity.DBEntity;
 import com.organOld.dao.entity.home.HomeOldman;
 import com.organOld.dao.entity.oldman.Linkman;
 import com.organOld.dao.entity.oldman.Oldman;
+import com.organOld.dao.entity.oldman.OldmanHealth;
 import com.organOld.dao.entity.organ.OrganOldman;
 import com.organOld.dao.entity.product.Product;
 import com.organOld.dao.entity.record.Record;
@@ -13,6 +14,8 @@ import com.organOld.oService.contract.BTableRequest;
 import com.organOld.oService.contract.CardLogsRequest;
 import com.organOld.oService.contract.Conse;
 import com.organOld.oService.contract.GoodsRequest;
+import com.organOld.oService.exception.OtherServiceException;
+import com.organOld.oService.exception.ServiceException;
 import com.organOld.oService.model.*;
 import com.organOld.oService.service.ComService;
 import com.organOld.oService.service.FileService;
@@ -68,10 +71,14 @@ public class FileServiceImpl implements FileService {
         Page<DBEntity> page=new Page<>();
         page.setLength(1);
         page.setStart(0);
-
+        //comService.getIdBySession()
         Oldman oldman=new Oldman();
-        oldman.setId(comService.getIdBySession());
-        OldsModel oldsModel = oldmanWrapper.wrapOldInfo(oldmanBaseDao.getById(oldman.getId()));
+        oldman.setId(oldmanId);
+        oldman = oldmanBaseDao.getById(oldman.getId());
+        if(oldman == null)
+            throw new ServiceException("错误！老人信息不存在！");
+        OldsModel oldsModel = oldmanWrapper.wrapOldInfo(oldman);
+
         personalInfoModel.setOldman(oldsModel);
         Linkman linkman=new Linkman();
         linkman.setOldman(oldman);
@@ -109,23 +116,29 @@ public class FileServiceImpl implements FileService {
 
     @Override
     public OldsHealthModel getOldmanHealth (int oldmanId){
-        return oldsHealthWrapper.wrap(oldmanHealthDao.getByOldmanId(comService.getIdBySession()));
+        OldmanHealth oldmanHealth = oldmanHealthDao.getByOldmanId(oldmanId);
+        if(oldmanHealth == null)
+            throw new ServiceException("错误！健康信息不存在!");
+        return oldsHealthWrapper.wrap(oldmanHealth);//comService.getIdBySession()));
     }
     @Override
     public String getByCardPage(BTableRequest bTableRequest, CardLogsRequest cardLogsRequest) {
         Page<Record> page= comService.getPage(bTableRequest,"record");
-        cardLogsRequest.setOldmanId(comService.getIdBySession());
+        //cardLogsRequest.setOldmanId(comService.getIdBySession());
         Record record = logsWrapper.unwrapCard(cardLogsRequest);
         page.setEntity(record);
         List<LogsModel> productModelList=recordDao.getByCardPage(page).stream().map( logsWrapper::wrap).collect(Collectors.toList());
         Long size=recordDao.getSizeByCardPage(page);
+        if(productModelList.size() == 0 || size == 0 )
+            throw new OtherServiceException("目前没有记录，请进行消费或签到。");
         return comService.tableReturn(bTableRequest.getsEcho(),size,productModelList);
     }
 
 
     @Override
     public Conse getByLabel (int oldmanId){
-        List<LabelInfoModel> labels = labelDao.getManLabelByOldmanId(comService.getIdBySession()).stream().map(labelWrapper::wrap).collect(Collectors.toList());
+        List<LabelInfoModel> labels = labelDao.getManLabelByOldmanId(oldmanId).stream().map(labelWrapper::wrap).collect(Collectors.toList());
         return new Conse(true,labels);
+        //comService.getIdBySession()
     }
 }

@@ -17,12 +17,15 @@ public class OldsHealthModel extends Pattern {
     private String bloodType;
     private String intelligence;//失智
     private String eyesight;//视力
-    private List<HealthAdd> Cancer=new ArrayList<>();//恶性肿瘤史  id+内容
-    private List<HealthAdd> broken=new ArrayList<>();//骨折史
-    private List<HealthAdd> disabled=new ArrayList<>();//残疾情况
     private List<HealthSelect> chronicDis=new ArrayList<>();//慢病
     private List<HealthSelect> abiliInfo=new ArrayList<>();//失能
     private List<HealthSelect> drugAlley=new ArrayList<>();//药物反应
+    private List<HealthAdd> Cancer=new ArrayList<>();//恶性肿瘤史  id+内容
+    private List<HealthAdd> broken=new ArrayList<>();//骨折史
+    private List<HealthAdd> disabled=new ArrayList<>();//残疾情况
+
+
+
     private String name;
 
     public int getOldmanId() {
