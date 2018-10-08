@@ -7,9 +7,11 @@ import com.organOld.oService.contract.Conse;
 public interface CartService {
     Conse SaveInCart(CartRequest cartRequest);
 
-    String getProductIds(int oldmanId, BTableRequest bTableRequest);
+    String getProductIds(BTableRequest bTableRequest);
 
-    String getProByOldmanId(int oldmanId, BTableRequest bTableRequest);
+    String getProByOldmanId(BTableRequest bTableRequest);
 
-    void delByIds(String[] ids);
+    Conse delByIds(String[] ids);
+
+    Conse SaveInBook();
 }

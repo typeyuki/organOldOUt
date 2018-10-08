@@ -12,6 +12,12 @@
 
     </select>
 
+    <select id="getNameById" resultType="java.lang.String">
+        SELECT name
+        FROM  organ
+        WHERE id = #{id}
+    </select>
+
 
     <select id="getNumByType" resultType="java.lang.Long">
         SELECT count(1) from organ where organ_type_id=#{type}
@@ -245,6 +251,11 @@
         WHERE o.id=#{id} and ot.id=o.organ_type_id
     </select>
 
+    <select id="getSimpleById" resultType="com.organOld.dao.entity.organ.Organ">
+        select * from organ
+        WHERE id = #{organId}
+    </select>
+
 
 
     <select id="getByType" resultType="com.organOld.dao.entity.organ.Organ">
@@ -327,6 +338,15 @@
 
     <select id="getOrganTypeMap" resultType="com.organOld.dao.entity.organ.Organ">
       SELECT o.id,ot.fir_type organFirTypeId from organ o,organ_type ot WHERE o.organ_type_id=ot.id and (ot.fir_type=21 or ot.fir_type=22)
+    </select>
+
+    <select id="getAutoValByIds" resultType="com.organOld.dao.entity.organ.Organ">
+        SELECT  id,name
+        FROM organ
+        WHERE organ_type_id IN
+        <foreach collection="list" index="index" item="item" open="(" separator="," close=")">
+            ${item}
+        </foreach>
     </select>
 
 </mapper>

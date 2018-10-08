@@ -13,4 +13,11 @@
             ${item}
         </foreach>
     </select>
+
+    <select id="getXqIdsByJwId" resultType="java.lang.Integer">
+        SELECT id FROM auto_value
+        WHERE parent_index = #{jw}
+
+    </select>
+
 </mapper>

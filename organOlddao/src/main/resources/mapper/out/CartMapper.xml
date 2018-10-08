@@ -19,6 +19,18 @@
         WHERE oldman_id = #{oldmanId}
     </select>
 
+    <select id="getIdsForOrder" resultType="com.organOld.dao.entity.product.ProductCart">
+        SELECT product_id,organ_id
+        FROM product_cart
+        WHERE oldman_id = #{oldmanId}
+    </select>
+    
+    <select id="getByOrganId" resultType="com.organOld.dao.entity.product.ProductCart">
+        SELECT product_id,organ_id
+        FROM product_cart
+        WHERE organ_id = #{organId}
+    </select>
+
     <select id="getSizeByOldmanId" resultType="java.lang.Long">
         SELECT count(1)
         FROM product_cart
@@ -30,6 +42,11 @@
         <foreach collection="array" index="index" item="item" open="(" separator="," close=")">
             #{item}
         </foreach>
+    </delete>
+
+    <delete id="delByOldmanId" >
+        DELETE from product_cart
+        where  oldman_id = #{oldmanId}
     </delete>
 
 

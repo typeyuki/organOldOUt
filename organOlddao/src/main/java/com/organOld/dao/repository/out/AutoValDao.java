@@ -7,4 +7,6 @@ import java.util.List;
 
 public interface AutoValDao extends BaseDao<AutoValue,Number> {
     List<AutoValue> getByIds(List<Integer> item);
+
+    List<Integer> getXqIdsByJwId(String jw);
 }

@@ -12,6 +12,12 @@
 
     </select>
 
+    <select id="getNameById" resultType="java.lang.String">
+        SELECT name
+        FROM  organ
+        WHERE id = #{id}
+    </select>
+
 
     <select id="getNumByType" resultType="java.lang.Long">
         SELECT count(1) from organ where organ_type_id=#{type}

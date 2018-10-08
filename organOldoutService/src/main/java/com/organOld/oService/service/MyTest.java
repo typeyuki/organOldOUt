@@ -29,6 +29,9 @@ public class MyTest {
     GoodsService goodsService;
 
     @Autowired
+    OutVisualService outVisualService;
+
+    @Autowired
     CartService cartService;
 
     @Test
@@ -121,5 +124,22 @@ public class MyTest {
         bTableRequest.setiDisplayStart(0);
         String result = cartService.getProByOldmanId(36,bTableRequest);
         String text = result;
+    }
+
+    @Test
+    public void testCartC(){
+        Conse conse = cartService.SaveInBook(36);
+        conse.getData();
+    }
+    @Test
+    public void testOutVisual(){
+        BTableRequest bTableRequest = new BTableRequest();
+        bTableRequest.setiDisplayLength(10);
+        bTableRequest.setiDisplayStart(0);
+        OldmanRequest oldmanRequest = new OldmanRequest();
+        String[] jwIds = {"58","59","2"};
+        oldmanRequest.setJw(jwIds);
+        Conse conse = outVisualService.getNeiborComAndNum(oldmanRequest,bTableRequest);
+        conse.getData();
     }
 }

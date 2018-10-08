@@ -8,6 +8,7 @@
         <result property="organId" column="organ_id" />
         <result property="time" column="time" />
         <result property="status" column="status" />
+        <result property="oldmanId" column="oldman_id" />
         <association property="oldman" javaType="com.organOld.dao.entity.oldman.Oldman">
             <id property="id" column="oid" />
             <result property="name" column="oname"/>
@@ -41,4 +42,13 @@
         SET ${prop}=#{value}
         WHERE id=#{id}
     </update>
+
+    <insert id="saveAll" parameterType="com.organOld.dao.entity.product.ProductBook">
+        INSERT into product_book(oldman_id,organ_id,`product_ids`,status)
+        VALUES
+        <foreach collection="list" item="item" index="index" separator=",">
+            (#{item.oldmanId},#{item.organId},#{item.productIds},#{item.status})
+        </foreach>
+
+    </insert>
 </mapper>

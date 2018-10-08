@@ -9,7 +9,15 @@ public class ProductBook extends DBEntity implements DBInterface{
     private Oldman oldman;
     private Integer status;
     private Integer organId;
+    private Integer oldmanId;
 
+    public Integer getOldmanId() {
+        return oldmanId;
+    }
+
+    public void setOldmanId(Integer oldmanId) {
+        this.oldmanId = oldmanId;
+    }
 
     public Integer getStatus() {
         return status;
@@ -43,4 +51,6 @@ public class ProductBook extends DBEntity implements DBInterface{
     public void setOldman(Oldman oldman) {
         this.oldman = oldman;
     }
+
+
 }

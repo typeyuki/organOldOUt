@@ -10,17 +10,20 @@ import com.organOld.dao.repository.AutoValueDao;
 import com.organOld.dao.repository.MessageDao;
 import com.organOld.dao.repository.OldmanDao;
 import com.organOld.dao.repository.UserDao;
+import com.organOld.dao.repository.out.AutoValDao;
 import com.organOld.dao.repository.out.oldsUserDao;
 import com.organOld.dao.util.Page;
 import com.organOld.oService.contract.*;
 import com.organOld.oService.enumModel.AutoValEnum;
 import com.organOld.oService.enumModel.MessageEnum;
+import com.organOld.oService.exception.ServiceException;
 import com.organOld.oService.model.Pattern;
 import com.organOld.oService.contract.Conse;
 import org.apache.poi.ss.usermodel.Cell;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
@@ -43,6 +46,8 @@ public class ComService {
     AutoValueDao autoValueDao;
     @Autowired
     oldsUserDao oldsUDao;
+    @Autowired
+    AutoValDao autoValDao;
     @Autowired
     AutoValService autoValService;
 
@@ -331,6 +336,18 @@ public class ComService {
         }
     }
 
+    public boolean PwdComparedBySession(String originPwd){
+        UserDetails userDetails=(UserDetails) SecurityContextHolder.getContext()
+                .getAuthentication()
+                .getPrincipal();
+        if(userDetails == null)
+            throw new ServiceException("找不到账户信息");
+        String password = userDetails.getPassword();
+        BCryptPasswordEncoder bCryptPasswordEncoder = new BCryptPasswordEncoder();
+        boolean f = bCryptPasswordEncoder.matches(originPwd,password);
+        return f;
+    }
+
     public Boolean excelIsNotNull(Cell cell){
         if(cell==null || cell.getStringCellValue()==null || cell.getStringCellValue().trim().equals("")){
             return false;
@@ -393,6 +410,13 @@ public class ComService {
         }else if(neiboRequest !=null && neiboRequest.getDistrict()!=null && neiboRequest.getDistrict().length>0){
             xqIds= autoValService.getXqIdsByPqIds(neiboRequest.getDistrict());
         }
+        xqInterface.setXqIds(xqIds);
+        getOrganXqs(xqInterface);
+    }
+
+    public void fillXqIds(String jwId,XqInterface xqInterface){
+        List<Integer> xqIds = new ArrayList<>();
+        xqIds = autoValDao.getXqIdsByJwId(jwId);
         xqInterface.setXqIds(xqIds);
         getOrganXqs(xqInterface);
     }

@@ -9,6 +9,7 @@ import com.organOld.oService.contract.OldmanRequest;
 import com.organOld.oService.model.OldsModel;
 import com.organOld.oService.service.AutoValService;
 import com.organOld.oService.service.ComService;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -60,7 +61,23 @@ public class OldmanWrap implements Wrap<Oldman,OldsModel,OldmanRequest> {
 
     @Override
     public Oldman unwrap(OldmanRequest oldmanRequest) {
-        return null;
+
+        Oldman oldman=new Oldman();
+        BeanUtils.copyProperties(oldmanRequest,oldman);
+//        if(oldmanRequest.getSqzwArray()!=null && oldmanRequest.getSqzwArray().length>0){
+//            for(String s:oldmanRequest.getSqzwArray()){
+//                oldman.getSqzwArray().add("s"+s+"s");
+//            }
+//        }
+
+        if(oldmanRequest.getAgeStart()!=null && !oldmanRequest.getAgeStart().equals(""))
+            oldman.setBirthdayEnd(comService.AgeTobirthday(Integer.parseInt(oldmanRequest.getAgeStart())));
+        if(oldmanRequest.getAgeEnd()!=null && !oldmanRequest.getAgeEnd().equals(""))
+            oldman.setBirthdayStart(comService.AgeTobirthday(Integer.parseInt(oldmanRequest.getAgeEnd())));
+
+
+
+        return oldman;
     }
 
     public OldsModel wrapOldInfo(Oldman oldman){

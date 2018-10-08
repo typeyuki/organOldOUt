@@ -1,5 +1,6 @@
 package com.organOld.dao.repository;
 
+import com.organOld.dao.entity.AutoValue;
 import com.organOld.dao.entity.organ.Organ;
 import org.apache.ibatis.annotations.Param;
 
@@ -12,9 +13,13 @@ import java.util.Map;
 public interface OrganDao extends BaseDao<Organ,Integer>{
     List<Organ> getSimpleByType(@Param("type") Integer type,@Param("organId") Integer organId);
 
+    String getNameById(int id);
+
     Organ getByUsername(String username);
 
     Organ getAuthById(int organId);
+
+    Organ getSimpleById(int organId);
 
     List<Organ> getRoleOrgan(@Param("type") int type, @Param("typeIndex") int typeIndex);
 
@@ -41,4 +46,6 @@ public interface OrganDao extends BaseDao<Organ,Integer>{
     Long getAllSize();
 
     List<Organ> getOrganTypeMap();
+
+    List<Organ> getAutoValueByIds(List<Integer> ids);
 }

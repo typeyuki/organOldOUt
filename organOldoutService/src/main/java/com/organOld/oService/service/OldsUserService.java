@@ -1,11 +1,13 @@
 package com.organOld.oService.service;
 
 import com.organOld.dao.entity.Card;
+import com.organOld.oService.contract.CardRequest;
+import com.organOld.oService.contract.Conse;
 
 public interface OldsUserService {
-    Card getBySession();
+    Conse getBySession();
 
-    void updatePwd (Card oldUser);
+    Conse updatePwd (CardRequest cardRequest);
 
     Card getByUsername (String name);
 
