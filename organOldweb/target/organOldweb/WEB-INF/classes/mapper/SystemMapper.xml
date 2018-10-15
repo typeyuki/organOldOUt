@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.organOld.dao.repository.SystemDao">
+
+    <insert id="importExcel">
+        INSERT INTO
+      <if test="pType=='oldman'">
+          oldman(name,sex) VALUES
+          <foreach collection="list" index="index" item="item" separator=",">
+              (#{item.name},#{item.sex})
+          </foreach>
+      </if>
+    </insert>
+
+    <select id="getRoleByUsername" resultType="com.organOld.dao.entity.SysRole">
+        SELECT r.id,r.name FROM sysrole r,sysuser u,user_role ur
+        WHERE u.username=#{username} and r.id=ur.role_id and u.id=ur.user_id
+    </select>
+</mapper>

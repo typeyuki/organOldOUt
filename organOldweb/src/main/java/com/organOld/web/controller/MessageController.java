@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 @Controller
-@RequestMapping(value = "/message")
+@RequestMapping("/message")
 public class MessageController {
     @Autowired
     MessageService messageService;

@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 @Controller
-@RequestMapping(value="/cart")
+@RequestMapping("/cart")
 public class CartController {
     @Autowired
     CartService cartService;
@@ -22,18 +22,18 @@ public class CartController {
     }
 
     @ResponseBody
-    @RequestMapping(value = "/getCartInfo",method = RequestMethod.POST)
+    @RequestMapping(value = "/getCartInfo",method = RequestMethod.GET)
     public String getCartProducts(BTableRequest bTableRequest){
         return cartService.getProByOldmanId(bTableRequest);
     }
 
     @ResponseBody
-    @RequestMapping(value = "/saveInBook",method = RequestMethod.POST)
+    @RequestMapping(value = "/saveInBook",method = RequestMethod.GET)
     public Conse saveBook(){
         return cartService.SaveInBook();
     }
     @ResponseBody
-    @RequestMapping(value = "/delete",method = RequestMethod.POST)
+    @RequestMapping(value = "/delete",method = RequestMethod.GET)
     public Conse DeleteGoods(String[] ids){
         return cartService.delByIds(ids);
     }

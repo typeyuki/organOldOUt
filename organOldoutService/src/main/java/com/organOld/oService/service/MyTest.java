@@ -47,7 +47,7 @@ public class MyTest {
     }
     @Test
     public void testPersonalInfo(){
-        PersonalInfoModel personalInfoModel = fileService.getPersonalInfo(34);
+        PersonalInfoModel personalInfoModel = fileService.getPersonalInfo(36);
         personalInfoModel.getHome();
     }
 
@@ -122,13 +122,13 @@ public class MyTest {
         BTableRequest bTableRequest = new BTableRequest();
         bTableRequest.setiDisplayLength(10);
         bTableRequest.setiDisplayStart(0);
-        String result = cartService.getProByOldmanId(36,bTableRequest);
+        String result = cartService.getProByOldmanId(bTableRequest);
         String text = result;
     }
 
     @Test
     public void testCartC(){
-        Conse conse = cartService.SaveInBook(36);
+        Conse conse = cartService.SaveInBook();
         conse.getData();
     }
     @Test
@@ -137,7 +137,7 @@ public class MyTest {
         bTableRequest.setiDisplayLength(10);
         bTableRequest.setiDisplayStart(0);
         OldmanRequest oldmanRequest = new OldmanRequest();
-        String[] jwIds = {"58","59","2"};
+        String[] jwIds = {"1","58","59","2"};
         oldmanRequest.setJw(jwIds);
         Conse conse = outVisualService.getNeiborComAndNum(oldmanRequest,bTableRequest);
         conse.getData();

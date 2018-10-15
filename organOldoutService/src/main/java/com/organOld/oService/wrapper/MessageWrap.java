@@ -7,7 +7,9 @@ import com.organOld.oService.model.Pattern;
 import com.organOld.oService.service.ComService;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
+@Service
 public class MessageWrap implements Wrap<Message,AutoValModel,MessageRequest> {
     @Autowired
     ComService comService;

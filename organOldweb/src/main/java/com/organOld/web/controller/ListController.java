@@ -10,18 +10,18 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 @Controller
-@RequestMapping(value="/list")
+@RequestMapping("/list")
 public class ListController {
     @Autowired
     ListService listService;
     @ResponseBody
-    @RequestMapping(value="/getLabels",method = RequestMethod.POST)
+    @RequestMapping(value="/getLabels",method = RequestMethod.GET)
     public Conse getSimpleOrganValue(ListRequest listRequest){
         return listService.getOrgAutoValue(listRequest);
     }
 
     @ResponseBody
-    @RequestMapping(value = "/getOrganInfo",method = RequestMethod.POST)
+    @RequestMapping(value = "/getOrganInfo",method = RequestMethod.GET)
     public Conse getOrganDetail(int organId){
         return listService.getOrganInfo(organId);
     }

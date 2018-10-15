@@ -18,23 +18,23 @@ public class FileController {
     FileService fileService;
 
     @ResponseBody
-    @RequestMapping(value="/getById", method = RequestMethod.GET)
+    @RequestMapping(value="/getById/{id}", method = RequestMethod.GET)
         public Conse getById (@PathVariable int id){return new Conse(true,fileService.getPersonalInfo(id)); }
 
     @ResponseBody
-    @RequestMapping(value="/getHealthById", method = RequestMethod.GET)
+    @RequestMapping(value="/getHealthById/{id}", method = RequestMethod.GET)
         public Conse getHealthById (@PathVariable int id){
             return new Conse(true,fileService.getOldmanHealth(id));
     }
 
     @ResponseBody
-    @RequestMapping(value = "/record",method = RequestMethod.POST)
+    @RequestMapping(value = "/record",method = RequestMethod.GET)
         public String data0(BTableRequest bTableRequest, CardLogsRequest cardLogsRequest){
             return fileService.getByCardPage(bTableRequest,cardLogsRequest);
     }
 
     @ResponseBody
-    @RequestMapping(value = "/getLabelById", method = RequestMethod.GET)
+    @RequestMapping(value = "/getLabelById/{id}", method = RequestMethod.GET)
         public Conse getLabelById (@PathVariable int id){
             return fileService.getByLabel(id);
     }

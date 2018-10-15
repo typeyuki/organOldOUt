@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.organOld.dao.repository.AutoValueDao">
+
+
+
+    <select id="getByTypeList" resultType="com.organOld.dao.entity.AutoValue">
+        SELECT id,type,value,time
+        FROM auto_value
+        WHERE type IN
+        <foreach collection="list" index="index" item="item" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+    </select>
+
+
+    <select id="getByType" resultType="com.organOld.dao.entity.AutoValue">
+        SELECT id,type,value,time
+        FROM auto_value
+        WHERE type=#{type}
+    </select>
+
+    <select id="getById" resultType="com.organOld.dao.entity.AutoValue">
+        SELECT id,type,value,time,parent_index
+        FROM auto_value
+        WHERE id=#{id}
+    </select>
+
+
+    <select id="getStringLikeIndex" resultType="java.lang.Integer">
+        SELECT id
+        FROM auto_value
+        WHERE value
+        <if test="type=='like'">
+            LIKE concat("%",#{str},"%")
+        </if>
+        <if test="type=='equals'">
+            =#{str}
+        </if>
+        and type=#{index}
+    </select>
+
+
+    <insert id="save" parameterType="com.organOld.dao.entity.AutoValue">
+        INSERT into auto_value(type,value,parent_index)
+        VALUES (#{type},#{value},#{parentIndex})
+    </insert>
+
+    <update id="updateById" parameterType="com.organOld.dao.entity.AutoValue">
+        UPDATE auto_value
+        set value=#{value},parent_index=#{parentIndex}
+        where id=#{id}
+    </update>
+
+    <select id="getByPage" parameterType="com.organOld.dao.util.Page" resultType="com.organOld.dao.entity.AutoValue">
+        SELECT id,value
+        FROM auto_value
+        WHERE type=#{entity.type}
+        <if test="sortType!=null and sortType!=''">
+            ORDER BY ${sortType}
+        </if>
+        <if test="sort!=null and sort!=''">
+            ${sort}
+        </if>
+        <if test="length!=null and length!=0">
+            limit #{start},#{length}
+        </if>
+    </select>
+
+    <select id="getSizeByPage" parameterType="com.organOld.dao.util.Page" resultType="java.lang.Long">
+        SELECT count(1)
+        FROM auto_value
+        WHERE type=#{entity.type}
+    </select>
+
+    <delete id="delByIds">
+        DELETE from auto_value where id in
+        <foreach collection="array" index="index" item="item" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+    </delete>
+
+    <select id="getByIds" resultType="com.organOld.dao.entity.AutoValue">
+        SELECT # from auto_value where id in
+        <foreach collection="array" index="index" item="item" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+    </select>
+
+    <select id="getXqIdsByUsername" resultType="java.lang.Integer">
+        <if test="username!=''">
+            SELECT x.id from auto_value x left join organ org on x.parent_index=org.id,sysuser u,user_organ uo
+            where u.username=#{username} and uo.user_id=u.id and (x.parent_index=uo.organ_id or (x.parent_index=org.id and org.parent=uo.organ_id))
+        </if>
+    </select>
+
+
+    <select id="getXqIdsByJwIds" resultType="java.lang.Integer">
+        SELECT id FROM auto_value
+        WHERE parent_index in
+        <foreach collection="array" index="index" item="item" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+    </select>
+
+
+    <select id="getXqIdsByPqIds" resultType="java.lang.Integer">
+        SELECT x.id FROM auto_value x,organ org
+        WHERE x.parent_index=org.id  and org.district_id in
+        <foreach collection="array" index="index" item="item" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+    </select>
+
+    <select id="getXqById" resultType="com.organOld.dao.entity.oldman.Xq">
+        select x.value name,jw.name jwName,pq.name districtName
+        FROM auto_value x,organ jw,organ pq
+        WHERE x.id=#{xqId} and x.parent_index=jw.id and jw.parent=pq.id
+    </select>
+
+    <select id="getNumByType" resultType="java.lang.Long">
+        SELECT count(1) from auto_value WHERE type=#{type}
+    </select>
+</mapper>

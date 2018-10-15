@@ -10,19 +10,19 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 @Controller
-@RequestMapping(value = "/cardUser")
+@RequestMapping("/cardUser")
 public class OldsUserController {
     @Autowired
     OldsUserService oldsUserService;
 
     @ResponseBody
-    @RequestMapping(value = "/accountInfo",method = RequestMethod.POST)
+    @RequestMapping(value = "/accountInfo",method = RequestMethod.GET)
     public Conse getAccount(){
         return oldsUserService.getBySession();
     }
 
     @ResponseBody
-    @RequestMapping(value = "/changePwd",method = RequestMethod.POST)
+    @RequestMapping(value = "/changePwd",method = RequestMethod.GET)
     public Conse UpdatePwd(CardRequest cardRequest){
         return oldsUserService.updatePwd(cardRequest);
     }

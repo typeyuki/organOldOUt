@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.organOld.dao.repository.out.CartDao">
+
+    <insert id="save" parameterType="com.organOld.dao.entity.product.ProductCart">
+        INSERT INTO product_cart(oldman_id,organ_id,product_id,type)
+        VALUES (#{oldmanId},#{organId},#{productId},#{type})
+    </insert>
+
+    <select id="getByOldmanId"  resultType="java.lang.Integer">
+        SELECT product_id
+        FROM product_cart
+        WHERE oldman_id = #{oldmanId}
+    </select>
+
+    <select id="getByOldmanIdB" resultType="com.organOld.dao.entity.product.ProductCart">
+        SELECT  product_id,id
+        FROM product_cart
+        WHERE oldman_id = #{oldmanId}
+    </select>
+
+    <select id="getIdsForOrder" resultType="com.organOld.dao.entity.product.ProductCart">
+        SELECT product_id,organ_id
+        FROM product_cart
+        WHERE oldman_id = #{oldmanId}
+    </select>
+    
+    <select id="getByOrganId" resultType="com.organOld.dao.entity.product.ProductCart">
+        SELECT product_id,organ_id
+        FROM product_cart
+        WHERE organ_id = #{organId}
+    </select>
+
+    <select id="getSizeByOldmanId" resultType="java.lang.Long">
+        SELECT count(1)
+        FROM product_cart
+        WHERE oldman_id = #{oldmanId}
+    </select>
+
+    <delete id="delByIds">
+        DELETE from product_cart where id in
+        <foreach collection="array" index="index" item="item" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+    </delete>
+
+    <delete id="delByOldmanId" >
+        DELETE from product_cart
+        where  oldman_id = #{oldmanId}
+    </delete>
+
+
+
+</mapper>

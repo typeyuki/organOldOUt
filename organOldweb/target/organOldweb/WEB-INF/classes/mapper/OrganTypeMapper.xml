@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.organOld.dao.repository.OrganTypeDao">
+
+    <select id="getByFirType" resultType="com.organOld.dao.entity.organ.OrganType">
+      SELECT * FROM organ_type WHERE
+            fir_type=#{firType}
+
+    </select>
+
+    <select id="getAllOldmanType" resultType="com.organOld.dao.entity.organ.OrganType">
+        SELECT * from organ_type WHERE fir_type=21 or fir_type=22
+    </select>
+
+
+    <select id="getFirTypeByOrganId" resultType="java.lang.Integer">
+        SELECT ot.fir_type from organ_type ot,organ o where o.organ_type_id=ot.id and o.id=#{organId}
+    </select>
+</mapper>

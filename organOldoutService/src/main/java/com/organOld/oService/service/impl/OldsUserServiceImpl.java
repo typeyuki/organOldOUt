@@ -18,25 +18,40 @@ public class OldsUserServiceImpl implements OldsUserService {
     ComService comService;
     @Autowired
     oldsUserDao oldUserDao;
+
+    /**
+     * 获取账户信息
+     * @param oldmanId
+     * @return
+     */
     @Override
-    public Conse getBySession(){
+    public Conse getBySession(String oldmanId){
         Card user = null;
-        Integer userId = comService.getIdBySession();
-        if(userId == null || userId == 0){
-            user = oldUserDao.getByUsername(comService.getUserNameBySession());
-        }else{
-            user = oldUserDao.getById(userId);
+        if(oldmanId != null)
+            user = oldUserDao.getById(Integer.parseInt(oldmanId));
+        else {
+            Integer userId = comService.getOldsIdBySession();
+            if (userId == null || userId == 0)
+                user = oldUserDao.getByUsername(comService.getUserNameBySession());
+            else
+                user = oldUserDao.getById(userId);
         }
         if(user == null){
             throw new ServiceException("找不到用户信息,请登录");
         }
         return new Conse(true,user);
     }
+
+    /**
+     * 修改密码
+     * @param cardRequest
+     * @return
+     */
     @Override
     public Conse updatePwd(CardRequest cardRequest){
         boolean f = comService.PwdComparedBySession(cardRequest.getOldPwd());
         if(f){
-            Integer userId = comService.getIdBySession();
+            Integer userId = comService.getOldsIdBySession();
             if (userId == null || userId == 0)
                 throw new ServiceException("请登录");
             BCryptPasswordEncoder bCryptPasswordEncoder = new BCryptPasswordEncoder();

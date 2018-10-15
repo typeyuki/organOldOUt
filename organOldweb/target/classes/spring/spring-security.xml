@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:sec="http://www.springframework.org/schema/security"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+            http://www.springframework.org/schema/beans/spring-beans.xsd
+            http://www.springframework.org/schema/security
+            http://www.springframework.org/schema/security/spring-security-3.1.xsd
+http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.0.xsd">
+
+    <context:annotation-config/>
+
+    <context:component-scan base-package="com.organOld"/>
+
+  <!--  <context:component-scan base-package="com.organOld.visualService"/>-->
+    <context:component-scan base-package="com.organOld.oService"/>
+
+    <!-- 配置不过滤的资源（静态资源及登录相关） -->
+    <sec:http pattern="/css/bootstrap.min.css" security="none"></sec:http>
+    <sec:http pattern="/img/profile_big.jpg" security="none"></sec:http>
+    <sec:http pattern="/fonts/fontawesome-webfont.woff" security="none"></sec:http>
+    <sec:http pattern="/**/*.jpeg" security="none"></sec:http>
+    <sec:http pattern="/js/plugins/fancybox/fancybox_loading@2x.gif" security="none"></sec:http>
+    <sec:http pattern="/css/plugins/jsTree/32px.png" security="none"></sec:http>
+    <sec:http pattern="/js/jquery.min.js" security="none"></sec:http>
+
+    <sec:http pattern="/login*" security="none"></sec:http>
+    <sec:http pattern="/getCode" security="none" /><!-- 不过滤验证码 -->
+    <sec:http pattern="/card/**" security="none" />
+
+    <sec:http auto-config="true" access-decision-manager-ref="accessDecisionManager">
+        <sec:access-denied-handler error-page="/WEB-INF/pages/error/403.ftl"/>
+        <sec:session-management invalid-session-url="/login" />
+
+        <!--<sec:intercept-url pattern="/news/**" access="AUTH_ADMIN,AUTH_NEWS"/>-->
+        <!--<sec:intercept-url pattern="/oldman/**" access="AUTH_ADMIN"/>-->
+        <!--所有用户都可以-->
+        <!--<sec:intercept-url pattern="/**" access="IS_AUTHENTICATED_ANONYMOUSLY "/>-->
+
+        <sec:form-login login-page="/login" authentication-failure-url="/login"
+                        default-target-url="/total/data"/>
+
+    </sec:http>
+
+    <!--访问决策器-->
+    <bean id="accessDecisionManager" class="org.springframework.security.access.vote.AffirmativeBased">
+        <constructor-arg name="decisionVoters">
+            <list>
+                <ref bean="roleVoter"/>
+                <ref bean="authenticatedVoter"/>
+            </list>
+        </constructor-arg>
+        <!--<property name="messageSource" ref="messageSource"></property>-->
+    </bean>
+
+    <!--修改权限 前缀名-->
+    <bean id="roleVoter" class="org.springframework.security.access.vote.RoleVoter">
+        <property name="rolePrefix" value="AUTH_"></property>
+    </bean>
+    <bean id="authenticatedVoter" class="org.springframework.security.access.vote.AuthenticatedVoter" />
+
+    <!--<bean id="accessDeniedHandler" class="com.liveBack.security.RequestAccessDeniedHandler">-->
+    <!--<property name="errorPage" value="/WEB-INF/pages/error/error/403.ftl"></property>-->
+    <!--</bean>-->
+
+    <sec:authentication-manager>
+        <sec:authentication-provider ref="authenticationProvider" />
+    </sec:authentication-manager>
+
+    <bean id="authenticationProvider" class="org.springframework.security.authentication.dao.DaoAuthenticationProvider">
+        <property name="hideUserNotFoundExceptions" value="false" />
+        <property name="userDetailsService" ref="userDetailService" />
+        <!--<property name="userCache" ref="userCache" />-->
+        <!--<property name="messageSource" ref="messageSource" />-->
+        <!--<property name="passwordEncoder" ref="passwordEncode" />-->
+        <!--<property name="saltSource" ref="saltSource" />-->
+    </bean>
+    <bean id="userDetailService" class="com.organOld.web.security.DefaultUserDetailsService" />
+
+
+    <!-- 配置密码加密类 -->
+    <bean id="passwordEncode" class="org.springframework.security.authentication.encoding.Md5PasswordEncoder" />
+    <bean id="saltSource" class="org.springframework.security.authentication.dao.ReflectionSaltSource">
+        <property name="userPropertyToUse" value="username"/>
+    </bean>
+
+    <!-- 启用用户的缓存功能 -->
+    <!--<bean id="userCache"-->
+    <!--class="org.springframework.security.core.userdetails.cache.EhCacheBasedUserCache">-->
+    <!--<property name="cache" ref="userEhCache" />-->
+    <!--</bean>-->
+
+    <!--<bean id="userEhCache" class="org.springframework.cache.ehcache.EhCacheFactoryBean">-->
+    <!--<property name="cacheName" value="userCache" />-->
+    <!--<property name="cacheManager" ref="cacheManager" />-->
+    <!--</bean>-->
+
+    <!--<bean id="cacheManager"-->
+    <!--class="org.springframework.cache.ehcache.EhCacheManagerFactoryBean" />-->
+
+</beans>

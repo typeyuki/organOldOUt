@@ -1,0 +1,11 @@
+<component name="ArtifactManager">
+  <artifact type="war" name="organOldweb:war">
+    <output-path>$PROJECT_DIR$/../organOldOut/organOldweb/target/</output-path>
+    <root id="archive" name="organOldweb_war.war">
+      <element id="artifact" artifact-name="organOldweb:war exploded" />
+      <element id="directory" name="META-INF">
+        <element id="file-copy" path="$PROJECT_DIR$/../organOldOut/organOldweb/target/organOldweb/META-INF/MANIFEST.MF" />
+      </element>
+    </root>
+  </artifact>
+</component>

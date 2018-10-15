@@ -215,8 +215,8 @@
 
     <select id="getSizeByPage" parameterType="com.organOld.dao.util.Page" resultType="java.lang.Long">
         SELECT count(1)
-        FROM oldman_base o,oldman_health_base ohb
-        WHERE  o.disable=0 and o.id=ohb.oldman_id
+        FROM oldman_base o,oldman_health_base ohb,organ_oldman oo,home_oldman ho,home hom
+        WHERE  o.disable=0 and o.id=ohb.oldman_id and o.id = oo.oldman_id and o.id = ho.oldman_id
         <if test="entity.birthdayStart!=null">
             <![CDATA[
             and DATE_FORMAT(o.birthday,'%Y') >= DATE_FORMAT(#{entity.birthdayStart},'%Y')
@@ -234,6 +234,18 @@
             and o.xq_id in
             <foreach collection="entity.xqIds" index="index" item="item" open="(" separator="," close=")">
                 ${item}
+            </foreach>
+        </if>
+        <if test="entity!=null and entity.organList!=null">
+            and oo.organ_id in
+            <foreach collection="entity.organList" index="index" item="item" open="(" separator="," close=")">
+                ${item.id}
+            </foreach>
+        </if>
+        <if test="entity!=null and entity.homeList!=null">
+            and hom.id = ho.home_id and (hom.fir_type = 1 or hom,fir_type = 2) and hom.sec_type IN
+            <foreach collection="entity.homeList" index="index" item="item" open="(" separator="," close=")">
+                ${item.secType}
             </foreach>
         </if>
         <if test="entity!=null and entity.sex!=null and entity.sex!=0">

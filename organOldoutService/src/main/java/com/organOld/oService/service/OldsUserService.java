@@ -5,7 +5,7 @@ import com.organOld.oService.contract.CardRequest;
 import com.organOld.oService.contract.Conse;
 
 public interface OldsUserService {
-    Conse getBySession();
+    Conse getBySession(String oldmanId);
 
     Conse updatePwd (CardRequest cardRequest);
 

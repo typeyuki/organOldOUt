@@ -11,18 +11,18 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 @Controller
-@RequestMapping(value = "/goods")
+@RequestMapping("/goods")
 public class GoodsController {
     @Autowired
     GoodsService goodsService;
     @ResponseBody
-    @RequestMapping(value="/getProductByPage",method = RequestMethod.POST)
+    @RequestMapping(value="/getProductByPage",method = RequestMethod.GET)
     public String getProductByPage(BTableRequest bTableRequest, GoodsRequest goodsRequest){
         return goodsService.getByProductPage(goodsRequest,bTableRequest);
     }
 
     @ResponseBody
-    @RequestMapping(value="/getByOrganId",method = RequestMethod.POST)
+    @RequestMapping(value="/getByOrganId",method = RequestMethod.GET)
     public String getByOrganId(BTableRequest bTableRequest,GoodsRequest goodsRequest){
         return goodsService.getProductByOrganId(goodsRequest,bTableRequest);
     }

@@ -1,0 +1,229 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.organOld.dao.repository.OldmanHealthDao">
+
+
+    <!--collection 一定要取到id 比如hsid haid  不然数据会重复 mybatis 无法识别是同一对象-->
+    <resultMap id="oldmanHealth" type="com.organOld.dao.entity.oldman.OldmanHealth">
+        <id property="id" column="id" />
+        <result property="bloodType" column="blood_type"/>
+        <result property="intelligence" column="intelligence" />
+        <result property="eyesight" column="eyesight" />
+        <result property="oldmanId" column="oldman_id" />
+        <result property="time" column="time" />
+        <association property="oldman" javaType="com.organOld.dao.entity.oldman.Oldman">
+            <id property="id" column="oid" />
+            <result property="name" column="name"/>
+        </association>
+        <collection property="healthAdd" ofType="com.organOld.dao.entity.oldman.HealthAdd">
+            <id property="id" column="haid" />
+            <result property="type" column="type"/>
+            <result property="desc" column="desc" />
+        </collection>
+        <collection property="healthSelect" ofType="com.organOld.dao.entity.oldman.HealthSelect">
+            <id property="id" column="hsid" />
+            <result property="firType" column="fir_type"/>
+            <result property="secTypeName" column="sec_type_name" />
+        </collection>
+    </resultMap>
+
+    <!--不能简单的 limit 0，10  因为有1对多的关系  会补全   一条记录当多条使用（由于某个字段有多个值）-->
+    <select id="getByPage" parameterType="com.organOld.dao.util.Page" resultMap="oldmanHealth">
+        SELECT o.id,o.time,old.id oid,old.name,o.blood_type,o.eyesight,o.intelligence,ha.type,ha.desc,hs.fir_type,hs.sec_type_name,ha.id haid,hs.id hsid
+        FROM oldman_base old,
+        oldman_health_base o LEFT JOIN health_add ha ON ha.oldman_id=o.oldman_id
+        LEFT JOIN health_select_oldman hso on hso.oldman_id=o.oldman_id
+        left join health_select hs on hso.health_select_id=hs.id
+        WHERE old.id=o.oldman_id
+        <if test="length!=null and length!=0">
+            and old.id in(
+            select a.id from
+            (select oo.id from oldman_base oo where oo.disable=0
+            <if test="entity!=null and entity.xqIds!=null">
+                and oo.xq_id in
+                <foreach collection="entity.xqIds" index="index" item="item" open="(" separator="," close=")">
+                    ${item}
+                </foreach>
+
+            </if>
+            <if test="entity!=null and entity.search!=null and entity.search!=''">
+                and oo.id in
+                (
+                SELECT DISTINCT(old.id) FROM oldman_base old,oldman_health_base o LEFT JOIN health_add ha ON ha.oldman_id=o.oldman_id
+                LEFT JOIN health_select_oldman hso on hso.oldman_id=o.oldman_id left join health_select hs on hso.health_select_id=hs.id
+                WHERE old.id=o.oldman_id
+                and (o.blood_type LIKE  concat('%',#{entity.search},'%') OR o.eyesight LIKE  concat('%',#{entity.search},'%') OR old.name LIKE  concat('%',#{entity.search},'%')
+                OR o.intelligence LIKE  concat('%',#{entity.search},'%') OR ha.desc LIKE  concat('%',#{entity.search},'%') OR hs.sec_type_name LIKE  concat('%',#{entity.search},'%'))
+                OR old.id=#{entity.search}
+                )
+            </if>
+            order by oo.${sortType} ${sort} limit #{start},#{length} ) as a
+            )
+        </if>
+        order by o.${sortType} ${sort}
+    </select>
+
+    <select id="getSizeByPage" parameterType="com.organOld.dao.util.Page" resultType="java.lang.Long">
+        select count(1) from oldman_base oo where  oo.disable=0
+        <if test="entity!=null and entity.xqIds!=null">
+            and oo.xq_id in
+            <foreach collection="entity.xqIds" index="index" item="item" open="(" separator="," close=")">
+                ${item}
+            </foreach>
+
+        </if>
+        <if test="entity!=null and entity.search!=null and entity.search!=''">
+            and oo.id in
+            (
+            SELECT DISTINCT(old.id) FROM oldman_base old,oldman_health_base o LEFT JOIN health_add ha ON ha.oldman_id=o.oldman_id
+            LEFT JOIN health_select_oldman hso on hso.oldman_id=o.oldman_id left join health_select hs on hso.health_select_id=hs.id
+            WHERE old.id=o.oldman_id
+            and (o.blood_type LIKE  concat('%',#{entity.search},'%') OR o.eyesight LIKE  concat('%',#{entity.search},'%') OR old.name LIKE  concat('%',#{entity.search},'%')
+            OR o.intelligence LIKE  concat('%',#{entity.search},'%') OR ha.desc LIKE  concat('%',#{entity.search},'%') OR hs.sec_type_name LIKE  concat('%',#{entity.search},'%')
+            OR old.id=#{entity.search})
+            )
+        </if>
+
+
+    </select>
+
+    <select id="getByOldmanId" resultMap="oldmanHealth">
+        SELECT o.id,o.time,o.blood_type,o.eyesight,o.intelligence,o.oldman_id,ha.type,ha.type,ha.desc,hs.fir_type,hs.sec_type_name,ha.id haid,hs.id hsid
+        FROM oldman_health_base o LEFT JOIN health_add ha ON ha.oldman_id=o.oldman_id
+        LEFT JOIN health_select_oldman hso on hso.oldman_id=o.oldman_id left join health_select hs on hso.health_select_id=hs.id
+        WHERE o.oldman_id=#{id}
+    </select>
+
+
+
+    <update id="updateById" parameterType="com.organOld.dao.entity.oldman.OldmanHealth">
+        UPDATE oldman_health_base
+        SET blood_type=#{bloodType},intelligence=#{intelligence},eyesight=#{eyesight},is_mb=#{isMb},
+        is_sn=#{isSn},is_ywfy=#{isYwfy},is_exzl=#{isExzl},is_gz=#{isGz},is_cj=#{isCj}
+        WHERE id=#{id}
+    </update>
+
+    <update id="updateByOldmanId" parameterType="com.organOld.dao.entity.oldman.OldmanHealth">
+        UPDATE oldman_health_base
+        SET blood_type=#{bloodType},intelligence=#{intelligence},eyesight=#{eyesight},is_mb=#{isMb},
+        is_sn=#{isSn},is_ywfy=#{isYwfy},is_exzl=#{isExzl},is_gz=#{isGz},is_cj=#{isCj}
+        WHERE oldman_id=#{oldmanId}
+    </update>
+
+    <select id="getAllHealthSelect" resultType="com.organOld.dao.entity.oldman.HealthSelect">
+        SELECT * FROM health_select
+    </select>
+
+    <select id="getSelectStringLikeIndex" resultType="java.lang.Integer">
+        SELECT id
+        FROM health_select
+        WHERE sec_type_name LIKE concat("%",#{str},"%")
+        and fir_type=#{type}
+    </select>
+
+
+    <update id="updateByOldmanIds" parameterType="java.util.List">
+        update oldman_health_base
+        SET
+        blood_type= CASE oldman_id
+        <foreach collection="list" index="index" item="item" open="" separator=" " close="">
+            WHEN ${item.oldmanId} THEN #{item.bloodType}
+        </foreach>
+        END,
+        eyesight= CASE oldman_id
+        <foreach collection="list" index="index" item="item" open="" separator=" " close="">
+            WHEN ${item.oldmanId} THEN #{item.eyesight}
+        </foreach>
+        END,
+        intelligence= CASE oldman_id
+        <foreach collection="list" index="index" item="item" open="" separator=" " close="">
+            WHEN ${item.oldmanId} THEN #{item.intelligence}
+        </foreach>
+        END,
+        is_mb= CASE oldman_id
+        <foreach collection="list" index="index" item="item" open="" separator=" " close="">
+            WHEN ${item.oldmanId} THEN #{item.isMb}
+        </foreach>
+        END,
+        is_sn= CASE oldman_id
+        <foreach collection="list" index="index" item="item" open="" separator=" " close="">
+            WHEN ${item.oldmanId} THEN #{item.isSn}
+        </foreach>
+        END,
+        is_ywfy= CASE oldman_id
+        <foreach collection="list" index="index" item="item" open="" separator=" " close="">
+            WHEN ${item.oldmanId} THEN #{item.isYwfy}
+        </foreach>
+        END
+        where oldman_id in
+        <foreach collection="list" index="index" item="item" separator="," open="(" close=")">
+            #{item.oldmanId,jdbcType=BIGINT}
+        </foreach>
+    </update>
+
+    <insert id="saveAll" parameterType="java.util.List">
+        INSERT into oldman_health_base(oldman_id,blood_type,eyesight,intelligence,is_mb,is_sn,is_ywfy,is_exzl,is_gz,is_cj)
+        VALUES
+        <foreach collection="list" item="item" index="index" separator=",">
+            (#{item.oldmanId}, #{item.bloodType},#{item.eyesight},#{item.intelligence},#{item.isMb},#{item.isSn},#{item.isYwfy},#{item.isExzl},#{item.isGz},#{item.isCj})
+        </foreach>
+    </insert>
+
+    <select id="getHealthNum" resultType="java.util.Map">
+        select
+        (select count(1) from oldman_health_base ohb,oldman_base o where o.id=ohb.oldman_id and o.disable=0
+        and is_mb=1
+        <if test="xqIds!=null">
+            and o.xq_id in
+            <foreach collection="list" index="index" item="item" open="(" separator="," close=")">
+                ${item}
+            </foreach>
+        </if>
+        ) as MbNum,
+        (select count(1) from oldman_health_base ohb,oldman_base o where o.id=ohb.oldman_id and o.disable=0
+        and is_sn=2
+        <if test="xqIds!=null">
+            and o.xq_id in
+            <foreach collection="list" index="index" item="item" open="(" separator="," close=")">
+                ${item}
+            </foreach>
+        </if>
+        ) as SnNum,
+        (select count(1) from oldman_health_base ohb,oldman_base o where o.id=ohb.oldman_id and o.disable=0
+        and is_ywfy=3
+        <if test="xqIds!=null">
+            and o.xq_id in
+            <foreach collection="list" index="index" item="item" open="(" separator="," close=")">
+                ${item}
+            </foreach>
+        </if>
+        ) as YwfyNum,
+        (select count(1) from oldman_health_base ohb,oldman_base o where o.id=ohb.oldman_id and o.disable=0
+        and is_exzl=4
+        <if test="xqIds!=null">
+            and o.xq_id in
+            <foreach collection="list" index="index" item="item" open="(" separator="," close=")">
+                ${item}
+            </foreach>
+        </if>
+        ) as ExzlNum,
+        (select count(1) from oldman_health_base ohb,oldman_base o where o.id=ohb.oldman_id and o.disable=0
+        and is_gz=5
+        <if test="xqIds!=null">
+            and o.xq_id in
+            <foreach collection="list" index="index" item="item" open="(" separator="," close=")">
+                ${item}
+            </foreach>
+        </if>
+        ) as GzNum,
+        (select count(1) from oldman_health_base ohb,oldman_base o where o.id=ohb.oldman_id and o.disable=0
+        and is_cj=6
+        <if test="xqIds!=null">
+            and o.xq_id in
+            <foreach collection="list" index="index" item="item" open="(" separator="," close=")">
+                ${item}
+            </foreach>
+        </if>
+        ) as CjNum
+    </select>
+</mapper>
