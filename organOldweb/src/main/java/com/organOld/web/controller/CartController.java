@@ -6,12 +6,14 @@ import com.organOld.oService.contract.Conse;
 import com.organOld.oService.service.CartService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 @Controller
 @RequestMapping("/cart")
+@CrossOrigin(origins = "*", maxAge = 3600)
 public class CartController {
     @Autowired
     CartService cartService;
@@ -23,14 +25,14 @@ public class CartController {
 
     @ResponseBody
     @RequestMapping(value = "/getCartInfo",method = RequestMethod.GET)
-    public String getCartProducts(BTableRequest bTableRequest){
-        return cartService.getProByOldmanId(bTableRequest);
+    public String getCartProducts(BTableRequest bTableRequest,Integer oldmanId){
+        return cartService.getProByOldmanId(bTableRequest,oldmanId);
     }
 
     @ResponseBody
     @RequestMapping(value = "/saveInBook",method = RequestMethod.GET)
-    public Conse saveBook(){
-        return cartService.SaveInBook();
+    public Conse saveBook(Integer oldmanId){
+        return cartService.SaveInBook(oldmanId);
     }
     @ResponseBody
     @RequestMapping(value = "/delete",method = RequestMethod.GET)

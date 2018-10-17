@@ -3,6 +3,7 @@ package com.organOld.oService.service;
 
 
 import com.organOld.dao.entity.AutoValue;
+import com.organOld.dao.entity.Card;
 import com.organOld.dao.entity.oldman.Linkman;
 import com.organOld.oService.contract.*;
 import com.organOld.oService.model.LinkmanModel;
@@ -33,6 +34,8 @@ public class MyTest {
 
     @Autowired
     CartService cartService;
+    @Autowired
+    OldsUserService oldsUserService;
 
     @Test
     public void myTest() {
@@ -117,20 +120,20 @@ public class MyTest {
         conse.getClass();
     }
 
-    @Test
-    public void testCartB(){
-        BTableRequest bTableRequest = new BTableRequest();
-        bTableRequest.setiDisplayLength(10);
-        bTableRequest.setiDisplayStart(0);
-        String result = cartService.getProByOldmanId(bTableRequest);
-        String text = result;
-    }
+//    @Test
+//    public void testCartB(){
+//        BTableRequest bTableRequest = new BTableRequest();
+//        bTableRequest.setiDisplayLength(10);
+//        bTableRequest.setiDisplayStart(0);
+//        String result = cartService.getProByOldmanId(bTableRequest);
+//        String text = result;
+//    }
 
-    @Test
-    public void testCartC(){
-        Conse conse = cartService.SaveInBook();
-        conse.getData();
-    }
+//    @Test
+//    public void testCartC(){
+//        Conse conse = cartService.SaveInBook();
+//        conse.getData();
+//    }
     @Test
     public void testOutVisual(){
         BTableRequest bTableRequest = new BTableRequest();
@@ -141,5 +144,22 @@ public class MyTest {
         oldmanRequest.setJw(jwIds);
         Conse conse = outVisualService.getNeiborComAndNum(oldmanRequest,bTableRequest);
         conse.getData();
+    }
+
+    @Test
+    public void testProductBook(){
+        BTableRequest bTableRequest = new BTableRequest();
+        bTableRequest.setiDisplayLength(10);
+        bTableRequest.setiDisplayStart(0);
+        ProductBookRequest productBookRequest = new ProductBookRequest();
+        productBookRequest.setOldmanId(36);
+        String text = goodsService.getBookByPage(productBookRequest,bTableRequest);
+        String result = text;
+    }
+    @Test
+    public void testUser(){
+        String name = "202018";
+        Card user = oldsUserService.getByUsername(name);
+        user.getMoney();
     }
 }

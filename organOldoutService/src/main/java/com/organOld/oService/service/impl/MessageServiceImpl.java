@@ -9,6 +9,7 @@ import com.organOld.oService.service.MessageService;
 import com.organOld.oService.wrapper.MessageWrap;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class MessageServiceImpl implements MessageService {
@@ -20,6 +21,7 @@ public class MessageServiceImpl implements MessageService {
     MessageWrap messageWrapper;
 
     @Override
+    @Transactional
     public Conse saveMessage(MessageRequest messageRequest){
         Message message = messageWrapper.unwrap(messageRequest);
         messageDao.save(message);

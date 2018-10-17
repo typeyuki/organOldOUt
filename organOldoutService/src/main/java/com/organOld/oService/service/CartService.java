@@ -9,9 +9,9 @@ public interface CartService {
 
     String getProductIds(BTableRequest bTableRequest);
 
-    String getProByOldmanId(BTableRequest bTableRequest);
+    String getProByOldmanId(BTableRequest bTableRequest,Integer oldmanId);
 
     Conse delByIds(String[] ids);
 
-    Conse SaveInBook();
+    Conse SaveInBook(Integer oldmanId);
 }

@@ -9,6 +9,7 @@ import com.organOld.dao.repository.out.CartDao;
 import com.organOld.oService.contract.BTableRequest;
 import com.organOld.oService.contract.CartRequest;
 import com.organOld.oService.contract.Conse;
+import com.organOld.oService.exception.ServiceException;
 import com.organOld.oService.model.GoodsModel;
 import com.organOld.oService.service.AutoValService;
 import com.organOld.oService.service.CartService;
@@ -17,6 +18,7 @@ import com.organOld.oService.service.GoodsService;
 import com.organOld.oService.wrapper.CartWrap;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -38,12 +40,23 @@ public class CartServiceImpl implements CartService {
     ComService comService;
 
     @Override
+    @Transactional
     public Conse SaveInCart (CartRequest cartRequest){
+        Integer userId = comService.getOldsIdBySession();
+        if(userId == null || userId == 0)
+            userId = cartRequest.getOldmanId();
+        if (userId == 0)
+            throw new ServiceException("请登录");
         ProductCart productCart = cartWrapper.unwrap(cartRequest);
         cartDao.save(productCart);
         return new Conse(true);
     }
 
+    /**
+     * 暂时不用，用下面那一个
+     * @param bTableRequest
+     * @return
+     */
     @Override
     public String getProductIds (BTableRequest bTableRequest){
         int oldmanid = comService.getIdBySession();
@@ -52,16 +65,25 @@ public class CartServiceImpl implements CartService {
     }
 
     @Override
-    public String getProByOldmanId(BTableRequest bTableRequest){
-        int oldmanid = comService.getIdBySession();
-        List<GoodsModel> goodsModelList = cartDao.getByOldmanIdB(oldmanid).stream().map(cartWrapper::wrap).collect(Collectors.toList());
-        Long size = cartDao.getSizeByOldmanId(oldmanid);
+    public String getProByOldmanId(BTableRequest bTableRequest,Integer oldmanId){
+        Integer userId = comService.getOldsIdBySession();
+        if(userId == null || userId == 0)
+            userId = oldmanId;
+        if (userId == 0)
+            throw new ServiceException("请登录");
+        List<GoodsModel> goodsModelList = cartDao.getByOldmanIdB(oldmanId).stream().map(cartWrapper::wrap).collect(Collectors.toList());
+        Long size = cartDao.getSizeByOldmanId(oldmanId);
         return  comService.tableReturn(bTableRequest.getsEcho(),size,goodsModelList);
     }
 
     @Override
-    public Conse SaveInBook(){
-        int oldmanId = comService.getIdBySession();
+    @Transactional
+    public Conse SaveInBook(Integer oldmanId){
+        Integer userId = comService.getOldsIdBySession();
+        if(userId == null || userId == 0)
+            userId = oldmanId;
+        if (userId == 0)
+            throw new ServiceException("请登录");
         List<ProductCart> productCarts = cartDao.getIdsForOrder(oldmanId);
         cartDao.delByOldmanId(oldmanId);
         Collections.sort(productCarts, new Comparator<ProductCart>() {
@@ -104,6 +126,7 @@ public class CartServiceImpl implements CartService {
     }
 
     @Override
+    @Transactional
     public Conse delByIds(String[] ids){
         Integer[] id=new Integer[ids.length];
         for(int i=0;i<ids.length;i++){

@@ -31,15 +31,15 @@ http://www.springframework.org/schema/context http://www.springframework.org/sch
 
     <sec:http auto-config="true" access-decision-manager-ref="accessDecisionManager">
         <sec:access-denied-handler error-page="/WEB-INF/pages/error/403.ftl"/>
-        <sec:session-management invalid-session-url="/login" />
+        <!--<sec:session-management invalid-session-url="/login" />-->
 
         <!--<sec:intercept-url pattern="/news/**" access="AUTH_ADMIN,AUTH_NEWS"/>-->
         <!--<sec:intercept-url pattern="/oldman/**" access="AUTH_ADMIN"/>-->
         <!--所有用户都可以-->
         <!--<sec:intercept-url pattern="/**" access="IS_AUTHENTICATED_ANONYMOUSLY "/>-->
 
-        <sec:form-login login-page="/login" authentication-failure-url="/login"
-                        default-target-url="/total/data"/>
+        <!--<sec:form-login login-page="/login" authentication-failure-url="/login"-->
+                        <!--default-target-url="/total/data"/>-->
 
     </sec:http>
 

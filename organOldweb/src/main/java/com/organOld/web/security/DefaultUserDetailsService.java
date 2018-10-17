@@ -31,8 +31,10 @@ public class DefaultUserDetailsService implements UserDetailsService {
 
 //        if(user == null){
             Card user = oldsUserService.getByUsername(username);
+
             if(user == null)
                 throw new UsernameNotFoundException("UserDetailsService.userNotFound");
+            user.setUsername(username);
             //得到用户的权限
 //        }
 

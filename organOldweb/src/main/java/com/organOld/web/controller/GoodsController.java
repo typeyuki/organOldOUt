@@ -3,15 +3,18 @@ package com.organOld.web.controller;
 import com.organOld.oService.contract.BTableRequest;
 import com.organOld.oService.contract.Conse;
 import com.organOld.oService.contract.GoodsRequest;
+import com.organOld.oService.contract.ProductBookRequest;
 import com.organOld.oService.service.GoodsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 @Controller
 @RequestMapping("/goods")
+@CrossOrigin(origins = "*", maxAge = 3600)
 public class GoodsController {
     @Autowired
     GoodsService goodsService;
@@ -35,6 +38,12 @@ public class GoodsController {
     @RequestMapping(value="getTypeByParent",method = RequestMethod.GET)
     public Conse getTypeByParent(int parent){
         return goodsService.getTypeByParent(parent);
+    }
+
+    @ResponseBody
+    @RequestMapping(value = "book/data",method = RequestMethod.GET)
+    public String data(ProductBookRequest productBookRequest, BTableRequest bTableRequest){
+        return goodsService.getBookByPage(productBookRequest,bTableRequest);
     }
 
 }

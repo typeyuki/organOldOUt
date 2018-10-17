@@ -3,7 +3,7 @@
 <dwr>
     <allow>
         <create creator="new" javascript="Remote">
-            <param name="class" value="com.organOld.outService.dwr.Remote" />
+            <param name="class" value="com.organOld.oService.dwr.Remote" />
             <include method="noticeNewOrder" />
             <!--<include method="getData" />-->
         </create>
@@ -11,6 +11,6 @@
         <!--传给前端的对象类型-->
         <convert converter="bean" match="com.organOld.oService.dwr.DwrData"/>
         <convert converter="bean" match="com.organOld.oService.contract.Conse"/>
-        <convert converter="bean" match="com.organOld.outService.model.ExcelReturnModel"/>
+        <convert converter="bean" match="com.organOld.oService.model.ExcelReturnModel"/>
     </allow>
 </dwr>

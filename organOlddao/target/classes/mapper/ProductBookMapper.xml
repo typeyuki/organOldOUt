@@ -19,7 +19,7 @@
     <select id="getByPage" parameterType="com.organOld.dao.util.Page" resultMap="productBook">
         SELECT pb.id,pb.product_ids,pb.time,pb.status,ob.id oid,ob.name oname
         FROM product_book pb,oldman_base ob
-        WHERE pb.organ_id=#{entity.organId} and pb.oldman_id=ob.id
+        WHERE pb.oldman_id=#{entity.oldmanId} and pb.oldman_id=ob.id
         <if test="sortType!=null and sortType!=''">
             ORDER BY pb.status
         </if>
@@ -34,7 +34,7 @@
     <select id="getSizeByPage" parameterType="com.organOld.dao.util.Page" resultType="java.lang.Long">
         SELECT count(1)
         FROM product_book
-        WHERE organ_id=#{entity.organId}
+        WHERE oldman_id=#{entity.oldmanId}
     </select>
 
     <update id="updateProp">

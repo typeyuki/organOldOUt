@@ -6,24 +6,23 @@ import com.organOld.oService.contract.Conse;
 import com.organOld.oService.service.FileService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 
 @Controller
 @RequestMapping("/file")
+@CrossOrigin(origins = "*", maxAge = 3600)
 public class FileController {
     @Autowired
     FileService fileService;
 
     @ResponseBody
-    @RequestMapping(value="/getById/{id}", method = RequestMethod.GET)
-        public Conse getById (@PathVariable int id){return new Conse(true,fileService.getPersonalInfo(id)); }
+    @RequestMapping(value="/{id}/getById", method = RequestMethod.GET)
+        public Conse getById (@PathVariable("id") int id){
+        return new Conse(true,fileService.getPersonalInfo(id)); }
 
     @ResponseBody
-    @RequestMapping(value="/getHealthById/{id}", method = RequestMethod.GET)
-        public Conse getHealthById (@PathVariable int id){
+    @RequestMapping(value="/{id}/getHealthById", method = RequestMethod.GET)
+        public Conse getHealthById (@PathVariable("id") int id){
             return new Conse(true,fileService.getOldmanHealth(id));
     }
 
@@ -34,8 +33,8 @@ public class FileController {
     }
 
     @ResponseBody
-    @RequestMapping(value = "/getLabelById/{id}", method = RequestMethod.GET)
-        public Conse getLabelById (@PathVariable int id){
+    @RequestMapping(value = "/{id}/getLabelById", method = RequestMethod.GET)
+        public Conse getLabelById (@PathVariable("id") int id){
             return fileService.getByLabel(id);
     }
 }

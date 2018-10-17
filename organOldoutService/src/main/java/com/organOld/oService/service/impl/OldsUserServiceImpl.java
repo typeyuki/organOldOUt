@@ -11,6 +11,7 @@ import com.organOld.oService.service.OldsUserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class OldsUserServiceImpl implements OldsUserService {
@@ -27,18 +28,21 @@ public class OldsUserServiceImpl implements OldsUserService {
     @Override
     public Conse getBySession(String oldmanId){
         Card user = null;
-        if(oldmanId != null)
-            user = oldUserDao.getById(Integer.parseInt(oldmanId));
-        else {
-            Integer userId = comService.getOldsIdBySession();
-            if (userId == null || userId == 0)
-                user = oldUserDao.getByUsername(comService.getUserNameBySession());
+        Integer userId = comService.getOldsIdBySession();
+        if(userId == null || userId == 0)
+            if(oldmanId != null && !oldmanId.equals(""))
+                userId = Integer.parseInt(oldmanId);
             else
+                throw new ServiceException("找不到用户信息,请登录");
+//            if (userId == null || userId == 0)
+//                user = oldUserDao.getByUsername(comService.getUserNameBySession());
+//            else
+//                user = oldUserDao.getById(userId);
+
+
+
                 user = oldUserDao.getById(userId);
-        }
-        if(user == null){
-            throw new ServiceException("找不到用户信息,请登录");
-        }
+
         return new Conse(true,user);
     }
 
@@ -48,12 +52,17 @@ public class OldsUserServiceImpl implements OldsUserService {
      * @return
      */
     @Override
+    @Transactional
     public Conse updatePwd(CardRequest cardRequest){
         boolean f = comService.PwdComparedBySession(cardRequest.getOldPwd());
         if(f){
+            String oldmanId = cardRequest.getOldmanId();
             Integer userId = comService.getOldsIdBySession();
-            if (userId == null || userId == 0)
-                throw new ServiceException("请登录");
+            if(userId == null || userId == 0)
+                if(oldmanId != null && !oldmanId.equals(""))
+                    userId = Integer.parseInt(oldmanId);
+                else
+                    throw new ServiceException("请登录");
             BCryptPasswordEncoder bCryptPasswordEncoder = new BCryptPasswordEncoder();
             String newPwd = bCryptPasswordEncoder.encode(cardRequest.getPassword());
             oldUserDao.updateProp("password",newPwd, userId);

@@ -6,7 +6,7 @@ import org.springframework.security.core.GrantedAuthority;
 import java.util.Collection;
 
 public class CardRequest {
-    private Integer oldmanId;
+    private String oldmanId;
     private String username;//身份证后六位
     private String password;
     private Double money;
@@ -26,11 +26,11 @@ public class CardRequest {
 
     private String search;
 
-    public Integer getOldmanId() {
+    public String getOldmanId() {
         return oldmanId;
     }
 
-    public void setOldmanId(Integer oldmanId) {
+    public void setOldmanId(String oldmanId) {
         this.oldmanId = oldmanId;
     }
 

@@ -12,15 +12,15 @@
         <result property="time" column="time" />
     </resultMap>
     <select id="getByUsername" resultType="com.organOld.dao.entity.Card">
-            SELECT oldmanId,password,username FROM card WHERE cid = #{cid}
+            SELECT oldman_id,cid,password FROM card WHERE cid = #{cid}
     </select>
 
     <select id="getOldsIdByUsername" resultType="java.lang.Integer">
-            SELECT oldmanId FROM card WHERE cid = #{cid}
+            SELECT oldman_id FROM card WHERE cid = #{cid}
     </select>
 
     <select id="getById" resultType="com.organOld.dao.entity.Card">
-            SELECT * from WHERE card WHERE oldmanId = #{id};
+            SELECT * from  card WHERE oldman_id = #{id};
     </select>
 
     <update id="updateProp">
