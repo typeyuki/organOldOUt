@@ -23,6 +23,7 @@ import com.organOld.oService.wrapper.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.sql.rowset.serial.SerialException;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -77,11 +78,13 @@ public class FileServiceImpl implements FileService {
         oldman = oldmanBaseDao.getById(oldman.getId());
         if(oldman == null)
             throw new ServiceException("错误！老人信息不存在！");
+        if(oldman.getDisable() == 1)
+            throw new ServiceException("该老人账号已被注销!");
         OldsModel oldsModel = oldmanWrapper.wrapOldInfo(oldman);
 
         personalInfoModel.setOldman(oldsModel);
         Linkman linkman=new Linkman();
-        linkman.setOldman(oldman);
+        linkman.setOldman(oldman);;
         page.setEntity(linkman);
         List<LinkmanModel> linkmanModelList=linkmanDao.getByPage(page).stream().map(contactsWrapper::wrap).collect(Collectors.toList());
         if(linkmanModelList!=null && linkmanModelList.size()>0)

@@ -122,7 +122,7 @@
     <select id="getSizeByCardPage" parameterType="com.organOld.dao.util.Page" resultType="java.lang.Long">
         SELECT count(1)
         FROM record r LEFT JOIN organ org on org.id=r.organ_id,card c
-        WHERE r.oldman_id=c.oldman_id and c.id=#{entity.cardId}
+        WHERE r.oldman_id=c.oldman_id and c.oldman_id=#{entity.oldmanId}
         <if test="entity.type==null or entity.type==0">
             and r.type != 9
         </if>

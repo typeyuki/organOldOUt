@@ -5,6 +5,7 @@ import com.organOld.oService.contract.Conse;
 import com.organOld.oService.contract.GoodsRequest;
 import com.organOld.oService.contract.ProductBookRequest;
 import com.organOld.oService.service.GoodsService;
+import com.organOld.oService.service.ProductTypeService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -18,30 +19,37 @@ import org.springframework.web.bind.annotation.ResponseBody;
 public class GoodsController {
     @Autowired
     GoodsService goodsService;
+    @Autowired
+    ProductTypeService productTypeService;
     @ResponseBody
-    @RequestMapping(value="/getProductByPage",method = RequestMethod.GET)
-    public String getProductByPage(BTableRequest bTableRequest, GoodsRequest goodsRequest){
-        return goodsService.getByProductPage(goodsRequest,bTableRequest);
+    @RequestMapping(value="/getProductByPage",method = RequestMethod.GET,produces="text/html;charset=UTF-8")
+    public String getProductByPage(Integer iDisplay, GoodsRequest goodsRequest){
+        return goodsService.getByProductPage(goodsRequest,iDisplay);
     }
 
     @ResponseBody
-    @RequestMapping(value="/getByOrganId",method = RequestMethod.GET)
-    public String getByOrganId(BTableRequest bTableRequest,GoodsRequest goodsRequest){
-        return goodsService.getProductByOrganId(goodsRequest,bTableRequest);
+    @RequestMapping(value="/getByOrganId",method = RequestMethod.GET,produces="text/html;charset=UTF-8")
+    public String getByOrganId(Integer iDisplay,GoodsRequest goodsRequest){
+        return goodsService.getProductByOrganId(goodsRequest,iDisplay);
     }
     @ResponseBody
-    @RequestMapping(value = "getAll",method = RequestMethod.GET)
-    public String getAll(BTableRequest bTableRequest){
-        return goodsService.getAllProduct(bTableRequest);
-    }
-    @ResponseBody
-    @RequestMapping(value="getTypeByParent",method = RequestMethod.GET)
-    public Conse getTypeByParent(int parent){
-        return goodsService.getTypeByParent(parent);
+    @RequestMapping(value = "/getAll",method = RequestMethod.GET,produces="text/html;charset=UTF-8")
+    public String getAll(){
+        return goodsService.getAllProduct();
     }
 
     @ResponseBody
-    @RequestMapping(value = "book/data",method = RequestMethod.GET)
+    @RequestMapping(value = "/getOrganByGood",method = RequestMethod.GET,produces="text/html;charset=UTF-8")
+    public Conse getOrgans(Integer type){return goodsService.getOrganByProduct(type);}
+
+    @ResponseBody
+    @RequestMapping(value="/getTypes",method = RequestMethod.GET)
+    public Conse getTypeByParent(){
+        return productTypeService.getProductType();
+    }
+
+    @ResponseBody
+    @RequestMapping(value = "/book/data",method = RequestMethod.GET,produces="text/html;charset=UTF-8")
     public String data(ProductBookRequest productBookRequest, BTableRequest bTableRequest){
         return goodsService.getBookByPage(productBookRequest,bTableRequest);
     }

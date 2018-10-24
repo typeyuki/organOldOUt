@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.organOld.dao.repository.out.GoodsTypeDao">
+    <select id="getProductType" resultType="com.organOld.dao.entity.product.ProductType">
+        select * FROM product_type
+        where type = 3
+    </select>
+
+    <select id="getFirType" resultType="com.organOld.dao.entity.product.ProductType">
+        select * from product_type
+        where type = 2 and parent = #{id}
+    </select>
+
+    <select id="getSecType" resultType="com.organOld.dao.entity.product.ProductType">
+        select * from product_type
+        where type = 1 and parent = #{id}
+    </select>
+</mapper>

@@ -13,6 +13,16 @@ public class LogsModel {
     private String order;
     private String moneyChange;
 
+    public Double getChangeDetail() {
+        return changeDetail;
+    }
+
+    public void setChangeDetail(Double changeDetail) {
+        this.changeDetail = changeDetail;
+    }
+
+    private Double changeDetail;
+
     public String getOrder() {
         return order;
     }

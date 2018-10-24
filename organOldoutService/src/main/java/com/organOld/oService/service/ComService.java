@@ -101,6 +101,19 @@ public class ComService {
         return getObj.toString();
     }
 
+    public String pageReturn(Long size,List<?> list){
+        JSONObject getObj = new JSONObject();
+        getObj.put("iTotalItems",size);
+        getObj.put("aaData",list);
+        return getObj.toString();
+    }
+
+    public Page getPageOut(Integer iDisplayStart){
+        Page page = new Page<>();
+        page.setLength(10);
+        page.setStart((iDisplayStart-1)*10);
+        return page;
+    }
 
     public Page getPage(BTableRequest bTableRequest, String type) {
         Page page = new Page<>();

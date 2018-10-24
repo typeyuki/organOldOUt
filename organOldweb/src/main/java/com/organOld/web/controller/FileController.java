@@ -27,7 +27,7 @@ public class FileController {
     }
 
     @ResponseBody
-    @RequestMapping(value = "/record",method = RequestMethod.GET)
+    @RequestMapping(value = "/record",method = RequestMethod.GET,produces="text/html;charset=UTF-8")
         public String data0(BTableRequest bTableRequest, CardLogsRequest cardLogsRequest){
             return fileService.getByCardPage(bTableRequest,cardLogsRequest);
     }

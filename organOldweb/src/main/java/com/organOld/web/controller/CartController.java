@@ -24,7 +24,7 @@ public class CartController {
     }
 
     @ResponseBody
-    @RequestMapping(value = "/getCartInfo",method = RequestMethod.GET)
+    @RequestMapping(value = "/getCartInfo",method = RequestMethod.GET,produces="text/html;charset=UTF-8")
     public String getCartProducts(BTableRequest bTableRequest,Integer oldmanId){
         return cartService.getProByOldmanId(bTableRequest,oldmanId);
     }

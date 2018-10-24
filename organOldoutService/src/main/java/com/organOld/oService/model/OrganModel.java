@@ -7,7 +7,7 @@ import java.util.List;
 
 public class OrganModel {
     private Integer id;
-    private Integer organTypeId;
+    private Integer organTypeId;//类型id
     private String organType;
     private String name;
     private String intro;

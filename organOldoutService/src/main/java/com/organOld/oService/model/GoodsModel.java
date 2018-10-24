@@ -3,14 +3,22 @@ package com.organOld.oService.model;
 public class GoodsModel {
     private int id;
     private Integer organId;
-    private String name;
-    private double price;
-    private String intro;
+    private String name;//商品名称
+    private double price;//价格
+    private String intro;//简介
     private String imgUrl;
     private String time;
-    private String firType;
-    private String secType;
+    private String firType;//商品的父标签
+    private String secType;//二级标签,就是商品名称
+    private String phone;
 
+    public String getPhone() {
+        return phone;
+    }
+
+    public void setPhone(String phone) {
+        this.phone = phone;
+    }
 
     public String getFirType() {
         return firType;

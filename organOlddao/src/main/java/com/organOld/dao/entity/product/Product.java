@@ -11,7 +11,15 @@ public class Product extends DBEntity implements DBInterface {
     private String imgUrl;
     private ProductType productType;
     private Integer type;
+    private String phone;
 
+    public String getPhone() {
+        return phone;
+    }
+
+    public void setPhone(String phone) {
+        this.phone = phone;
+    }
 
     public ProductType getProductType() {
         return productType;

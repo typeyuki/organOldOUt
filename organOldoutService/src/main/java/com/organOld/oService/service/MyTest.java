@@ -36,6 +36,8 @@ public class MyTest {
     CartService cartService;
     @Autowired
     OldsUserService oldsUserService;
+    @Autowired
+    ProductTypeService productTypeService;
 
     @Test
     public void myTest() {
@@ -72,7 +74,7 @@ public class MyTest {
         bTableRequest.setiDisplayLength(10);
         bTableRequest.setiDisplayStart(0);
         goodsRequest.setType(7);
-        String result = goodsService.getByProductPage(goodsRequest,bTableRequest);
+        String result = goodsService.getByProductPage(goodsRequest,1);
         String text = result;
 
     }
@@ -83,7 +85,7 @@ public class MyTest {
         GoodsRequest goodsRequest = new GoodsRequest();
         bTableRequest.setiDisplayLength(10);
         bTableRequest.setiDisplayStart(0);
-        String result = goodsService.getAllProduct(bTableRequest);
+        String result = goodsService.getAllProduct();
         String text = result;
     }
 
@@ -94,7 +96,7 @@ public class MyTest {
         bTableRequest.setiDisplayLength(10);
         bTableRequest.setiDisplayStart(0);
         goodsRequest.setOrganId(7);
-        String result = goodsService.getProductByOrganId(goodsRequest,bTableRequest);
+        String result = goodsService.getProductByOrganId(goodsRequest,1);
         String text = result;
     }
 
@@ -106,7 +108,7 @@ public class MyTest {
 
     @Test
     public void testProductD(){
-        Conse conse = goodsService.getTypeByParent(3);
+        Conse conse = goodsService.getTypeByParent(22);
         conse.getData();
     }
 
@@ -161,5 +163,11 @@ public class MyTest {
         String name = "202018";
         Card user = oldsUserService.getByUsername(name);
         user.getMoney();
+    }
+
+    @Test
+    public void testProductType(){
+        Conse conse = productTypeService.getProductType();
+        conse.getData();
     }
 }

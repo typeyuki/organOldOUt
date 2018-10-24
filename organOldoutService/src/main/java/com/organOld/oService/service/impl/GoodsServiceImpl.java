@@ -50,8 +50,8 @@ public class GoodsServiceImpl implements GoodsService {
     @Autowired
     ProductBookWrap productBookWrapper;
     @Override
-    public String getByProductPage (GoodsRequest goodsRequest, BTableRequest bTableRequest){
-        Page<Product> page= comService.getPage(bTableRequest,"product");
+    public String getByProductPage (GoodsRequest goodsRequest, Integer iDisplayStart){
+        Page<Product> page= comService.getPageOut(iDisplayStart);
         Product product=  goodsWrapper.unwrap(goodsRequest);
 //        if(product.getOrganId()==null || product.getOrganId()==0){
 //            //机构账号页面
@@ -62,12 +62,12 @@ public class GoodsServiceImpl implements GoodsService {
         Long size=goodsDao.getSizeByPage(page);
         if(goodsModelList.size() == 0|| size == 0)
             throw new OtherServiceException("无法获取商品信息");
-        return comService.tableReturn(bTableRequest.getsEcho(),size, goodsModelList);
+        return comService.pageReturn(size, goodsModelList);
     }
 
     @Override
-    public String getProductByOrganId(GoodsRequest goodsRequest, BTableRequest bTableRequest){
-        Page<Product> page= comService.getPage(bTableRequest,"product");
+    public String getProductByOrganId(GoodsRequest goodsRequest, Integer iDisplay){
+        Page<Product> page= comService.getPageOut(iDisplay);
         Product product=  goodsWrapper.unwrap(goodsRequest);
 //        if(product.getOrganId()==null || product.getOrganId()==0){
 //            //机构账号页面
@@ -78,7 +78,7 @@ public class GoodsServiceImpl implements GoodsService {
         Long size=goodsDao.getSizeByPageOrg(page);
         if(size == 0)
             throw new OtherServiceException("获取商品信息出错.");
-        return comService.tableReturn(bTableRequest.getsEcho(),size, goodsModelList);
+        return comService.pageReturn(size, goodsModelList);
     }
     @Override
     public Conse getOrganByProduct(int type){
@@ -90,12 +90,12 @@ public class GoodsServiceImpl implements GoodsService {
     }
 
     @Override
-    public String getAllProduct(BTableRequest bTableRequest){
+    public String getAllProduct(){
         List<GoodsModel> goodsModelList = goodsDao.getAllProducts().stream().map(goodsWrapper::wrap).collect(Collectors.toList());
         Long size = goodsDao.getAllSize();
         if(size == 0)
             throw new OtherServiceException("获取商品信息出错.");
-        return comService.tableReturn(bTableRequest.getsEcho(),size,goodsModelList);
+        return comService.pageReturn(size,goodsModelList);
     }
 
     @Override

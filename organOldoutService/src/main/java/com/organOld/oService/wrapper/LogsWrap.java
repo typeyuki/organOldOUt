@@ -24,6 +24,7 @@ public class LogsWrap implements Wrap<Record,LogsModel,LogsRequest> {
             logsModel.setOrgan(record.getOrgan());
             logsModel.setType(LogsTypeEnum.getValue(record.getType()));
             logsModel.setOrder(record.getOrder());
+            logsModel.setChangeDetail(record.getPrevMoney()-record.getNowMoney());
             if (record.getPrevMoney() != null) {
                 if (record.getType() == 9) {
                     logsModel.setMoneyChange(record.getPrevMoney().intValue() + "--->" + record.getNowMoney().intValue());
