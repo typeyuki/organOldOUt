@@ -11,7 +11,7 @@ import java.util.List;
 /**
  * Created by netlab606 on 2018/7/8.
  */
-public class LabelMan extends DBEntity implements DBInterface,XqInterface{
+public class LabelMan extends DBEntity implements XqInterface{
     private int labelId;
     private int oldmanId;
     private int isImplement;
@@ -48,7 +48,7 @@ public class LabelMan extends DBEntity implements DBInterface,XqInterface{
         return organId;
     }
 
-    @Override
+
     public void setOrganId(Integer organId) {
         this.organId = organId;
     }

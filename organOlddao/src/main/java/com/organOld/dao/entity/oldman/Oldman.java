@@ -14,7 +14,7 @@ import java.util.List;
  * 老人  相等 根据身份号码
  * Created by netlab606 on 2018/4/2.
  */
-public class Oldman extends Man implements DBInterface,XqInterface {
+public class Oldman extends Man implements XqInterface {
     private Integer sex;//1女 2男
     private Date birthday;//出生年月
     private String pid;//身份证号
@@ -408,7 +408,7 @@ public class Oldman extends Man implements DBInterface,XqInterface {
         return organId;
     }
 
-    @Override
+
     public void setOrganId(Integer organId) {
         this.organId = organId;
     }

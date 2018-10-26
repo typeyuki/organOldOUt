@@ -26,4 +26,8 @@ public interface GoodsDao  extends BaseDao<Product,Number> {
 
      @Override
      Product getById(Number number);
+
+     List<Product> getByPageCur(Page<Product> page);
+
+     Long getSizeByPageCur(Page<Product> page);
 }

@@ -16,4 +16,15 @@
     <select id="getFirTypeByOrganId" resultType="java.lang.Integer">
         SELECT ot.fir_type from organ_type ot,organ o where o.organ_type_id=ot.id and o.id=#{organId}
     </select>
+
+    <select id="getByIds" resultType="com.organOld.dao.entity.organ.OrganType">
+        select id ,sec_type from organ_type WHERE id in
+        <foreach collection="list" index="index" item="item" open="(" separator="," close=")">
+            ${item}
+        </foreach>
+    </select>
+
+    <select id="getOrgansByType" resultType="com.organOld.dao.entity.organ.Organ">
+        select id,name from organ where organ_type_id = #{typeId}
+    </select>
 </mapper>

@@ -22,24 +22,24 @@ public class GoodsController {
     @Autowired
     ProductTypeService productTypeService;
     @ResponseBody
-    @RequestMapping(value="/getProductByPage",method = RequestMethod.GET,produces="text/html;charset=UTF-8")
-    public String getProductByPage(Integer iDisplay, GoodsRequest goodsRequest){
+    @RequestMapping(value="/getProductByPage",method = RequestMethod.GET)
+    public Conse getProductByPage(Integer iDisplay, GoodsRequest goodsRequest){
         return goodsService.getByProductPage(goodsRequest,iDisplay);
     }
 
     @ResponseBody
-    @RequestMapping(value="/getByOrganId",method = RequestMethod.GET,produces="text/html;charset=UTF-8")
-    public String getByOrganId(Integer iDisplay,GoodsRequest goodsRequest){
+    @RequestMapping(value="/getByOrganId",method = RequestMethod.GET)
+    public Conse getByOrganId(Integer iDisplay,GoodsRequest goodsRequest){
         return goodsService.getProductByOrganId(goodsRequest,iDisplay);
     }
     @ResponseBody
     @RequestMapping(value = "/getAll",method = RequestMethod.GET,produces="text/html;charset=UTF-8")
-    public String getAll(){
+    public Conse getAll(){
         return goodsService.getAllProduct();
     }
 
     @ResponseBody
-    @RequestMapping(value = "/getOrganByGood",method = RequestMethod.GET,produces="text/html;charset=UTF-8")
+    @RequestMapping(value = "/getOrganByGood",method = RequestMethod.GET)
     public Conse getOrgans(Integer type){return goodsService.getOrganByProduct(type);}
 
     @ResponseBody

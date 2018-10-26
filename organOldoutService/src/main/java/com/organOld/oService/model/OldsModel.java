@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class OldsModel extends MenModel {
+    private Integer integral;
     private String sex;
     private String census;//户籍
     private Integer age;//年龄
@@ -17,7 +18,17 @@ public class OldsModel extends MenModel {
     private String area;//片区名称
     private List<String> family = new ArrayList<>();//家庭结构
     private List<String> economic = new ArrayList<>();//经济条件
-   // private List<String> familyType=new ArrayList<>();
+
+
+    public Integer getIntegral() {
+        return integral;
+    }
+
+    public void setIntegral(Integer integral) {
+        this.integral = integral;
+    }
+
+    // private List<String> familyType=new ArrayList<>();
     //    private List<LabelManInfoModel> labelManInfoModelList;
     public String getIdNum() {
         return idNum;

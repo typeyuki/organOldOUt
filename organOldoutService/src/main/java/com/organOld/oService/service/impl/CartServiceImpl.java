@@ -42,12 +42,11 @@ public class CartServiceImpl implements CartService {
     @Override
     @Transactional
     public Conse SaveInCart (CartRequest cartRequest){
-        Integer userId = comService.getOldsIdBySession();
-        if(userId == null || userId == 0)
-            userId = cartRequest.getOldmanId();
-        if (userId == 0)
-            throw new ServiceException("请登录");
         ProductCart productCart = cartWrapper.unwrap(cartRequest);
+        if(productCart.getOldmanId()==null || productCart.getOldmanId() == 0)
+            comService.checkIsUser(productCart);
+        if(productCart.getOldmanId()==null || productCart.getOldmanId() == 0)
+            throw new ServiceException("请先登录");
         cartDao.save(productCart);
         return new Conse(true);
     }
@@ -71,8 +70,8 @@ public class CartServiceImpl implements CartService {
             userId = oldmanId;
         if (userId == 0)
             throw new ServiceException("请登录");
-        List<GoodsModel> goodsModelList = cartDao.getByOldmanIdB(oldmanId).stream().map(cartWrapper::wrap).collect(Collectors.toList());
-        Long size = cartDao.getSizeByOldmanId(oldmanId);
+        List<GoodsModel> goodsModelList = cartDao.getByOldmanIdB(userId).stream().map(cartWrapper::wrap).collect(Collectors.toList());
+        Long size = cartDao.getSizeByOldmanId(userId);
         return  comService.tableReturn(bTableRequest.getsEcho(),size,goodsModelList);
     }
 
@@ -84,8 +83,8 @@ public class CartServiceImpl implements CartService {
             userId = oldmanId;
         if (userId == 0)
             throw new ServiceException("请登录");
-        List<ProductCart> productCarts = cartDao.getIdsForOrder(oldmanId);
-        cartDao.delByOldmanId(oldmanId);
+        List<ProductCart> productCarts = cartDao.getIdsForOrder(userId);
+        cartDao.delByOldmanId(userId);
         Collections.sort(productCarts, new Comparator<ProductCart>() {
             @Override
             public int compare(ProductCart o1, ProductCart o2) {
@@ -101,7 +100,7 @@ public class CartServiceImpl implements CartService {
         for(ProductCart pc : productCarts){
             if(productBookList.size() == 0){
                 ProductBook productBook = new ProductBook();
-                productBook.setOldmanId(oldmanId);
+                productBook.setOldmanId(userId);
                 productBook.setOrganId(pc.getOrganId());
                 productBook.setProductIds(pc.getProductId()+"");
                 productBook.setStatus(0);
@@ -113,7 +112,7 @@ public class CartServiceImpl implements CartService {
                      productBookList.get(i).setProductIds(s1+"#"+s2);
                  } else{
                        ProductBook productBook = new ProductBook();
-                       productBook.setOldmanId(oldmanId);
+                       productBook.setOldmanId(userId);
                        productBook.setOrganId(pc.getOrganId());
                        productBook.setProductIds(pc.getProductId()+"");
                        productBook.setStatus(0);

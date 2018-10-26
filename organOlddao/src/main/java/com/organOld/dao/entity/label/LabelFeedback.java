@@ -4,7 +4,7 @@ import com.organOld.dao.entity.DBEntity;
 import com.organOld.dao.entity.DBInterface;
 import com.organOld.dao.entity.organ.Organ;
 
-public class LabelFeedback extends DBEntity implements DBInterface{
+public class LabelFeedback extends DBEntity {
 
     private int labelId;
     private Organ organ;
@@ -58,7 +58,7 @@ public class LabelFeedback extends DBEntity implements DBInterface{
         return organId;
     }
 
-    @Override
+
     public void setOrganId(Integer organId) {
         this.organId = organId;
     }

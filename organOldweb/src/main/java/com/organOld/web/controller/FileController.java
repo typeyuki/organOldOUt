@@ -3,6 +3,7 @@ package com.organOld.web.controller;
 import com.organOld.oService.contract.BTableRequest;
 import com.organOld.oService.contract.CardLogsRequest;
 import com.organOld.oService.contract.Conse;
+import com.organOld.oService.contract.LogsRequest;
 import com.organOld.oService.service.FileService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -30,6 +31,18 @@ public class FileController {
     @RequestMapping(value = "/record",method = RequestMethod.GET,produces="text/html;charset=UTF-8")
         public String data0(BTableRequest bTableRequest, CardLogsRequest cardLogsRequest){
             return fileService.getByCardPage(bTableRequest,cardLogsRequest);
+    }
+
+
+    @ResponseBody
+    @RequestMapping(value = "/data",method = RequestMethod.GET,produces = "text/html;charset=UTF-8")
+    public String getData(BTableRequest bTableRequest, LogsRequest logsRequest){
+           return fileService.getByLogPage(logsRequest,bTableRequest);
+    }
+    @ResponseBody
+    @RequestMapping(value = "/getIntegral",method = RequestMethod.GET)
+    public Conse getIntegral(int id){
+        return fileService.getOldsIntegral(id);
     }
 
     @ResponseBody

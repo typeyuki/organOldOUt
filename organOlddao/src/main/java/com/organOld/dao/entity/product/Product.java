@@ -4,22 +4,13 @@ import com.organOld.dao.entity.DBEntity;
 import com.organOld.dao.entity.DBInterface;
 import org.springframework.web.multipart.MultipartFile;
 
-public class Product extends DBEntity implements DBInterface {
+public class Product extends DBEntity  {
     private Integer organId;
     private double price;
     private String intro;
     private String imgUrl;
     private ProductType productType;
     private Integer type;
-    private String phone;
-
-    public String getPhone() {
-        return phone;
-    }
-
-    public void setPhone(String phone) {
-        this.phone = phone;
-    }
 
     public ProductType getProductType() {
         return productType;
@@ -41,7 +32,7 @@ public class Product extends DBEntity implements DBInterface {
         return organId;
     }
 
-    @Override
+
     public void setOrganId(Integer organId) {
         this.organId = organId;
     }

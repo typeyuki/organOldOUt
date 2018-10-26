@@ -1,9 +1,18 @@
 package com.organOld.oService.contract;
 
 public class MessageRequest {
-    public String content;
-    public int type;
-    public int organId;
+    private String content;
+    private int type;
+    private int organId;
+    private Integer oldmanId;
+
+    public Integer getOldmanId() {
+        return oldmanId;
+    }
+
+    public void setOldmanId(Integer oldmanId) {
+        this.oldmanId = oldmanId;
+    }
 
     public String getContent() {
         return content;

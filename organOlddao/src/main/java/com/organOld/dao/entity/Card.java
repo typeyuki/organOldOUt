@@ -13,7 +13,7 @@ import java.util.Collection;
  */
 public class Card extends DBEntity implements UserDetails,Serializable {
     private Integer oldmanId;
-    private String username;//身份证后六位
+    private String cid;//身份证后六位
     private String password;
     private Double money;
     private Integer status;
@@ -104,16 +104,16 @@ public class Card extends DBEntity implements UserDetails,Serializable {
 
     @Override
     public boolean equals(Object obj) {
-        return this.username.equals(((SysUser)obj).getUsername());
+        return this.cid.equals(((SysUser)obj).getUsername());
     }
 
     @Override
     public String getUsername() {
-        return username;
+        return cid;
     }
 
     public void setUsername(String username) {
-        this.username = username;
+        this.cid = username;
     }
 
     @Override

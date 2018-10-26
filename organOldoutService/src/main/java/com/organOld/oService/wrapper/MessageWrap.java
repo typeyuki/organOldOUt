@@ -22,7 +22,6 @@ public class MessageWrap implements Wrap<Message,AutoValModel,MessageRequest> {
         Message message = new Message();
         message.setContent(messageRequest.getContent());
         message.setType(2);
-        message.setUserId(comService.getIdBySession());
         return message;
     }
 

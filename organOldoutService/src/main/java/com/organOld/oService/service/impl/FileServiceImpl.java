@@ -10,10 +10,7 @@ import com.organOld.dao.entity.product.Product;
 import com.organOld.dao.entity.record.Record;
 import com.organOld.dao.repository.*;
 import com.organOld.dao.util.Page;
-import com.organOld.oService.contract.BTableRequest;
-import com.organOld.oService.contract.CardLogsRequest;
-import com.organOld.oService.contract.Conse;
-import com.organOld.oService.contract.GoodsRequest;
+import com.organOld.oService.contract.*;
 import com.organOld.oService.exception.OtherServiceException;
 import com.organOld.oService.exception.ServiceException;
 import com.organOld.oService.model.*;
@@ -68,13 +65,18 @@ public class FileServiceImpl implements FileService {
     LabelWrap labelWrapper;
     @Override
     public PersonalInfoModel getPersonalInfo (int oldmanId){
+        Integer userId = comService.getOldsIdBySession();
+        if(userId == null || userId == 0)
+            userId = oldmanId;
+        if (userId == 0)
+            throw new ServiceException("请登录");
         PersonalInfoModel personalInfoModel = new PersonalInfoModel();
         Page<DBEntity> page=new Page<>();
         page.setLength(1);
         page.setStart(0);
         //comService.getIdBySession()
         Oldman oldman=new Oldman();
-        oldman.setId(oldmanId);
+        oldman.setId(userId);
         oldman = oldmanBaseDao.getById(oldman.getId());
         if(oldman == null)
             throw new ServiceException("错误！老人信息不存在！");
@@ -84,7 +86,7 @@ public class FileServiceImpl implements FileService {
 
         personalInfoModel.setOldman(oldsModel);
         Linkman linkman=new Linkman();
-        linkman.setOldman(oldman);;
+        linkman.setOldman(oldman);
         page.setEntity(linkman);
         List<LinkmanModel> linkmanModelList=linkmanDao.getByPage(page).stream().map(contactsWrapper::wrap).collect(Collectors.toList());
         if(linkmanModelList!=null && linkmanModelList.size()>0)
@@ -119,7 +121,12 @@ public class FileServiceImpl implements FileService {
 
     @Override
     public OldsHealthModel getOldmanHealth (int oldmanId){
-        OldmanHealth oldmanHealth = oldmanHealthDao.getByOldmanId(oldmanId);
+        Integer userId = comService.getOldsIdBySession();
+        if(userId == null || userId == 0)
+            userId = oldmanId;
+        if (userId == 0)
+            throw new ServiceException("请登录");
+        OldmanHealth oldmanHealth = oldmanHealthDao.getByOldmanId(userId);
         if(oldmanHealth == null)
             throw new ServiceException("错误！健康信息不存在!");
         return oldsHealthWrapper.wrap(oldmanHealth);//comService.getIdBySession()));
@@ -129,19 +136,55 @@ public class FileServiceImpl implements FileService {
         Page<Record> page= comService.getPage(bTableRequest,"record");
         //cardLogsRequest.setOldmanId(comService.getIdBySession());
         Record record = logsWrapper.unwrapCard(cardLogsRequest);
+        if(record.getOldmanId()==null || record.getOldmanId() == 0)
+            comService.checkIsUser(record);
+        if(record.getOldmanId()==null || record.getOldmanId() == 0)
+            throw new OtherServiceException("请先登录");
         page.setEntity(record);
         List<LogsModel> productModelList=recordDao.getByCardPage(page).stream().map( logsWrapper::wrap).collect(Collectors.toList());
         Long size=recordDao.getSizeByCardPage(page);
         if(productModelList.size() == 0 || size == 0 )
-            throw new OtherServiceException("目前没有记录，请进行消费或签到。");
+            throw new OtherServiceException("目前没有扫码记录。");
         return comService.tableReturn(bTableRequest.getsEcho(),size,productModelList);
     }
 
+    @Override
+    public String getByLogPage(LogsRequest logsRequest,BTableRequest bTableRequest){
+        Page<Record> page = comService.getPage(bTableRequest,"record");
+        Record record = logsWrapper.unwrap(logsRequest);
+        if(record.getOldmanId()==null || record.getOldmanId() == 0)
+            comService.checkIsUser(record);
+        if(record.getOldmanId()==null || record.getOldmanId() == 0)
+            throw new OtherServiceException("请先登录");
+        page.setEntity(record);
+        List<LogsModel> logsModelList = recordDao.getByPage(page).stream().map(logsWrapper::wrap).collect(Collectors.toList());
+        Long size = recordDao.getSizeByPage(page);
+        if(logsModelList.size() == 0|| size == 0)
+            throw new OtherServiceException("目前没有积分记录");
+        return comService.tableReturn(bTableRequest.getsEcho(),size,logsModelList);
+    }
 
     @Override
     public Conse getByLabel (int oldmanId){
-        List<LabelInfoModel> labels = labelDao.getManLabelByOldmanId(oldmanId).stream().map(labelWrapper::wrap).collect(Collectors.toList());
+        Integer userId = comService.getOldsIdBySession();
+        if(userId == null || userId == 0)
+            userId = oldmanId;
+        if (userId == 0)
+            throw new ServiceException("请登录");
+        List<LabelInfoModel> labels = labelDao.getManLabelByOldmanId(userId).stream().map(labelWrapper::wrap).collect(Collectors.toList());
         return new Conse(true,labels);
         //comService.getIdBySession()
+    }
+
+    @Override
+    public Conse getOldsIntegral(int oldmanId){
+        Integer userId = comService.getOldsIdBySession();
+        if(userId == null || userId == 0)
+            userId = oldmanId;
+        if (userId == 0)
+            throw new ServiceException("请登录");
+        Oldman oldman = oldmanBaseDao.getIntegralByOldmanId(userId);
+        OldsModel oldsModel = oldmanWrapper.wrapIntegral(oldman);
+        return new Conse(true,oldsModel);
     }
 }

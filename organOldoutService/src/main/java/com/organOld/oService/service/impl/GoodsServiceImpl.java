@@ -50,7 +50,7 @@ public class GoodsServiceImpl implements GoodsService {
     @Autowired
     ProductBookWrap productBookWrapper;
     @Override
-    public String getByProductPage (GoodsRequest goodsRequest, Integer iDisplayStart){
+    public Conse getByProductPage (GoodsRequest goodsRequest, Integer iDisplayStart){
         Page<Product> page= comService.getPageOut(iDisplayStart);
         Product product=  goodsWrapper.unwrap(goodsRequest);
 //        if(product.getOrganId()==null || product.getOrganId()==0){
@@ -58,15 +58,15 @@ public class GoodsServiceImpl implements GoodsService {
 //            comService.checkIsOrgan(product);
 //        }
         page.setEntity(product);
-        List<GoodsModel> goodsModelList =goodsDao.getByPage(page).stream().map(goodsWrapper::wrap).collect(Collectors.toList());
-        Long size=goodsDao.getSizeByPage(page);
+        List<GoodsModel> goodsModelList =goodsDao.getByPageCur(page).stream().map(goodsWrapper::wrap).collect(Collectors.toList());
+        Long size=goodsDao.getSizeByPageCur(page);
         if(goodsModelList.size() == 0|| size == 0)
-            throw new OtherServiceException("无法获取商品信息");
-        return comService.pageReturn(size, goodsModelList);
+            throw new ServiceException("无法获取商品信息");
+        return new Conse(true,comService.pageReturn(size,goodsModelList));
     }
 
     @Override
-    public String getProductByOrganId(GoodsRequest goodsRequest, Integer iDisplay){
+    public Conse getProductByOrganId(GoodsRequest goodsRequest, Integer iDisplay){
         Page<Product> page= comService.getPageOut(iDisplay);
         Product product=  goodsWrapper.unwrap(goodsRequest);
 //        if(product.getOrganId()==null || product.getOrganId()==0){
@@ -76,9 +76,11 @@ public class GoodsServiceImpl implements GoodsService {
         page.setEntity(product);
         List<GoodsModel> goodsModelList =goodsDao.getGoodsByOrganId(page).stream().map(goodsWrapper::wrap).collect(Collectors.toList());
         Long size=goodsDao.getSizeByPageOrg(page);
+        String name = goodsModelList.get(0).getOrganName();
+        Integer id = goodsModelList.get(0).getOrganId();
         if(size == 0)
-            throw new OtherServiceException("获取商品信息出错.");
-        return comService.pageReturn(size, goodsModelList);
+            throw new ServiceException("获取商品信息出错.");
+        return new Conse(true,comService.organGoodsReturn(size,goodsModelList,name,id));
     }
     @Override
     public Conse getOrganByProduct(int type){
@@ -90,12 +92,12 @@ public class GoodsServiceImpl implements GoodsService {
     }
 
     @Override
-    public String getAllProduct(){
+    public Conse getAllProduct(){
         List<GoodsModel> goodsModelList = goodsDao.getAllProducts().stream().map(goodsWrapper::wrap).collect(Collectors.toList());
         Long size = goodsDao.getAllSize();
         if(size == 0)
             throw new OtherServiceException("获取商品信息出错.");
-        return comService.pageReturn(size,goodsModelList);
+        return new Conse(true,comService.pageReturn(size,goodsModelList));
     }
 
     @Override
@@ -123,11 +125,10 @@ public class GoodsServiceImpl implements GoodsService {
     public String getBookByPage(ProductBookRequest productBookRequest, BTableRequest bTableRequest){
         Page<ProductBook> page=comService.getPage(bTableRequest,"product_book");
         ProductBook productBook=  productBookWrapper.unwrap(productBookRequest);
-//        if(productBook.getOrganId()==null || productBook.getOrganId()==0){
-//            //机构账号页面
-//            comService.checkIsOrgan(productBook);
-//        }
-//        comService.checkIsOrgan(productBook);
+        if(productBook.getOldmanId()==null || productBook.getOldmanId() == 0)
+            comService.checkIsUser(productBook);
+        if(productBook.getOldmanId()==null || productBook.getOldmanId() == 0)
+            throw new OtherServiceException("请先登录");
         page.setEntity(productBook);
         List<ProductBookModel> productBookModelList=productBookDao.getByPage(page).stream().map( productBookWrapper::wrap).collect(Collectors.toList());
         Long size=productBookDao.getSizeByPage(page);

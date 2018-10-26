@@ -11,7 +11,7 @@ public class ProductCart extends DBEntity implements DBInterface {
     public Integer getOldmanId() {
         return oldmanId;
     }
-
+   @Override
     public void setOldmanId(Integer oldmanId) {
         this.oldmanId = oldmanId;
     }

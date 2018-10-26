@@ -8,9 +8,36 @@ public class GoodsModel {
     private String intro;//简介
     private String imgUrl;
     private String time;
-    private String firType;//商品的父标签
-    private String secType;//二级标签,就是商品名称
+
+
+
+    private String type;
+//    private String firType;//商品的父标签
+//    private String secType;//二级标签,就是商品名称
     private String phone;
+    private String webUrl;
+    private String organName;
+    public String getWebUrl() {
+        return webUrl;
+    }
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
+    }
+    public void setWebUrl(String webUrl) {
+        this.webUrl = webUrl;
+    }
+
+    public String getOrganName() {
+        return organName;
+    }
+
+    public void setOrganName(String organName) {
+        this.organName = organName;
+    }
 
     public String getPhone() {
         return phone;
@@ -20,21 +47,21 @@ public class GoodsModel {
         this.phone = phone;
     }
 
-    public String getFirType() {
-        return firType;
-    }
-
-    public void setFirType(String firType) {
-        this.firType = firType;
-    }
-
-    public String getSecType() {
-        return secType;
-    }
-
-    public void setSecType(String secType) {
-        this.secType = secType;
-    }
+//    public String getFirType() {
+//        return firType;
+//    }
+//
+//    public void setFirType(String firType) {
+//        this.firType = firType;
+//    }
+//
+//    public String getSecType() {
+//        return secType;
+//    }
+//
+//    public void setSecType(String secType) {
+//        this.secType = secType;
+//    }
 
     public int getId() {
         return id;

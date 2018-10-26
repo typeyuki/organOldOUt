@@ -14,4 +14,10 @@ public interface OrganTypeDao extends BaseDao<OrganType,Number> {
     List<Organ> getOrganByFirType(int firType);
 
     Integer getFirTypeByOrganId(Integer organId);
+
+    List<OrganType> getByIds(List<String> ids);
+
+    List<Organ> getOrgansByType(int typeId);
+
+
 }

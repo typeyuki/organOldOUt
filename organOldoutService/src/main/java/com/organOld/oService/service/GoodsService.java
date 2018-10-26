@@ -10,13 +10,13 @@ import com.organOld.oService.model.GoodsModel;
 import java.util.List;
 
 public interface GoodsService {
-    String getByProductPage (GoodsRequest goodsRequest, Integer iDisplayStart);
+    Conse getByProductPage (GoodsRequest goodsRequest, Integer iDisplayStart);
 
-    String getProductByOrganId (GoodsRequest goodsRequest,Integer iDisplayStart );
+    Conse getProductByOrganId (GoodsRequest goodsRequest,Integer iDisplayStart );
 
     Conse getOrganByProduct (int type);
 
-    String getAllProduct();
+    Conse getAllProduct();
 
     Conse getTypeByParent (int parent);
 

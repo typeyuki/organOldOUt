@@ -3,7 +3,7 @@ package com.organOld.dao.entity.oldman;
 import com.organOld.dao.entity.DBEntity;
 import com.organOld.dao.entity.DBInterface;
 
-public class OldmanIntegral extends DBEntity implements DBInterface{
+public class OldmanIntegral extends DBEntity {
     private Oldman oldman;
     private Integer integral;
     private Integer organId;
@@ -23,7 +23,7 @@ public class OldmanIntegral extends DBEntity implements DBInterface{
         return organId;
     }
 
-    @Override
+
     public void setOrganId(Integer organId) {
         this.organId = organId;
     }

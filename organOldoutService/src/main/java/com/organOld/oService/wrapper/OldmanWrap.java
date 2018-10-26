@@ -112,4 +112,11 @@ public class OldmanWrap implements Wrap<Oldman,OldsModel,OldmanRequest> {
         comService.fillAutoValue(oldman, oldsModel,method,map);
         return oldsModel;
     }
+
+        public OldsModel wrapIntegral(Oldman oldman){
+        OldsModel oldsModel = new OldsModel();
+        oldsModel.setName(oldman.getName());
+        oldsModel.setIntegral(oldman.getIntegral());
+        return oldsModel;
+        }
 }

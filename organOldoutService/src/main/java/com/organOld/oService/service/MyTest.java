@@ -61,21 +61,29 @@ public class MyTest {
         BTableRequest bTableRequest = new BTableRequest();
         CardLogsRequest cardLogsRequest = new CardLogsRequest();
         cardLogsRequest.setOldmanId(3374);
-        cardLogsRequest.setType(9);
+       // cardLogsRequest.setType(9);
         bTableRequest.setiDisplayLength(10);
         bTableRequest.setiDisplayStart(0);
         String result = fileService.getByCardPage(bTableRequest,cardLogsRequest);
         String tesxt= result;
     }
+
     @Test
-    public void testProduct(){
+    public void testLog(){
         BTableRequest bTableRequest = new BTableRequest();
-        GoodsRequest goodsRequest = new GoodsRequest();
+        LogsRequest logsRequest = new LogsRequest();
+        logsRequest.setOldmanId(3374);
         bTableRequest.setiDisplayLength(10);
         bTableRequest.setiDisplayStart(0);
-        goodsRequest.setType(7);
-        String result = goodsService.getByProductPage(goodsRequest,1);
-        String text = result;
+        String result = fileService.getByLogPage(logsRequest,bTableRequest);
+        result.length();
+    }
+    @Test
+    public void testProduct(){
+        GoodsRequest goodsRequest = new GoodsRequest();
+        goodsRequest.setType(46);
+        Conse result = goodsService.getByProductPage(goodsRequest,1);
+        result.getData();
 
     }
 
@@ -85,19 +93,18 @@ public class MyTest {
         GoodsRequest goodsRequest = new GoodsRequest();
         bTableRequest.setiDisplayLength(10);
         bTableRequest.setiDisplayStart(0);
-        String result = goodsService.getAllProduct();
-        String text = result;
+        //String result = goodsService.getAllProduct();
+        //String text = result;
     }
 
     @Test
     public void testProductB(){
-        BTableRequest bTableRequest = new BTableRequest();
+
         GoodsRequest goodsRequest = new GoodsRequest();
-        bTableRequest.setiDisplayLength(10);
-        bTableRequest.setiDisplayStart(0);
-        goodsRequest.setOrganId(7);
-        String result = goodsService.getProductByOrganId(goodsRequest,1);
-        String text = result;
+
+        goodsRequest.setOrganId(6);
+        Conse result = goodsService.getProductByOrganId(goodsRequest,1);
+        result.getData();
     }
 
     @Test

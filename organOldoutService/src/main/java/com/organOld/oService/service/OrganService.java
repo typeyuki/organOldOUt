@@ -8,5 +8,7 @@ import javax.servlet.http.HttpServletRequest;
 public interface OrganService {
     Conse reg(OrganRegRequest organRegRequest, HttpServletRequest request);
 
+    Conse getOrganTypes();
+
 
 }

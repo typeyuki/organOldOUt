@@ -101,11 +101,20 @@ public class ComService {
         return getObj.toString();
     }
 
-    public String pageReturn(Long size,List<?> list){
+    public JSONObject pageReturn(Long size,List<?> list){
         JSONObject getObj = new JSONObject();
         getObj.put("iTotalItems",size);
         getObj.put("aaData",list);
-        return getObj.toString();
+        return getObj;
+    }
+
+    public JSONObject organGoodsReturn(Long size,List<?> list,String name,Integer id){
+        JSONObject getObj = new JSONObject();
+        getObj.put("iTotalItems",size);
+        getObj.put("aaData",list);
+        getObj.put("organId",id);
+        getObj.put("organName",name);
+        return getObj;
     }
 
     public Page getPageOut(Integer iDisplayStart){
@@ -237,6 +246,12 @@ public class ComService {
         if (organId!=null && organId!=0){
             dbInterface.setOrganId(organId);
         }
+    }
+
+    public void checkIsUser(DBInterface dbInterface){
+        Integer oldmanId = getOldsIdBySession();
+        if(oldmanId != null && oldmanId != 0)
+            dbInterface.setOrganId(oldmanId);
     }
 
 

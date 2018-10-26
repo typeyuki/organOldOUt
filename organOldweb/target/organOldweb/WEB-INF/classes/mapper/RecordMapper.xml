@@ -10,6 +10,10 @@
         <result property="nowMoney" column="now_money"/>
         <result property="order" column="order"/>
         <result property="time" column="time" />
+        <result property="name" column="rname"/>
+        <result property="hdType" column="hd_type"/>
+        <result property="hdTime" column="hd_time"/>
+        <result property="peopleType" column="people_type"/>
         <association property="oldman" javaType="com.organOld.dao.entity.oldman.Oldman">
             <id property="id" column="oid" />
             <result property="name" column="name"/>
@@ -20,12 +24,22 @@
         </association>
     </resultMap>
     <select id="getByPage" parameterType="com.organOld.dao.util.Page" resultMap="record">
-        SELECT r.id,r.data,r.time,r.type,r.order,r.prev_money,r.now_money,o.id oid,o.name,org.id orgid,org.name orgname
+        SELECT r.id,r.data,r.hd_type,r.hd_time,r.name rname,r.people_type,r.time,r.type,r.order,r.prev_money,r.now_money,o.id oid,o.name,org.id orgid,org.name orgname
         FROM record r left JOIN organ org on org.id=r.organ_id,oldman_base o
-        WHERE r.oldman_id=o.id and type=#{entity.type}
+        WHERE r.oldman_id=o.id and r.oldman_id = #{entity.oldmanId}
+        <if test="entity.organIds!=null and entity.organIds.length>0">
+            and r.organ_id IN
+            <foreach collection="entity.organIds" index="index" item="item" open="(" separator="," close=")">
+                ${item}
+            </foreach>
+        </if>
         <if test="entity.organId!=null and entity.organId!=0">
             and r.organ_id=#{entity.organId}
         </if>
+        <if test="entity.order!=null and entity.order!=0">
+            and r.order=#{entity.order}
+        </if>
+            and (r.type = 2 or r.type = 3 or r.type = 4)
         <if test="entity.start!=null">
             <![CDATA[
             and DATE_FORMAT(r.time,'%Y%m%d') >= DATE_FORMAT(#{entity.start},'%Y%m%d')
@@ -35,6 +49,11 @@
             <![CDATA[
             and DATE_FORMAT(r.time,'%Y%m%d') <= DATE_FORMAT(#{entity.end},'%Y%m%d')
             ]]>
+        </if>
+        <if test="entity!=null and entity.search!=null and entity.search!=''">
+            and (o.name LIKE  concat('%',#{entity.search},'%')
+            OR r.name LIKE  concat('%',#{entity.search},'%')
+            )
         </if>
         <if test="sortType!=null and sortType!=''">
             ORDER BY r.time
@@ -49,17 +68,18 @@
 
     <select id="getMoneySum" resultType="java.lang.Double">
         SELECT sum(data) from record where type=1
+
         <if test="organId!=null and organId!=0">
             and organ_id=#{organId}
         </if>
         <if test="start!=null">
             <![CDATA[
-            and DATE_FORMAT(time,'%Y%m%d') >= DATE_FORMAT(#{start},'%Y%m%d')
+            and DATE_FORMAT(r.time,'%Y%m%d') >= DATE_FORMAT(#{entity.start},'%Y%m%d')
             ]]>
         </if>
         <if test="end!=null">
             <![CDATA[
-            and DATE_FORMAT(time,'%Y%m%d') <= DATE_FORMAT(#{end},'%Y%m%d')
+            and DATE_FORMAT(r.time,'%Y%m%d') <= DATE_FORMAT(#{entity.end},'%Y%m%d')
             ]]>
         </if>
     </select>
@@ -67,16 +87,41 @@
     <select id="getSizeByPage" parameterType="com.organOld.dao.util.Page" resultType="java.lang.Long">
         SELECT count(1)
         FROM record r left JOIN organ org on org.id=r.organ_id,oldman_base o
-        WHERE r.oldman_id=o.id and type=#{entity.type}
+        WHERE r.oldman_id=o.id and r.oldman_id = #{entity.oldmanId}
+        <if test="entity.organIds!=null and entity.organIds.length>0">
+            and r.organ_id IN
+            <foreach collection="entity.organIds" index="index" item="item" open="(" separator="," close=")">
+                ${item}
+            </foreach>
+        </if>
         <if test="entity.organId!=null and entity.organId!=0">
             and organ_id=#{entity.organId}
+        </if>
+            and (r.type = 2 or r.type = 3 or r.type = 4)
+        <if test="entity.order!=null and entity.order!=0">
+            and r.order=#{entity.order}
+        </if>
+        <if test="entity.start!=null">
+            <![CDATA[
+            and DATE_FORMAT(r.time,'%Y%m%d') >= DATE_FORMAT(#{entity.start},'%Y%m%d')
+            ]]>
+        </if>
+        <if test="entity.end!=null">
+            <![CDATA[
+            and DATE_FORMAT(r.time,'%Y%m%d') <= DATE_FORMAT(#{entity.end},'%Y%m%d')
+            ]]>
+        </if>
+        <if test="entity!=null and entity.search!=null and entity.search!=''">
+            and (o.name LIKE  concat('%',#{entity.search},'%')
+            OR r.name LIKE  concat('%',#{entity.search},'%')
+            )
         </if>
     </select>
 
 
     <insert id="save" parameterType="com.organOld.dao.entity.record.Record">
-        INSERT into record(organ_id,oldman_id,`type`,`data`,prev_money,now_money,`order`)
-        VALUES (#{organId},#{oldmanId},#{type},#{data},#{prevMoney},#{nowMoney},#{order})
+        INSERT into record(organ_id,oldman_id,`type`,`data`,prev_money,now_money,`order`,name,hd_type,people_type,hd_time)
+        VALUES (#{organId},#{oldmanId},#{type},#{data},#{prevMoney},#{nowMoney},#{order},#{name},#{hdType},#{peopleType},#{hdTime})
     </insert>
 
     <insert id="saveAll" parameterType="com.organOld.dao.entity.record.Record">
@@ -91,7 +136,7 @@
     <select id="getByCardPage" parameterType="com.organOld.dao.util.Page" resultMap="record">
         SELECT r.id,r.data,r.time,r.type,r.order,r.prev_money,r.now_money,org.id orgid,org.name orgname
         FROM record r LEFT JOIN organ org on org.id=r.organ_id,card c
-        WHERE r.oldman_id=c.oldman_id and c.oldman_id=#{entity.oldmanId}
+        WHERE r.oldman_id=c.oldman_id and r.oldman_id = #{entity.oldmanId}
         <if test="entity.type==null or entity.type==0">
             and r.type != 9
         </if>
@@ -122,7 +167,7 @@
     <select id="getSizeByCardPage" parameterType="com.organOld.dao.util.Page" resultType="java.lang.Long">
         SELECT count(1)
         FROM record r LEFT JOIN organ org on org.id=r.organ_id,card c
-        WHERE r.oldman_id=c.oldman_id and c.oldman_id=#{entity.oldmanId}
+        WHERE r.oldman_id=c.oldman_id and r.oldman_id = #{entity.oldmanId}
         <if test="entity.type==null or entity.type==0">
             and r.type != 9
         </if>
@@ -139,5 +184,50 @@
             and DATE_FORMAT(r.time,'%Y%m%d') <= DATE_FORMAT(#{entity.end},'%Y%m%d')
             ]]>
         </if>
+    </select>
+
+    <select id="getCountByOldmanIdToday" resultType="java.lang.Integer">
+        SELECT count(1) from record where organ_id=#{organId}
+        and type=#{type} and oldman_id=#{oldmanId}
+        and TO_DAYS(CURDATE())=TO_DAYS(time)
+    </select>
+
+    <select id="getAll" parameterType="com.organOld.dao.entity.record.Record" resultMap="record">
+        SELECT r.id,r.time,r.type,o.name,org.name orgname
+        FROM record r left JOIN organ org on org.id=r.organ_id,oldman_base o
+        WHERE r.oldman_id=o.id and type=#{type}
+        <if test="organIds!=null and organIds.length()>0">
+            and r.organ_id IN
+            <foreach collection="organIds" index="index" item="item" open="(" separator="," close=")">
+                ${item}
+            </foreach>
+        </if>
+        <if test="organId!=null and organId!=0">
+            and r.organ_id=#{organId}
+        </if>
+        <if test="order!=null and order!=0">
+            and r.order=#{order}
+        </if>
+        <if test="start!=null">
+            <![CDATA[
+            and DATE_FORMAT(r.time,'%Y%m%d') >= DATE_FORMAT(#{start},'%Y%m%d')
+            ]]>
+        </if>
+        <if test="end!=null">
+            <![CDATA[
+            and DATE_FORMAT(r.time,'%Y%m%d') <= DATE_FORMAT(#{end},'%Y%m%d')
+            ]]>
+        </if>
+        <if test="search!=null and search!=''">
+            and (o.name LIKE  concat('%',#{search},'%')
+            OR r.name LIKE  concat('%',#{search},'%')
+            )
+        </if>
+        ORDER BY r.time DESC
+    </select>
+
+
+    <select id="getHdNameLike" resultType="java.lang.String">
+        SELECT DISTINCT name from record WHERE name like concat('%',#{name},'%')
     </select>
 </mapper>

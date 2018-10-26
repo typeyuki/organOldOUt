@@ -4,9 +4,9 @@ import java.util.List;
 
 public class ProductTypeModel {
     private String name;
-//    private String type;
+    //private String type;
 //    private String parent;
-//    private int id;
+    private int id;
     private List<ProductTypeModel> productTypeModels;
 
     public String getName() {
@@ -33,13 +33,13 @@ public class ProductTypeModel {
 //        this.parent = parent;
 //    }
 //
-//    public int getId() {
-//        return id;
-//    }
-//
-//    public void setId(int id) {
-//        this.id = id;
-//    }
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
 
     public List<ProductTypeModel> getProductTypeModels() {
         return productTypeModels;

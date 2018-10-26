@@ -56,6 +56,39 @@
             limit #{start},#{length}
         </if>
     </select>
+    <select id="getGoodsByOrganId" parameterType="com.organOld.dao.util.Page" resultMap="product">
+        SELECT p.id,p.time,p.price,p.organ_id,p.intro,p.img_url,pt.id ptid,pt.name secName
+        FROM product p,product_type pt,organ o
+        WHERE organ_id = #{entity.organId} AND p.type=pt.id and o.disable = 0
+        <if test="sortType!=null and sortType!=''">
+            ORDER BY ${sortType}
+        </if>
+        <if test="sort!=null and sort!=''">
+            ${sort}
+        </if>
+        <if test="length!=null and length!=0">
+            limit #{start},#{length}
+        </if>
+    </select>
+    <select id="getByPageCur" parameterType="com.organOld.dao.util.Page" resultMap="product">
+        SELECT p.id,p.time,p.price,p.organ_id,p.intro,p.img_url,pt.id ptid,pt.name secName
+        from product p,product_type pt,organ o
+        WHERE p.type = pt.id and p.type = #{entity.type} and o.disable = 0
+        <if test="sortType!=null and sortType!=''">
+            ORDER BY ${sortType}
+        </if>
+        <if test="sort!=null and sort!=''">
+            ${sort}
+        </if>
+        <if test="length!=null and length!=0">
+            limit #{start},#{length}
+        </if>
+    </select>
+    <select id="getSizeByPageCur" parameterType="com.organOld.dao.util.Page" resultType="java.lang.Long">
+        SELECT count(1)
+        FROM product p,product_type pt
+        WHERE p.type = pt.id and p.type = #{entity.type}
+    </select>
     <select id="getSizeByPage" parameterType="com.organOld.dao.util.Page" resultType="java.lang.Long">
         SELECT count(1)
         FROM product p,product_type pt,product_type pf
@@ -85,20 +118,7 @@
         </foreach>
     </select>
 
-    <select id="getGoodsByOrganId" parameterType="com.organOld.dao.util.Page" resultMap="product">
-        SELECT p.id,p.time,p.price,p.organ_id,p.intro,p.img_url,pt.id ptid,pt.name secName,pf.name firName,pt.type secType,pf.type firType
-        FROM product p,product_type pt,product_type pf
-        WHERE organ_id = #{entity.organId} AND p.type=pt.id and pt.parent=pf.id
-        <if test="sortType!=null and sortType!=''">
-            ORDER BY ${sortType}
-        </if>
-        <if test="sort!=null and sort!=''">
-            ${sort}
-        </if>
-        <if test="length!=null and length!=0">
-            limit #{start},#{length}
-        </if>
-    </select>
+
 
     <select id="getSizeByPageOrg" parameterType="com.organOld.dao.util.Page" resultType="java.lang.Long">
         SELECT count(1)
@@ -113,6 +133,7 @@
            WHERE type = #{type}
        </if>
    </select>
+
 
 
 </mapper>
