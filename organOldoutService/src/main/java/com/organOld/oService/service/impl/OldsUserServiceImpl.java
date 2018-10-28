@@ -1,6 +1,7 @@
 package com.organOld.oService.service.impl;
 
 import com.organOld.dao.entity.Card;
+import com.organOld.dao.repository.CardDao;
 import com.organOld.dao.repository.out.oldsUserDao;
 import com.organOld.oService.contract.CardRequest;
 import com.organOld.oService.contract.CartRequest;
@@ -23,6 +24,8 @@ public class OldsUserServiceImpl implements OldsUserService {
     oldsUserDao oldUserDao;
     @Autowired
     UserWrap userWrapper;
+    @Autowired
+    CardDao cardDao;
 
     /**
      * 获取账户信息
@@ -83,6 +86,13 @@ public class OldsUserServiceImpl implements OldsUserService {
     public Card getByUsername (String username){
         Card user = oldUserDao.getByUsername(username);
         return user;
+    }
+
+    @Override
+    public Conse checkLogin(CardRequest cardRequest){
+        Card card = cardDao.getByCid(cardRequest.getUsername());
+        if(cardRequest.getPassword().equals(card.getPassword()))
+            return new Conse(true);
     }
 
 }

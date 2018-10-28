@@ -11,4 +11,6 @@ public interface OldsUserService {
 
     Card getByUsername (String name);
 
+    Conse checkLogin(CardRequest cardRequest);
+
 }
