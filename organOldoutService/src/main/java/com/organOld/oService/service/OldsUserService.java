@@ -13,4 +13,6 @@ public interface OldsUserService {
 
     Conse checkLogin(CardRequest cardRequest);
 
+    Conse checkLogOut(CardRequest cardRequest);
+
 }

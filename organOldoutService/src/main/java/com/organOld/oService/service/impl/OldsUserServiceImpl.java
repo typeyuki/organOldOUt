@@ -3,6 +3,7 @@ package com.organOld.oService.service.impl;
 import com.organOld.dao.entity.Card;
 import com.organOld.dao.repository.CardDao;
 import com.organOld.dao.repository.out.oldsUserDao;
+import com.organOld.oService.constant.Constant;
 import com.organOld.oService.contract.CardRequest;
 import com.organOld.oService.contract.CartRequest;
 import com.organOld.oService.contract.Conse;
@@ -10,6 +11,8 @@ import com.organOld.oService.exception.ServiceException;
 import com.organOld.oService.model.UserModel;
 import com.organOld.oService.service.ComService;
 import com.organOld.oService.service.OldsUserService;
+import com.organOld.oService.service.TokenMgrService;
+import com.organOld.oService.tool.Cache;
 import com.organOld.oService.wrapper.UserWrap;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -26,6 +29,8 @@ public class OldsUserServiceImpl implements OldsUserService {
     UserWrap userWrapper;
     @Autowired
     CardDao cardDao;
+    @Autowired
+    TokenMgrService tokenMgrService;
 
     /**
      * 获取账户信息
@@ -91,8 +96,30 @@ public class OldsUserServiceImpl implements OldsUserService {
     @Override
     public Conse checkLogin(CardRequest cardRequest){
         Card card = cardDao.getByCid(cardRequest.getUsername());
-        if(cardRequest.getPassword().equals(card.getPassword()))
-            return new Conse(true);
+        if(card == null)
+            throw new ServiceException("账号不存在");
+        if(cardRequest.getPassword().equals(card.getPassword())){
+           String token = tokenMgrService.createJWT(card.getUsername(), Constant.JWT_ISS,tokenMgrService.generalSubject(card),Constant.JWT_TTL);
+//           if(Cache.checkCacheName(card.getUsername()+""))
+//               throw new ServiceException("该账号已登录！");
+           Cache.put(token,card,Cache.CACHE_HOLD_TIME_24H);
+           return new Conse(true,token);
+
+        }
+
+        else
+            throw new ServiceException("账号或密码输入错误！");
+    }
+    @Override
+    public Conse checkLogOut(CardRequest cardRequest){
+        if(Cache.checkCacheName(cardRequest.getUsername())){
+            Cache.remove(cardRequest.getUsername());
+            return new Conse(true,"退出成功");
+        }
+        else
+            throw new ServiceException("您还未登录");
+
+
     }
 
 }

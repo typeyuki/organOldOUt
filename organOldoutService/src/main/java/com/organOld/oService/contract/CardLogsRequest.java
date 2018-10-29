@@ -1,11 +1,11 @@
 package com.organOld.oService.contract;
 
 public class CardLogsRequest {
-    private int id;
+    private Integer id;
     private Integer type;
     private String start;
     private String end;
-    private int oldmanId;
+    private Integer oldmanId;
 
     public Integer getType() {
         return type;
@@ -39,7 +39,7 @@ public class CardLogsRequest {
         this.id = id;
     }
 
-    public int getOldmanId() {
+    public Integer getOldmanId() {
         return oldmanId;
     }
 

@@ -4,8 +4,10 @@ import com.organOld.oService.contract.BTableRequest;
 import com.organOld.oService.contract.CartRequest;
 import com.organOld.oService.contract.Conse;
 
+import javax.servlet.http.HttpServletRequest;
+
 public interface CartService {
-    Conse SaveInCart(CartRequest cartRequest);
+    Conse SaveInCart( CartRequest cartRequest);
 
     String getProductIds(BTableRequest bTableRequest);
 

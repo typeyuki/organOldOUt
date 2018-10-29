@@ -2,14 +2,8 @@ package com.organOld.oService.service;
 
 import com.alibaba.fastjson.JSONObject;
 
-import com.organOld.dao.entity.DBEntity;
-import com.organOld.dao.entity.DBInterface;
-import com.organOld.dao.entity.Message;
-import com.organOld.dao.entity.XqInterface;
-import com.organOld.dao.repository.AutoValueDao;
-import com.organOld.dao.repository.MessageDao;
-import com.organOld.dao.repository.OldmanDao;
-import com.organOld.dao.repository.UserDao;
+import com.organOld.dao.entity.*;
+import com.organOld.dao.repository.*;
 import com.organOld.dao.repository.out.AutoValDao;
 import com.organOld.dao.repository.out.oldsUserDao;
 import com.organOld.dao.util.Page;
@@ -19,6 +13,8 @@ import com.organOld.oService.enumModel.MessageEnum;
 import com.organOld.oService.exception.ServiceException;
 import com.organOld.oService.model.Pattern;
 import com.organOld.oService.contract.Conse;
+import com.organOld.oService.tool.Cache;
+import io.jsonwebtoken.Claims;
 import org.apache.poi.ss.usermodel.Cell;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -26,7 +22,9 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
+import org.springframework.web.bind.annotation.ExceptionHandler;
 
+import javax.servlet.http.HttpServletRequest;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.text.ParseException;
@@ -50,6 +48,10 @@ public class ComService {
     AutoValDao autoValDao;
     @Autowired
     AutoValService autoValService;
+    @Autowired
+    CardDao cardDao;
+    @Autowired
+    TokenMgrService tokenMgrService;
 
     public static int birthdayToAge(Date birthday){
         if(birthday==null){
@@ -352,6 +354,7 @@ public class ComService {
         return oldmanDao.getIdByPid(pid);
     }
 
+
     public String getUserNameBySession() {
         try {
             UserDetails userDetails=(UserDetails) SecurityContextHolder.getContext()
@@ -362,6 +365,24 @@ public class ComService {
         }catch (Exception e){
             return "";
         }
+    }
+
+    public Integer getUserByToken(HttpServletRequest request){
+        try{
+        String url =request.getServletPath().toString();
+        String tokenStr = request.getParameter("token");
+        Claims claims = null;
+        claims = tokenMgrService.parseJWT(tokenStr);
+        String username = claims.getId();
+        Integer oldmanId = oldsUDao.getOldsIdByUsername(username);
+        if(Cache.checkCacheName(tokenStr))
+            return oldmanId;
+        else return 0;
+       }
+        catch(Exception e){
+            return 0;
+        }
+
     }
 
     public boolean PwdComparedBySession(String originPwd){
