@@ -26,5 +26,7 @@
 
     <select id="getOrgansByType" resultType="com.organOld.dao.entity.organ.Organ">
         select id,name from organ where organ_type_id = #{typeId}
+        and disable = 0
+        ORDER BY sort
     </select>
 </mapper>

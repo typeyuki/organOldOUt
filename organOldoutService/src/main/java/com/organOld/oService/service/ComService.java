@@ -1,8 +1,11 @@
 package com.organOld.oService.service;
 
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 
 import com.organOld.dao.entity.*;
+import com.organOld.dao.entity.oldman.Oldman;
+import com.organOld.dao.entity.organ.Organ;
 import com.organOld.dao.repository.*;
 import com.organOld.dao.repository.out.AutoValDao;
 import com.organOld.dao.repository.out.oldsUserDao;
@@ -110,6 +113,13 @@ public class ComService {
         return getObj;
     }
 
+    public JSONObject JwReturn(List<?> list){
+        JSONObject getObj = new JSONObject();
+        getObj.put("organData",list);
+        getObj.put("name","居委会");
+        return getObj;
+    }
+
     public JSONObject organGoodsReturn(Long size,List<?> list,String name,Integer id){
         JSONObject getObj = new JSONObject();
         getObj.put("iTotalItems",size);
@@ -117,6 +127,21 @@ public class ComService {
         getObj.put("organId",id);
         getObj.put("organName",name);
         return getObj;
+    }
+
+    public JSONObject mapOrganReturn(Organ organ){
+        JSONObject getObj = new JSONObject();
+        getObj.put("id",organ.getId());
+        getObj.put("X",organ.getMapX());
+        getObj.put("Y",organ.getMapY());
+        return getObj;
+    }
+
+    public JSONObject IntegralReturn(Oldman oldman){
+        JSONObject getOgj = new JSONObject();
+        getOgj.put("name",oldman.getName());
+        getOgj.put("Integral",oldman.getIntegral());
+        return getOgj;
     }
 
     public Page getPageOut(Integer iDisplayStart){

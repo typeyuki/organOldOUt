@@ -9,7 +9,10 @@ public class LabelWrap {
     public LabelInfoModel wrap(LabelMan labelMan) {
         LabelInfoModel labelInfoModel = new LabelInfoModel();
         labelInfoModel.setLabelName(labelMan.getLabelName());
-        labelInfoModel.setIsImplement(labelMan.getIsImplement()==0?"已落实":"未落实");
+        if(labelMan.getIsImplement()==0)
+            labelInfoModel.setIsImplement("未落实");
+        if(labelMan.getIsImplement()==1)
+            labelInfoModel.setIsImplement("落实");
         return labelInfoModel;
     }
 }

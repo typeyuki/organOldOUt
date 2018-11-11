@@ -32,4 +32,11 @@ public class OrganTypeWrap implements Wrap<OrganType,OrganTypeModel,OrganRequest
         organTypeModel.setOrgans(organList);
         return organTypeModel;
     }
+
+    public OrganTypeModel wrapDis(Organ organ){
+        OrganTypeModel organTypeModel = new OrganTypeModel();
+        organTypeModel.setId(organ.getId());
+        organTypeModel.setOrganName(organ.getName());
+        return organTypeModel;
+    }
 }

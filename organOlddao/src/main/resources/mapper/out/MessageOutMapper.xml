@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.organOld.dao.repository.out.MessageOutDao">
+    <select id="getMessage" resultType="com.organOld.dao.entity.MessageOut">
+        SELECT  content,time
+        from message_card
+        where card_id = #{id}
+    </select>
+
+
+
+</mapper>

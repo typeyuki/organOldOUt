@@ -7,26 +7,35 @@ import java.util.List;
 
 public class ProductBookModel {
     private int id;
-    private List<GoodsModel> productList;
-    private Oldman oldman;
+    //private Oldman oldman;
     private String time;
-    private String ids;
-    private int status;
+    private String organName;
+    private String name;
+    private String status;
 
-    public int getStatus() {
+    public String getStatus() {
         return status;
     }
 
-    public void setStatus(int status) {
+    public void setStatus(String status) {
         this.status = status;
     }
 
-    public String getIds() {
-        return ids;
+
+    public String getOrganName() {
+        return organName;
     }
 
-    public void setIds(String ids) {
-        this.ids = ids;
+    public void setOrganName(String organName) {
+        this.organName = organName;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
     }
 
     public String getTime() {
@@ -45,20 +54,16 @@ public class ProductBookModel {
         this.id = id;
     }
 
-    public List<GoodsModel> getProductList() {
-        return productList;
-    }
 
-    public void setProductList(List<GoodsModel> productList) {
-        this.productList = productList;
-    }
 
-    public Oldman getOldman() {
-        return oldman;
-    }
 
-    public void setOldman(Oldman oldman) {
-        this.oldman = oldman;
-    }
+
+//    public Oldman getOldman() {
+//        return oldman;
+//    }
+//
+//    public void setOldman(Oldman oldman) {
+//        this.oldman = oldman;
+//    }
 
 }

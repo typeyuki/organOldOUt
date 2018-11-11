@@ -6,31 +6,31 @@ public class OrganRegRequest {
     private Integer organFirType;
 
     private int id;
-    private Integer organTypeId;
-    private String name;
-    private String intro;
-    private String work;
-    private String serviceTime;
-    private String address;
-    private String phone;
-    private String webUrl;
-    private MultipartFile pic;
-    private Integer num;
+    private Integer organTypeId;//类型id
+    private String name;//名称
+    private String intro;//简介
+    private String work;//工作内容
+    private String serviceTime;//工作时间
+    private String address;//地址
+    private String phone;//机构联系电话
+    private String webUrl;//网址
+    private MultipartFile pic;//图片
+    private Integer num;//床位数
     private String districtId;//所属片区名称 如果有的话
     private String[] auth;
     private String require;
-    private String insitution;
-    private Integer numIn;
-    private Integer numRemain;
-    private Integer parent;
+    private String insitution;//设施情况
+    private Integer numIn;//入住数
+    private Integer numRemain;//剩余床数
+    private Integer parent;//
     private Integer signCount;
     private Integer peopleNum;
 
     /**
      * 机构注册  注册人信息
      */
-    private String personPhone;
-    private String email;
+    private String personPhone;//联系人电话
+    private String email;//邮箱
 
     public Integer getPeopleNum() {
         return peopleNum;

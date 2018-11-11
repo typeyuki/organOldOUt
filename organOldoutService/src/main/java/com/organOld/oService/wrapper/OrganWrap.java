@@ -3,6 +3,7 @@ package com.organOld.oService.wrapper;
 import com.organOld.dao.entity.organ.Organ;
 import com.organOld.dao.entity.organ.OrganReg;
 import com.organOld.oService.contract.OrganRegRequest;
+import com.organOld.oService.model.AutoValModel;
 import com.organOld.oService.model.OrganModel;
 import com.organOld.oService.tool.ImgUpload;
 import org.springframework.beans.BeanUtils;
@@ -28,6 +29,8 @@ public class OrganWrap implements Wrap<Organ,OrganModel,OrganRequest> {
     }
     public Organ unwrapRegOrgan(OrganRegRequest organRegRequest, HttpServletRequest request) {
         Organ organ=new Organ();
+//        if(organRegRequest.getOrganFirType()==3)
+//            organ.setStatus("2");
         BeanUtils.copyProperties(organRegRequest,organ);
         if(organRegRequest.getAuth()!=null && organRegRequest.getAuth().length>0){
             List<String> auths= Arrays.asList(organRegRequest.getAuth());
@@ -43,7 +46,7 @@ public class OrganWrap implements Wrap<Organ,OrganModel,OrganRequest> {
             organ.setAuthQueryInfo(0);
             organ.setAuthQueryIntegral(0);
         }
-        if(!organRegRequest.getPic().isEmpty()){
+        if(organRegRequest.getPic() != null){
             try {
                 String path= ImgUpload.uploadFile(organRegRequest.getPic(), request,"organ");
                 int index = path.indexOf("img");
@@ -61,5 +64,12 @@ public class OrganWrap implements Wrap<Organ,OrganModel,OrganRequest> {
         BeanUtils.copyProperties(organRegRequest,organReg);
         organReg.setPhone(organRegRequest.getPersonPhone());
         return organReg;
+    }
+
+    public AutoValModel wrapJw(Organ organ){
+        AutoValModel autoValModel = new AutoValModel();
+        autoValModel.setId(organ.getId());
+        autoValModel.setValue(organ.getName());
+        return autoValModel;
     }
 }

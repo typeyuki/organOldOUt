@@ -6,4 +6,6 @@ import java.util.List;
 
 public interface ProductTypeDao extends BaseDao<ProductType,Number> {
     List<ProductType> getByParent(int parent);
+
+    Integer getParentById(Integer id);
 }

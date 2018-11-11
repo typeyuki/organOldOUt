@@ -1,5 +1,6 @@
 package com.organOld.oService.service.impl;
 
+import com.alibaba.fastjson.JSONObject;
 import com.organOld.dao.entity.DBEntity;
 import com.organOld.dao.entity.home.HomeOldman;
 import com.organOld.dao.entity.oldman.Linkman;
@@ -136,15 +137,15 @@ public class FileServiceImpl implements FileService {
         Page<Record> page= comService.getPage(bTableRequest,"record");
         //cardLogsRequest.setOldmanId(comService.getIdBySession());
         Record record = logsWrapper.unwrapCard(cardLogsRequest);
-        if(record.getOldmanId()==null || record.getOldmanId() == 0)
-            comService.checkIsUser(record);
+//        if(record.getOldmanId()==null || record.getOldmanId() == 0)
+//            comService.checkIsUser(record);
         if(record.getOldmanId()==null || record.getOldmanId() == 0)
             throw new OtherServiceException("请先登录");
         page.setEntity(record);
         List<LogsModel> productModelList=recordDao.getByCardPage(page).stream().map( logsWrapper::wrap).collect(Collectors.toList());
         Long size=recordDao.getSizeByCardPage(page);
-        if(productModelList.size() == 0 || size == 0 )
-            throw new OtherServiceException("目前没有扫码记录。");
+//        if(productModelList.size() == 0 || size == 0 )
+//            throw new OtherServiceException("目前没有扫码记录。");
         return comService.tableReturn(bTableRequest.getsEcho(),size,productModelList);
     }
 
@@ -159,8 +160,8 @@ public class FileServiceImpl implements FileService {
         page.setEntity(record);
         List<LogsModel> logsModelList = recordDao.getByPage(page).stream().map(logsWrapper::wrap).collect(Collectors.toList());
         Long size = recordDao.getSizeByPage(page);
-        if(logsModelList.size() == 0|| size == 0)
-            throw new OtherServiceException("目前没有积分记录");
+//        if(logsModelList.size() == 0|| size == 0)
+//            throw new OtherServiceException("目前没有积分记录");
         return comService.tableReturn(bTableRequest.getsEcho(),size,logsModelList);
     }
 
@@ -184,7 +185,7 @@ public class FileServiceImpl implements FileService {
         if (userId == 0)
             throw new ServiceException("请登录");
         Oldman oldman = oldmanBaseDao.getIntegralByOldmanId(userId);
-        OldsModel oldsModel = oldmanWrapper.wrapIntegral(oldman);
-        return new Conse(true,oldsModel);
+        JSONObject getObj = comService.IntegralReturn(oldman);
+        return new Conse(true,getObj);
     }
 }

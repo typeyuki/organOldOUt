@@ -104,9 +104,9 @@
     </select>
 
     <select id="getById" resultMap="product">
-        SELECT p.id,p.time,p.price,p.organ_id,p.intro,p.img_url,pt.id ptid,pt.name secName,pf.name firName,pt.type secType,pf.type firType
-        FROM product p,product_type pt,product_type pf
-        WHERE  p.type=pt.id and pt.parent=pf.id and p.id = #{id}
+        SELECT p.id,p.time,p.price,p.organ_id,p.intro,p.img_url,pt.id ptid,pt.name secName
+        FROM product p,product_type pt
+        WHERE  p.type=pt.id and p.id = #{id}
     </select>
 
     <select id="getSizeByIds" resultType="java.lang.Long">

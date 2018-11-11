@@ -14,7 +14,7 @@
     </select>
 
     <select id="getByOldmanIdB" resultType="com.organOld.dao.entity.product.ProductCart">
-        SELECT  product_id,id
+        SELECT  product_id,id,time
         FROM product_cart
         WHERE oldman_id = #{oldmanId}
     </select>

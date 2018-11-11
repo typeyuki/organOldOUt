@@ -5,9 +5,7 @@ import com.organOld.oService.contract.OrganRegRequest;
 import com.organOld.oService.service.OrganService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpServletRequest;
@@ -17,12 +15,12 @@ import javax.servlet.http.HttpServletRequest;
 public class OrganController {
     @Autowired
     OrganService organService;
+    @ResponseBody
     @RequestMapping(value = "/reg",method = RequestMethod.GET)
-    public ModelAndView reg(OrganRegRequest organRegRequest, HttpServletRequest request){
-        ModelAndView mv=new ModelAndView("organ/reg_return");
+    public Conse reg(OrganRegRequest organRegRequest, HttpServletRequest request, @RequestParam(value = "auth[]",required = false) String authArray[]){
+        organRegRequest.setAuth(authArray);
         Conse result=organService.reg(organRegRequest,request);
-        mv.addObject("result",result);
-        return mv;
+        return result;
     }
 
 //    @RequestMapping(value = "/organReg",method = RequestMethod.GET)

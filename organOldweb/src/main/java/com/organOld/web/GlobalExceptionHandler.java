@@ -28,7 +28,7 @@ public class GlobalExceptionHandler {
     Conse handleException(Exception e){
         logger.error(e.getMessage(),e);
         Conse conse = new Conse(false);
-        conse.setError("操作失败!请确认参数是否输入正确或完整比如oldmanId，也有可能数据库中并没有相关数据，实在无法解决请联系我");
+        conse.setError(e.getMessage());
         return conse;
     }
     /**

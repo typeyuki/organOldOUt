@@ -27,6 +27,11 @@
         VALUES (#{userId},#{type},#{content})
     </insert>
 
+    <insert id="saveBookMessage">
+        INSERT into message(user_id,type,content,organ_id,is_read)
+        VALUES (#{userId},#{type},#{content},#{organ.id},#{isRead})
+    </insert>
+
     <select id="getByPage" parameterType="com.organOld.dao.util.Page" resultMap="message">
         SELECT m.id,m.time,m.type,m.content,o.id oid,o.name,m.is_read
         FROM message m left join organ o on m.organ_id=o.id,sysuser u

@@ -4,8 +4,10 @@ import com.organOld.dao.entity.Card;
 import com.organOld.oService.contract.CardRequest;
 import com.organOld.oService.contract.Conse;
 
+import javax.servlet.http.HttpServletRequest;
+
 public interface OldsUserService {
-    Conse getBySession(String oldmanId);
+    Conse getBySession(Integer oldmanId);
 
     Conse updatePwd (CardRequest cardRequest);
 
@@ -13,6 +15,6 @@ public interface OldsUserService {
 
     Conse checkLogin(CardRequest cardRequest);
 
-    Conse checkLogOut(CardRequest cardRequest);
+    Conse checkLogOut(HttpServletRequest request);
 
 }

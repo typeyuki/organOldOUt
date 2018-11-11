@@ -19,6 +19,8 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.servlet.http.HttpServletRequest;
+
 @Service
 public class OldsUserServiceImpl implements OldsUserService {
     @Autowired
@@ -38,12 +40,12 @@ public class OldsUserServiceImpl implements OldsUserService {
      * @return
      */
     @Override
-    public Conse getBySession(String oldmanId){
+    public Conse getBySession(Integer oldmanId){
         Card user = null;
         Integer userId = comService.getOldsIdBySession();
         if(userId == null || userId == 0)
-            if(oldmanId != null && !oldmanId.equals(""))
-                userId = Integer.parseInt(oldmanId);
+            if(oldmanId != null && oldmanId != 0)
+                userId = oldmanId;
             else
                 throw new ServiceException("找不到用户信息,请登录");
 //            if (userId == null || userId == 0)
@@ -111,9 +113,10 @@ public class OldsUserServiceImpl implements OldsUserService {
             throw new ServiceException("账号或密码输入错误！");
     }
     @Override
-    public Conse checkLogOut(CardRequest cardRequest){
-        if(Cache.checkCacheName(cardRequest.getUsername())){
-            Cache.remove(cardRequest.getUsername());
+    public Conse checkLogOut(HttpServletRequest request){
+        String tokenStr = request.getParameter("token");
+        if(Cache.checkCacheName(tokenStr)){
+            Cache.remove(tokenStr);
             return new Conse(true,"退出成功");
         }
         else

@@ -34,7 +34,10 @@ public class Organ extends DBEntity {
     private Integer authQueryInfo;
     private Integer authQueryIntegral;
 
-
+    private Integer mapX;
+    private Integer mapY;
+    private String mapTop;
+    private String mapLeft;
 
     private String organNum;//床位号 0表示排队   助餐点无排队
     private String applyTime;//主动申请的时间
@@ -46,6 +49,37 @@ public class Organ extends DBEntity {
     private String search;//模糊搜索
     private Integer oldmanId;
 
+    public Integer getMapX() {
+        return mapX;
+    }
+
+    public void setMapX(Integer mapX) {
+        this.mapX = mapX;
+    }
+
+    public Integer getMapY() {
+        return mapY;
+    }
+
+    public void setMapY(Integer mapY) {
+        this.mapY = mapY;
+    }
+
+    public String getMapTop() {
+        return mapTop;
+    }
+
+    public void setMap_top(String mapTop) {
+        this.mapTop = mapTop;
+    }
+
+    public String getMapLeft() {
+        return mapLeft;
+    }
+
+    public void setMapLeft(String mapLeft) {
+        this.mapLeft = mapLeft;
+    }
 
     public Organ (){
 

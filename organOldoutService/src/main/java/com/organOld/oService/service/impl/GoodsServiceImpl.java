@@ -134,19 +134,19 @@ public class GoodsServiceImpl implements GoodsService {
         Long size=productBookDao.getSizeByPage(page);
 
 
-        //TODO  先获得 该机构所有的 商品 做缓存  减少查询次数
-        for(ProductBookModel book:productBookModelList){
-            String[] ids=book.getIds().split("#");
-            List<GoodsModel> productList=new ArrayList<>();
-            for(int i=0;i<ids.length;i++){
-                Product product=goodsDao.getById(Integer.parseInt(ids[i]));
-                if(product == null)
-                    throw new OtherServiceException("您可能还没有下单");
-                productList.add(goodsWrapper.wrap(product));
-            }
-            book.setProductList(productList);
-
-        }
+//        //TODO  先获得 该机构所有的 商品 做缓存  减少查询次数
+//        for(ProductBookModel book:productBookModelList){
+//            String[] ids=book.getIds().split("#");
+//            List<GoodsModel> productList=new ArrayList<>();
+//            for(int i=0;i<ids.length;i++){
+//                Product product=goodsDao.getById(Integer.parseInt(ids[i]));
+//                if(product == null)
+//                    throw new OtherServiceException("您可能还没有下单");
+//                productList.add(goodsWrapper.wrapBook(product));
+//            }
+//            book.setProductList(productList);
+//
+//        }
         return comService.tableReturn(bTableRequest.getsEcho(),size,productBookModelList);
     }
 }

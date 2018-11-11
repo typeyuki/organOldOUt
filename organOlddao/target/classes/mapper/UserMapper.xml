@@ -126,6 +126,14 @@ UPDATE user_organ SET organ_id=#{organId} where user_id=#{id}
 			where  uo.user_id=u.id and  uo.organ_id=#{organId}
     </select>
 
+    <select id="getUserId" resultType="java.lang.Integer">
+        select user_id from user_organ where organ_id = #{organId}
+    </select>
+
+    <select id="getRoleUserIds" resultType="java.lang.Integer">
+        select user_id from user_role WHERE role_id = 1
+    </select>
+
 
     <update id="updateProp">
         UPDATE sysuser

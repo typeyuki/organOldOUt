@@ -22,4 +22,22 @@ public class OneMapController {
         return organService.getOrganTypes();
     }
 
+    @ResponseBody
+    @RequestMapping(value = "/getDetails",method = RequestMethod.GET)
+    public Conse getOrganDetails(Integer organId){
+         return organService.getOrganInfo(organId);
+    }
+
+    @ResponseBody
+    @RequestMapping(value = "/getJwTypes",method = RequestMethod.GET)
+    public Conse getJwTypes(){
+        return organService.getTypes();
+    }
+
+    @ResponseBody
+    @RequestMapping(value = "/getLocation",method = RequestMethod.GET)
+    public Conse getOrganLocation(){
+        return organService.getOrganLocation();
+    }
+
 }

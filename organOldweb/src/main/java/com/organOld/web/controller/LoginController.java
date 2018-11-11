@@ -32,8 +32,8 @@ public class LoginController {
 
     @ResponseBody
     @RequestMapping(value = "/logout",method = RequestMethod.GET)
-    public Conse LogOut(CardRequest cardRequest){
-        return oldsUserService.checkLogOut(cardRequest);
+    public Conse LogOut(HttpServletRequest request){
+        return oldsUserService.checkLogOut(request);
     }
 
     @ResponseBody

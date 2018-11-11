@@ -5,8 +5,8 @@ import com.organOld.dao.entity.DBInterface;
 import com.organOld.dao.entity.oldman.Oldman;
 
 public class ProductBook extends DBEntity implements DBInterface{
-    private String productIds;
-    private Oldman oldman;
+    private String productId;
+    //private Oldman oldman;
     private Integer status;
     private Integer organId;
     private Integer oldmanId;
@@ -37,20 +37,20 @@ public class ProductBook extends DBEntity implements DBInterface{
     }
 
     public String getProductIds() {
-        return productIds;
+        return productId;
     }
 
     public void setProductIds(String productIds) {
-        this.productIds = productIds;
+        this.productId = productIds;
     }
 
-    public Oldman getOldman() {
-        return oldman;
-    }
-
-    public void setOldman(Oldman oldman) {
-        this.oldman = oldman;
-    }
+//    public Oldman getOldman() {
+//        return oldman;
+//    }
+//
+//    public void setOldman(Oldman oldman) {
+//        this.oldman = oldman;
+//    }
 
 
 }

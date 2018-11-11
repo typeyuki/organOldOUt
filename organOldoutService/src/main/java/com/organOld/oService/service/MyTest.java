@@ -31,7 +31,8 @@ public class MyTest {
 
     @Autowired
     OutVisualService outVisualService;
-
+    @Autowired
+    OrganService organService;
     @Autowired
     CartService cartService;
     @Autowired
@@ -175,6 +176,11 @@ public class MyTest {
     @Test
     public void testProductType(){
         Conse conse = productTypeService.getProductType();
+        conse.getData();
+    }
+    @Test
+    public void testJwTypes(){
+        Conse conse = organService.getTypes();
         conse.getData();
     }
 }

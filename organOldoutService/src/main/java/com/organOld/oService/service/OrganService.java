@@ -10,5 +10,11 @@ public interface OrganService {
 
     Conse getOrganTypes();
 
+    Conse getOrganInfo(Integer organId);
+
+    Conse getTypes();
+
+    Conse getOrganLocation();
+
 
 }

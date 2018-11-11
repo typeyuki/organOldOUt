@@ -4,10 +4,13 @@ import com.organOld.dao.entity.AutoValue;
 import com.organOld.dao.entity.organ.Organ;
 import com.organOld.dao.entity.product.Product;
 import com.organOld.dao.repository.OrganDao;
+import com.organOld.dao.repository.ProductTypeDao;
+import com.organOld.oService.constant.Constant;
 import com.organOld.oService.constant.TimeConst;
 import com.organOld.oService.contract.GoodsRequest;
 import com.organOld.oService.model.GoodsModel;
 import com.organOld.oService.Tool;
+import com.organOld.oService.service.ProductTypeService;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -16,14 +19,22 @@ import org.springframework.stereotype.Service;
 public class GoodsWrap implements Wrap<Product,GoodsModel,GoodsRequest> {
     @Autowired
     OrganDao organDao;
+    @Autowired
+    ProductTypeDao productTypeDao;
 
     @Override
     public GoodsModel wrap(Product p ){
         GoodsModel goodsModel = new GoodsModel();
         if(p != null){
             goodsModel.setName(p.getProductType().getName());
+            if(p.getImgUrl() != null)
+                p.setImgUrl(Constant.url+p.getImgUrl());
             BeanUtils.copyProperties(p,goodsModel);
             goodsModel.setType(p.getProductType().getId()+"");
+            if(productTypeDao.getParentById(p.getProductType().getId()) == 23)
+                goodsModel.setButton("book");
+            else
+                goodsModel.setButton("saveInCart");
             goodsModel.setTime(Tool.dateToString(p.getTime(),TimeConst.DATA_FORMAT_YMD));
         }
         if(p.getOrganId() != null) {
@@ -34,6 +45,19 @@ public class GoodsWrap implements Wrap<Product,GoodsModel,GoodsRequest> {
         }
         return goodsModel;
     }
+    public GoodsModel wrapBook(Product p){
+        GoodsModel goodsModel = new GoodsModel();
+        if(p != null){
+            goodsModel.setName(p.getProductType().getName());
+            goodsModel.setOrganId(p.getOrganId());
+        }
+        if(p.getOrganId() != null){
+            Organ organ = organDao.getSimpleById(p.getOrganId());
+            goodsModel.setOrganName(organ.getName());
+        }
+        return goodsModel;
+    }
+
 //    public GoodsModel wrap(Product product) {
 //        GoodsModel goodsModel =new GoodsModel();
 //        if(product != null) {
@@ -61,7 +85,6 @@ public class GoodsWrap implements Wrap<Product,GoodsModel,GoodsRequest> {
         product.setType(goodsRequest.getType());
         return product;
     }
-
 
 
 }

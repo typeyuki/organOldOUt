@@ -22,7 +22,6 @@ public class CartController {
     @ResponseBody
     @RequestMapping(value="/save",method= RequestMethod.GET)
     public Conse saveCart(HttpServletRequest request, CartRequest cartRequest){
-        if(cartRequest.getOldmanId() == null)
         cartRequest.setOldmanId(comService.getUserByToken(request));
         return cartService.SaveInCart(cartRequest);
     }
@@ -30,16 +29,14 @@ public class CartController {
     @ResponseBody
     @RequestMapping(value = "/getCartInfo",method = RequestMethod.GET,produces="text/html;charset=UTF-8")
     public String getCartProducts(HttpServletRequest request,BTableRequest bTableRequest,Integer oldmanId){
-        if(oldmanId == null)
-            oldmanId = comService.getUserByToken(request);
+        oldmanId = comService.getUserByToken(request);
         return cartService.getProByOldmanId(bTableRequest,oldmanId);
     }
 
     @ResponseBody
     @RequestMapping(value = "/saveInBook",method = RequestMethod.GET)
     public Conse saveBook(HttpServletRequest request,Integer oldmanId){
-        if(oldmanId == null)
-            oldmanId = comService.getUserByToken(request);
+        oldmanId = comService.getUserByToken(request);
         return cartService.SaveInBook(oldmanId);
     }
     @ResponseBody

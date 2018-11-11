@@ -21,6 +21,8 @@ public interface OrganDao extends BaseDao<Organ,Integer>{
 
     Organ getSimpleById(int organId);
 
+    Organ getOrganDById(Integer organId);
+
     List<Organ> getRoleOrgan(@Param("type") int type, @Param("typeIndex") int typeIndex);
 
     List<Organ> getByType(int type);
@@ -48,4 +50,6 @@ public interface OrganDao extends BaseDao<Organ,Integer>{
     List<Organ> getOrganTypeMap();
 
     List<Organ> getAutoValueByIds(List<Integer> ids);
+
+    List<Organ> getJwByDis(Integer disId);
 }

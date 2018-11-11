@@ -5,4 +5,7 @@
    <select id="getByParent" resultType="com.organOld.dao.entity.product.ProductType">
        SELECT * from product_type WHERE parent=#{parent}
    </select>
+    <select id="getParentById" resultType="java.lang.Integer">
+        select parent from product_type where id = #{id};
+    </select>
 </mapper>

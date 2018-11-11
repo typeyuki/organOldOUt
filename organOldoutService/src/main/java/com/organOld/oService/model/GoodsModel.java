@@ -8,7 +8,7 @@ public class GoodsModel {
     private String intro;//简介
     private String imgUrl;
     private String time;
-
+    private String button;
 
 
     private String type;
@@ -22,6 +22,13 @@ public class GoodsModel {
     }
     public String getType() {
         return type;
+    }
+    public String getButton() {
+        return button;
+    }
+
+    public void setButton(String button) {
+        this.button = button;
     }
 
     public void setType(String type) {
